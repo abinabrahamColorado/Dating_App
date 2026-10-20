@@ -1,0 +1,12 @@
+{
+  "folders": [{ "path": "." }],
+  "settings": {
+    "files.eol": "\n",
+    "files.exclude": { "**/.local": true },
+    "search.exclude": {
+      "**/.local": true,
+      "**/node_modules": true,
+      "**/.next": true,
+    },
+  },
+}

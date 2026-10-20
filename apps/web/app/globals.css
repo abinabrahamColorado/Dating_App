@@ -1,0 +1,36 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #faf8f3;
+  color: #322c2a;
+  font-family: system-ui, sans-serif;
+  line-height: 1.65;
+}
+main {
+  max-width: 42rem;
+  padding: 5rem 1.5rem;
+  margin: auto;
+}
+h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-weight: 400;
+  margin: 1rem 0;
+}
+.label {
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+}
+a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: #513649;
+  text-underline-offset: 0.2em;
+}
+a:focus-visible {
+  outline: 3px solid #513649;
+  outline-offset: 5px;
+}

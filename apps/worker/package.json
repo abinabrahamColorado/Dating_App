@@ -1,0 +1,16 @@
+{
+  "name": "@meetwell/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/main.ts"
+  },
+  "dependencies": {
+    "@meetwell/config": "workspace:*",
+    "@meetwell/db": "workspace:*",
+    "dotenv": "18.0.8",
+    "pg-boss": "12.38.0",
+    "tsx": "4.23.15"
+  }
+}
