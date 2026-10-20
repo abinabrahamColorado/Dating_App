@@ -3,7 +3,13 @@ import { randomUUID } from 'node:crypto';
 export const HEALTH_QUEUE = 'system.healthcheck';
 export function workerOptions(connectionString: string) {
   if (!/^postgres(ql)?:/.test(connectionString)) throw new Error('PostgreSQL is required');
-  return { connectionString, schema: 'queue', application_name: 'meetwell-worker' };
+  // Spec P22: the migration administrator creates the schema; the worker has no database CREATE privilege.
+  return {
+    connectionString,
+    schema: 'queue',
+    createSchema: false,
+    application_name: 'meetwell-worker',
+  };
 }
 export function writeOperationalEvent(event: 'worker.started' | 'worker.stopped' | 'worker.error') {
   // Spec P22 / I-12 / I-17: fixed event names, opaque request IDs, no arbitrary payloads.

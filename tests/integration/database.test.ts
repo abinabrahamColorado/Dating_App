@@ -44,11 +44,13 @@ it('I-12 M0 foundation: app and learning roles cannot read safety records', asyn
     c.release();
   }
 });
-it('M0 runtime roles cannot create application tables or inherit case privileges', async () => {
-  const r = await pool.query<{ unsafe: boolean; safety: boolean }>(
-    "SELECT has_schema_privilege('meetwell_app','app','CREATE') AS unsafe, pg_has_role('meetwell_app','meetwell_safety','MEMBER') AS safety",
+it('M0 runtime roles cannot create application tables, create schemas or inherit case privileges', async () => {
+  const r = await pool.query<{ unsafe: boolean; safety: boolean; workerCreate: boolean }>(
+    `SELECT has_schema_privilege('meetwell_app','app','CREATE') AS unsafe,
+      pg_has_role('meetwell_app','meetwell_safety','MEMBER') AS safety,
+      has_database_privilege('meetwell_worker',current_database(),'CREATE') AS "workerCreate"`,
   );
-  expect(r.rows[0]).toEqual({ unsafe: false, safety: false });
+  expect(r.rows[0]).toEqual({ unsafe: false, safety: false, workerCreate: false });
 });
 it('M0 pg-boss executes a real durable infrastructure job with the worker role', async () => {
   const workerUrl = new URL(url);

@@ -29,6 +29,10 @@ Date: 2026-10-16. Status: M0 review proposals unless explicitly a founder-suppli
 
 2026-10-16: Pin TypeScript 6.0.3, the latest stable 6.0 patch, because the current stable typescript-eslint 8.71.2 explicitly rejects TypeScript 7 and requires `<6.1.0`. This preserves strict TypeScript and a supported lint pipeline. Upgrade the compiler after the linter supports its API. Source: installed package peer requirements and official npm registry version metadata. Approve only the reviewed esbuild installer with pnpm's per-package build policy; do not enable arbitrary dependency scripts.
 
+## Worker schema setup (DEC-022)
+
+2026-10-20: Real PostgreSQL CI showed that pg-boss's default `CREATE SCHEMA IF NOT EXISTS` requires database-level CREATE permission even when the queue schema already exists. Configure `createSchema: false` because the M0 migration provisions the schema. Keep the worker limited to creating objects inside `queue`; add a database privilege assertion to the integration suite. Do not grant database CREATE or case access to make startup pass. Source: Spec P22, I-12/I-19, pg-boss 12.38.0 constructor API and CI run 39377749710. Run CI on pull requests and main pushes to avoid duplicate branch/PR jobs.
+
 ## Founder questions before M1
 
 1. Keep **Meetwell** as the working name, and keep all eight provisional areas? A narrower catchment may be easier to operate.
