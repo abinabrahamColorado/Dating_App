@@ -1,0 +1,10 @@
+pnpm-lock.yaml
+docs/architecture-v0.2.*
+AGENTS.md
+CODEX_PROMPTS.md
+.next/
+.local/
+node_modules/
+**/next-env.d.ts
+playwright-report/
+test-results/
