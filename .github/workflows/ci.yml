@@ -1,4 +1,4 @@
-name: M0 quality gates
+name: Meetwell quality gates
 on:
   pull_request:
   push:
@@ -29,6 +29,7 @@ jobs:
         run: pnpm setup:windows
       - run: pnpm db:migrate
       - run: pnpm db:grant-local-worker
+      - run: pnpm setup:accounts
       - run: pnpm exec playwright install chromium
       - run: pnpm check
       - name: Stop services and preserve local data
@@ -76,6 +77,9 @@ jobs:
           node-version: '24'
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Start private object storage and development mailbox
+        run: docker compose up --build -d --wait --wait-timeout 120 minio mailpit
+      - run: pnpm setup:accounts
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm format:check
@@ -87,6 +91,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: synthetic-scaffold-test-results
+          name: synthetic-browser-test-results
           path: test-results/
           retention-days: 3

@@ -1,8 +1,60 @@
-# Meetwell architecture — M0
+# Meetwell architecture — implementation and full plan
 
-Status: design plus infrastructure scaffold; product entities and endpoints below are **planned**. The initial migration creates only access boundaries and the migration ledger. Source: Spec P4–P6, P11–P13, P15–P23, P26, P29 and P31. See DECISIONS.md for explicit interpretations and SPEC_TRACE.md for executable acceptance targets.
+Status: M0 infrastructure and M1 accounts/onboarding are implemented. The current
+slice below distinguishes them from the full planned entity/route model that follows.
+Source: the authoritative v0.2 PDF, Spec P4–P6, P11–P13, P15–P23, P26, P29 and
+P31. See DECISIONS.md for improvements and SPEC_TRACE.md for executable evidence.
 
 Meetwell is a working name. The pilot catchment is Manhattan, New York City, ages 18–30 inclusive, using America/New_York time. Eight provisional areas are in `packages/config/src/pilot.ts`. These are broad public reference centroids for estimated travel, not inferred or collected member coordinates. No sign-up, profile, matching, chat, safety case UI, operator console or event feature ships in M0.
+
+## Implemented M1 slice
+
+M0 and M1 are implemented; the original entity/route designs below remain
+**planned** except for this section. The authoritative source is the PDF.
+M1 permits synthetic loopback development only. See DEC-024–028.
+
+Migration 0002 adds identity users, consents, magic links, sessions, passkeys,
+challenges and rate limits; app members, encrypted profiles, immutable preference
+versions, media and command receipts; ops staff, audit and moderation receipts.
+Migration 0003 adds narrow owner-media locking without general app UPDATE access.
+Migrations are the executable field/key/index schema.
+
+The web process uses separate identity/app/ops LOGIN pools with no administrator
+fallback. Identity owns encrypted email/DOB and hashed tokens. App owns the single
+account-state/version/epoch authority and encrypted profiles/preferences. Media is
+decoded, metadata-stripped and envelope encrypted in a private bucket. Separate
+keys protect identity, app and media. Production KMS/process isolation is a release gate.
+
+Core owns date/cohort rules, strict schemas, bilateral hard preferences and state
+transitions. Repositories use Drizzle reads and SQL transactions for locking/CAS.
+The worker schedules `auth.deliver`; its generic mail comes from an encrypted,
+retriable identity outbox. No product queue payload holds addresses or location.
+The shared Node-only mail adapter currently lives in web/server; extract an adapter
+package when more consumers justify it.
+
+| Current route, prefixed by `/api/v1`                                                  | Authorization                                                                            |
+| ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `GET /health`                                                                         | Fixed anonymous liveness                                                                 |
+| `POST /auth/request`, `/auth/consume`                                                 | Exact origin, generic response, keyed budgets, browser-bound one-time link               |
+| `POST /auth/passkey/options`, `/auth/passkey/verify`                                  | RP/origin/challenge/user verification; registration requires a recent registered session |
+| `GET /me`                                                                             | Own minimized age/policy/profile/preferences/photo/role DTO; no email or DOB             |
+| `POST /account/register`                                                              | Own account, adult cohort and current consent versions                                   |
+| `POST /auth/signout`; `GET /account/sessions`; `POST /account/sessions/revoke-others` | Own sessions                                                                             |
+| `POST /account/policy`                                                                | Own versioned command/receipt; DELETE requires recent authentication                     |
+| `POST /profile`, `/preferences`                                                       | Registered owner, strict field allowlists, CAS/receipt; disabled accounts denied         |
+| `POST /photos`; `GET /photos/:id`; `POST /photos/:id/remove`                          | Registered owner, bounded bytes, object ownership and idempotent mutations               |
+| `GET /ops/photos`, `/ops/photos/:id`                                                  | Operator/admin, pending media only, audited                                              |
+| `POST /ops/photos/:id`                                                                | Recent operator/admin session, no self-review, version/CAS/receipt and audit             |
+| `GET /ops/audit`                                                                      | Admin, audited read                                                                      |
+
+Except health, account routes fail closed without local/test mode and loopback
+APP_ORIGIN. Same-origin writes, HttpOnly SameSite cookies, no-store responses and
+opaque errors apply. The server binds to loopback. Public/member/ops UI is responsive.
+
+Readiness is checked under member/media locks. Removing a photo revokes active
+discovery before storage deletion. Deletion first commits account disable; authority
+rechecks this even if session revocation fails. M1 does not promise full erasure.
+M5 must reconcile crash-orphaned encrypted media, perform retention and prove restore.
 
 ## Repository and boundaries
 

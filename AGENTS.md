@@ -26,8 +26,11 @@ Because of that, domain logic must never live in UI components.
 
 ## 2. Source of truth
 
-- `docs/architecture-v0.2.txt` (text extracted from
-  `docs/architecture-v0.2.pdf`) is the product and engineering specification.
+- `docs/architecture-v0.2.pdf` is the founder-designated authoritative product
+  and engineering specification. Read its extracted text in
+  `docs/architecture-v0.2.txt`, and inspect the PDF for diagrams or layout-sensitive
+  meaning. The PDF wins if extraction differs. Preserve both source files;
+  record justified implementation improvements in `docs/DECISIONS.md`.
   Cite it in code and tests as `Spec P<n>`. For example, `Spec P5` is Part 5,
   the modes and state machine.
 - Where the spec states a numeric value (caps, timers, retention), treat it as

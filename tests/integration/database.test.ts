@@ -22,7 +22,9 @@ it('M0 PostGIS is installed on PostgreSQL 16', async () => {
 });
 it('M0 migration reruns preserve the immutable ledger', async () => {
   await Promise.all([migrate(url), migrate(url)]);
-  const r = await pool.query('SELECT name FROM ops.schema_migrations');
+  const r = await pool.query(
+    "SELECT name FROM ops.schema_migrations WHERE name='0001_boundaries.sql'",
+  );
   expect(r.rows).toEqual([{ name: '0001_boundaries.sql' }]);
 });
 it('M0 migrations reject ledger drift without changing the applied schema', async () => {

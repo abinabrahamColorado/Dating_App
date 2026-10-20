@@ -59,7 +59,91 @@ restricted role. Configure `createSchema: false` because migration 0001 already 
 the queue schema. Verify that real jobs execute while the worker still lacks database
 CREATE privilege; do not fix initialization by widening runtime privileges.
 
-## Founder questions before M1 (still open)
+## Authoritative source and local release gate (DEC-024)
+
+2026-10-20, Spec P4/P22/P23/P31: The founder explicitly designated the supplied
+67-page PDF as the main architecture and authorized justified improvements.
+The supplied PDF and `docs/architecture-v0.2.pdf` are byte-identical (SHA-256
+`c4c27ec3560cee9855d4129e06769e10330e87e0dff86935d4206740c77dd4a0`).
+All 32 parts of the extracted text were read; the state-machine diagram (page 12)
+and architecture diagram with its continuation (pages 61–62) were inspected visually.
+Preserve the original PDF and text. The PDF governs if extraction differs.
+
+M1 permits accounts only with explicit local/test mode and a loopback application
+origin. The web server binds to loopback. Use synthetic data; production enrollment
+remains disabled until safety, erasure/restore, operations and legal review are ready.
+Development terms/privacy are versioned acknowledgements, not launch-ready legal
+documents. Birth-date entry is self-asserted adult eligibility, not identity verification.
+
+## Explicit preferences and state authority (DEC-025)
+
+2026-10-20, Spec P4/P5/P11/P12: Use provisional, explicitly stated gender,
+relationship intention/structure, smoking and interest options from
+`packages/config/src/accounts.ts`. No attribute is inferred. Optional smoking
+supports unknown; unknown fails a hard exclusion. Who-to-meet is a required
+structural eligibility choice. Age, intention, structure and smoking expose all
+three exact preference labels. Store immutable encrypted USER revisions, prior
+version and future-introduction scope. Richer taxonomies need pilot review.
+
+`app.members` owns account state/version/policy epoch; identity owns credentials,
+birth date and consent. A single state authority avoids competing cross-schema
+copies. Mutation receipts and row locks protect retries and racing edits.
+Activation/resumption recheck age, profile/preferences and reviewed photos.
+Removing any photo moves an active account back to onboarding, conservatively
+requiring a fresh readiness check. Exit has no self-service restoration in M1.
+Deletion immediately disables authority and revokes sessions; M5 performs erasure.
+
+## Authentication, encryption and local adapters (DEC-026)
+
+2026-10-20, Spec P8/P21/P22: Magic links are short-lived, single-use, browser-bound
+and explicitly submitted after opening. Keep tokens in URL fragments to avoid
+request/referrer logging. Pending email uses an encrypted identity outbox; failures
+retry through pg-boss. SMTP retries may duplicate a generic email, never a login.
+Optional resident passkeys require user verification and bound one-time challenges.
+Sensitive operations require recent authentication. Active sessions can be inspected
+and revoked. Passkey removal/recovery management remains a release-hardening item.
+
+Use AES-256-GCM envelope encryption with random per-record data keys, separate
+identity/profile/media wrapping keys, and authenticated row/field context. Lookup
+tokens use a separate keyed HMAC; random session/link tokens are hashed. Generated
+keys and role passwords stay only in ignored `.env`. These local keys are not a
+production KMS or tested key-rotation deployment. MinIO and Mailpit are local adapters;
+MinIO development root credentials are confined to loopback synthetic storage.
+Production purpose-scoped object credentials, mail transport and key custody require
+review before the local gate is changed.
+
+New operational limits live in `packages/config/src/accounts.ts`; spec-supplied
+numeric pilot hypotheses remain in `pilot.ts`. Dependency release-age enforcement
+was retained: AWS S3 client 3.1152.0 was selected because 3.1153.0 was too new.
+
+## Private media and staff controls (DEC-027)
+
+2026-10-20, Spec P4/P20/P21/P22: Decode uploaded images, bound bytes/pixels,
+reject animation, orient and re-encode to JPEG without metadata, then encrypt before
+private S3 storage. Random object IDs never authorize retrieval. Owners may preview
+their uploads; photo reviewers receive only the pending queue and audited reads.
+Operators/admins may review; safety-reviewer status alone grants no photo access.
+Audit-log reads require admin. Exited/restricted staff lose role authorization;
+moderators cannot approve their own uploads. No public staff-assignment endpoint.
+
+Real PostgreSQL tests showed media row locking requires UPDATE privilege.
+Forward migration 0003 adds a narrow owner-media locking function instead of
+granting the application role permission to approve photos. The removal function
+can only mark REMOVED. Audit/preference/consent histories are append-only to runtime.
+S3 write and database commit cannot be one transaction: ordinary failures compensate,
+but a crash may leave an encrypted orphan. M5 must reconcile orphans and deletion.
+
+## Verification scope and remaining gates (DEC-028)
+
+2026-10-20: M1 tests use real PostgreSQL/PostGIS, a private test bucket, Mailpit,
+synthetic images and Chromium's virtual authenticator. Scripted onboarding latency
+does not measure human comprehension or moderation turnaround. Axe and keyboard/
+mobile checks provide automated evidence, not a completed assistive-technology audit.
+The full I-19 route matrix and I-20 case-access controls expand with later milestones.
+No report, allocator, chat, plan, feedback, erasure job, event-Go or serving model
+is claimed implemented by this milestone. Review and merge M1 before M2.
+
+## Founder questions before live enrollment (still open)
 
 1. Keep **Meetwell** as the working name, and keep all eight provisional areas? A narrower catchment may be easier to operate.
 2. Confirm ages18–30 inclusive and the proposed policy when an active member turns31.
