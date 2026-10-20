@@ -29,4 +29,4 @@ Pricing/payments; demographic research; pooled models/embeddings; broad neighbor
 
 ## M0 verification limits to close
 
-Track actual local and CI outcomes in M0_REPORT.md. A missing test service is a failed/unrun gate, never a pass. Validate the Compose/native service setup in an environment with normal non-root service users; this execution sandbox cannot run PostgreSQL. Keep that limitation visible even if CI database tests pass.
+CI now verifies real PostgreSQL/PostGIS integration, Chromium E2E and the complete Compose service setup; evidence is in M0_REPORT.md. Founder review and merge remain outstanding. The alternative native Ubuntu installer still needs a normal host with service-user support; it was not verified in this restricted sandbox. Never report missing service prerequisites as passed tests.

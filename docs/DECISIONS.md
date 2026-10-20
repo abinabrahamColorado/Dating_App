@@ -31,7 +31,7 @@ Date: 2026-10-16. Status: M0 review proposals unless explicitly a founder-suppli
 
 ## Worker schema setup (DEC-022)
 
-2026-10-20: Real PostgreSQL CI showed that pg-boss's default `CREATE SCHEMA IF NOT EXISTS` requires database-level CREATE permission even when the queue schema already exists. Configure `createSchema: false` because the M0 migration provisions the schema. Keep the worker limited to creating objects inside `queue`; add a database privilege assertion to the integration suite. Do not grant database CREATE or case access to make startup pass. Source: Spec P22, I-12/I-19, pg-boss 12.38.0 constructor API and CI run 39377749710. Run CI on pull requests and main pushes to avoid duplicate branch/PR jobs.
+2026-10-20: Real PostgreSQL CI showed that pg-boss's default `CREATE SCHEMA IF NOT EXISTS` requires database-level CREATE permission even when the queue schema already exists. Configure `createSchema: false` because the M0 migration provisions the schema. Keep the worker limited to creating objects inside `queue`; add a database privilege assertion to the integration suite. Do not grant database CREATE or case access to make startup pass. Source: Spec P22, I-12/I-19, pg-boss 12.38.0 constructor API and CI run 39377749710. Run CI on pull requests and main pushes to avoid duplicate branch/PR jobs. The worker entry point resolves the root `.env` explicitly because pnpm starts it from `apps/worker`; externally supplied environment variables retain precedence.
 
 ## Founder questions before M1
 

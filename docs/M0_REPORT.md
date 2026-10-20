@@ -55,26 +55,27 @@ These are review questions, not claims that live operations are ready. Full rati
 
 ## Verification
 
-Local checks completed before opening the PR:
+[CI run 39378020161](https://github.com/abinabrahamColorado/Dating_App/actions/runs/39378020161) passed both jobs on commit `00194ce3daf5485ccb5060ea3704f96f1cd2f592`, on 2026-10-20:
 
 ```text
-pnpm peers check: no peer dependency issues
-pnpm typecheck: passed
-pnpm lint: passed
-pnpm test:unit: 6 files passed; 9 tests passed
-pnpm format:check: passed
-pnpm build: passed (Next.js production build)
-bash -n scripts/*.sh: passed
-pnpm test:integration: blocked; no local PostgreSQL service
-pnpm test:e2e: blocked; browser executable unavailable
+Frozen dependency installation: passed
+Typecheck / lint / formatting: passed
+Unit tests: 6 files passed; 9 tests passed
+Real PostgreSQL 16 + PostGIS integration: 5 tests passed
+Next.js production build: passed
+Chromium end-to-end test: 1 passed
+Compose: PostgreSQL, MinIO and Mailpit healthy
+Separate development and test databases: verified
 ```
 
-The GitHub access blocker from 2026-10-16 was resolved on 2026-10-20: `Dating_App` is now included in the connection. Branch publication and CI verification are in progress. The results below remain local results until CI completes.
+The initial CI run caught pg-boss trying to create its existing schema without database CREATE privilege. DEC-022 fixes the configuration and adds a privilege regression check; permissions were not broadened. The subsequent startup path fix resolves the root `.env` file explicitly when pnpm runs the worker from its package directory. Follow-up commits run the same CI gates; the current [PR #1 checks](https://github.com/abinabrahamColorado/Dating_App/pull/1/checks) are authoritative for the latest branch head.
 
-Playwright browser installation returned a truncated/non-ZIP download; the local E2E attempt failed before the browser could launch. The local native PostgreSQL setup attempt failed because this sandbox maps only UID 0 and cannot switch to a PostgreSQL service account. Database tests are a required real PostgreSQL 16/PostGIS CI gate; there is no SQLite or memory fallback. The native installer cannot be certified in this sandbox. A green Compose check does not certify that alternative installer.
+Local typecheck, lint, formatting, build, all 9 unit tests and shell syntax checks also passed. Local integration and browser attempts were blocked by environmental prerequisites: this sandbox cannot switch to a PostgreSQL service user, and its browser download was truncated. The successful CI tests use real PostgreSQL/PostGIS and Chromium; there is no SQLite or memory fallback. The alternative native Ubuntu installer remains unverified on a normal host; the passing Compose job does not certify that installer.
+
+The GitHub access blocker from 2026-10-16 was resolved on 2026-10-20. The M0 branch and draft PR are published. Founder review and merge are still outstanding; M1 has not started.
 
 ## Decisions and scope limits
 
-No production stack replacement: DEC-001 separates the prior preview from this repository. DEC-002 distinguishes static public reference centroids from prohibited member coordinates. DEC-003/007/010/012/013 document age-out, deletion/pair retention and other unresolved policies. DEC-004/015 resolve milestone dependency issues. DEC-005/006 preserve privacy and exclude models. DEC-009 applies the under-21 venue rule. DEC-014 avoids fake invariant coverage. DEC-016 records the environment restriction. DEC-017/018/021 record exact dependency pins and supported compiler/linter compatibility. DEC-019 retains provisional branding/areas; DEC-020 isolates safety data.
+No production stack replacement: DEC-001 separates the prior preview from this repository. DEC-002 distinguishes static public reference centroids from prohibited member coordinates. DEC-003/007/010/012/013 document age-out, deletion/pair retention and other unresolved policies. DEC-004/015 resolve milestone dependency issues. DEC-005/006 preserve privacy and exclude models. DEC-009 applies the under-21 venue rule. DEC-014 avoids fake invariant coverage. DEC-016 records the environment restriction. DEC-017/018/021 record exact dependency pins and supported compiler/linter compatibility. DEC-019 retains provisional branding/areas; DEC-020 isolates safety data; DEC-022 preserves least privilege during queue startup.
 
 Deliberately not built: accounts, onboarding, member profiles, matching, reports, chat, venue management, plans, feedback, metrics, deletion jobs, events, Go, models, payments, real vendor integrations or production deployment. No M1 work begins in this PR.

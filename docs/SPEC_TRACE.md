@@ -207,18 +207,20 @@ Source: `docs/architecture-v0.2.txt` (all 32 parts read) and `AGENTS.md`. `P<n>`
 
 ## M0 implemented scope
 
-| Check                                                    | Source                         | Executable evidence                                           |
-| -------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------- |
-| Six-workspace Next.js/worker/core/db/config layout       | M0                             | typecheck, lint, build                                        |
-| Versioned infrastructure health with no private payload  | Spec P22                       | `tests/unit/web.test.ts`, `tests/e2e/scaffold.spec.ts`        |
-| Pure core trace primitive, property-tested               | M0                             | `tests/unit/core.test.ts`                                     |
-| Default-off flags and selected catchment                 | Spec P23                       | `tests/unit/config.test.ts`                                   |
-| PostgreSQL-only adapter and PostGIS 16 runtime           | Spec P22                       | `tests/unit/db.test.ts`, `tests/integration/database.test.ts` |
-| Schema-role isolation, migration replay and worker queue | Spec P22; I-12 foundation only | `tests/integration/database.test.ts`                          |
-| Infrastructure-only worker option validation             | M0                             | `tests/unit/worker.test.ts`                                   |
-| Requirement/field inventory completeness                 | M0                             | `tests/unit/docs.test.ts`                                     |
+| Check                                                     | Source                         | Executable evidence                                           |
+| --------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------- |
+| Six-workspace Next.js/worker/core/db/config layout        | M0                             | typecheck, lint, build                                        |
+| Versioned infrastructure health with no private payload   | Spec P22                       | `tests/unit/web.test.ts`, `tests/e2e/scaffold.spec.ts`        |
+| Pure core trace primitive, property-tested                | M0                             | `tests/unit/core.test.ts`                                     |
+| Default-off flags and selected catchment                  | Spec P23                       | `tests/unit/config.test.ts`                                   |
+| PostgreSQL-only adapter and PostgreSQL 16/PostGIS runtime | Spec P22                       | `tests/unit/db.test.ts`, `tests/integration/database.test.ts` |
+| Schema-role isolation, migration replay and worker queue  | Spec P22; I-12 foundation only | `tests/integration/database.test.ts`                          |
+| Infrastructure-only worker option validation              | M0                             | `tests/unit/worker.test.ts`                                   |
+| Requirement/field inventory completeness                  | M0                             | `tests/unit/docs.test.ts`                                     |
 
 The I-12 foundation probe verifies database privileges on a synthetic transaction-scoped table. It does **not** mark the full safety/report feature complete. All other I-series tests belong to their stated milestones.
+
+M0 infrastructure evidence: [CI run 39378020161](https://github.com/abinabrahamColorado/Dating_App/actions/runs/39378020161) passed unit, real database, browser, build and Compose checks on 2026-10-20. The worker privilege check also verifies that its role cannot create new schemas. This does not change any product requirement from PLANNED.
 
 ## Explicitly outside M0–M7
 
