@@ -187,6 +187,9 @@ explicit approval; no production migration was performed.
 
 ## Milestone crosswalk and pre-pilot privacy gates (DEC-031)
 
+**REJECTED by the founder; superseded by DEC-033.** The text below records the
+historical proposal only. It is not the approved roadmap.
+
 2026-10-20, Spec P23/P31/P32. The directive's historical M5–M7 labels differ from
 CODEX_PROMPTS: repository M5 already includes deletion, M6 event Go, M7 hardening.
 Preserve repository IDs and their trace links, document the crosswalk in
@@ -218,3 +221,35 @@ is unavailable locally; native Windows checks do not substitute for this job.
 The broader option is a schema-aware readiness probe; TCP plus the existing SQL
 assertions is sufficient for this initialization race. Rollback only changes the
 probe and reintroduces that race. No data cleanup or production operation occurs.
+
+## Founder decisions for the M1 merge review (DEC-033)
+
+2026-10-20, Spec P22/P23/P31. The founder explicitly rejected the roadmap crosswalk.
+Keep the milestone numbering and order in CODEX_PROMPTS.md without reinterpretation:
+M0 foundation, M1 accounts/onboarding, M2 safety, M3 Explore, M4 connections/plans,
+M5 feedback/outcomes/metrics/deletion, M6 events/Go prototype, M7 hardening/release.
+Deletion and operational readiness before any real users or Go are approved.
+M5 before M6 already satisfies the deletion order; no renumbering is required.
+Synthetic development may continue in that order; live use remains gated.
+
+The founder accepted possible duplicate magic-link emails after an ambiguous
+SMTP send as a documented limitation. Tokens remain expiring, browser-bound and
+single-use; this does not authorize duplicate product notifications or relax consent.
+REA stays uninstalled. Competitor research is complete for now; no further research
+or tool installation is part of this task. PR #3 must not be merged yet; do not
+start M2 or close the superseded open M0 PR #1.
+
+## Correct and audit the Markdown rewrite (DEC-034)
+
+2026-10-20. The earlier broad text rewrite was inappropriate. Recover the original
+creation text from this task's execution record, compare all eight affected
+documents with commit 90b371f and inspect every non-formatting difference. Restore
+the altered Mailpit URL, Timeleft +1 identifier and five lines of invariant-ID
+spelling. Other changes only separate prose labels from unchanged numbers/versions
+or format unchanged PR references; no changed thousand separators, clock times,
+version values or quoted sentences were found. The complete line-by-line inventory
+is in docs/testing/markdown-rewrite-audit.md. No source PDF or prompt was changed.
+
+Never run blanket regex rewrites over documents again. Use explicit edits and
+review the diff for numbers, times, versions, identifiers, URLs and quotations.
+The regression proof and migration review are in docs/testing/m1-merge-review.md.

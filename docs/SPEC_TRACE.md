@@ -290,3 +290,17 @@ socket-only initialization server. The existing `dev-services` job still asserts
 PostGIS availability and separate development/test databases; it remains the
 executable integration gate. Docker is unavailable on this PC, so this check runs
 on the disposable GitHub Linux runner, not the local native Windows services.
+
+## M1 merge review requested by the founder
+
+DEC-033 rejects the crosswalk and retains CODEX_PROMPTS numbering/order; deletion
+and operational readiness before real users or Go are approved. DEC-034 documents
+the scoped text corrections. The [complete rewrite audit](testing/markdown-rewrite-audit.md)
+and [merge review](testing/m1-merge-review.md) record the evidence. All 193 requirement
+rows and 20 canonical invariant IDs above remain unchanged.
+
+Spec P22 auth regression proof: the four delivery tests fail against the exact
+pre-fix `accounts.ts` blob from `3cc38d7`, then pass after restoration. Migration
+0004 upgrades a disposable M1 schema, preserving 15 application-table snapshots
+and role grants; rollback and migration-runner replay are verified. No later
+milestone implementation or production readiness is implied by these checks.

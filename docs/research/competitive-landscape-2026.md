@@ -95,7 +95,7 @@ not prove atomic capacity reservations, permanent pair closure, or blind decisio
   broaden the mix. This must not be copied as a romantic hard-boundary policy.
   [Matching help](https://help.timeleft.com/hc/en-150/articles/28530361837212-How-Does-Timeleft-Match-Me-With-a-Group).
 - **Communication/meeting/venue/UX (C):** coordinated venue and timing, followed by
-  Connect, Repeat and + 1 functions for continued friendship. Specific mutual
+  Connect, Repeat and +1 functions for continued friendship. Specific mutual
   authorization semantics of Connect were not tested.
   [Product description](https://timeleft.com/about/).
 - **Revenue/privacy/safety (C/U):** subscription-based access, food/drink separately;

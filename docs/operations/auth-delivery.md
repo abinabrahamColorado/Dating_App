@@ -22,6 +22,7 @@ one row during SMTP; a future production transport needs total-deadline testing.
 
 If SMTP accepts mail and the process or database fails before the commit is known,
 the same generic link can be delivered again. Exactly-once SMTP is not claimed.
+The founder explicitly accepted this documented limitation in DEC-033.
 The link remains browser-bound, expiring and single-use. Failure of a later row
 cannot undo the committed delivery marker of an earlier row.
 
@@ -29,7 +30,7 @@ cannot undo the committed delivery marker of an earlier row.
 
 1. Start services with `corepack pnpm services:windows:start`, apply local additive
    migrations with `corepack pnpm setup:accounts`, and run `corepack pnpm worker`.
-2. Check loopback Mailpit at `http://127.0.0.1: 8025`. Its contents are synthetic
+2. Check loopback Mailpit at `http://127.0.0.1:8025`. Its contents are synthetic
    development email; never include tokens in screenshots, tickets or Git.
 3. `auth.delivery.retry` logs only aggregate sent/failed counts. Inspect service
    availability and configuration without printing credentials or provider errors.

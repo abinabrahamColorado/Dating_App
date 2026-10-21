@@ -8,8 +8,13 @@ The founder's 2026-10-20 execution directive governs authorization: do not merge
 PRs, force-push shared branches, delete branches, deploy, run irreversible
 production migrations, or change consequential product/privacy behavior without
 explicit approval. Prepare a concrete reviewed change first. Ordinary reversible
-development fixes remain authorized. See DEC-029 and the roadmap crosswalk in
-`docs/product/roadmap.md`; preserve the authoritative PDF and existing milestone IDs.
+development fixes remain authorized. See DEC-029 and DEC-033. The founder rejected
+the roadmap crosswalk: use the numbering and order in `CODEX_PROMPTS.md` exactly.
+Deletion and operational readiness must precede real users or Go. Preserve the PDF.
+
+Never run blanket regex rewrites over documents. Make explicit, reviewed edits
+and verify numbers, times, versions, identifiers, URLs and quotations unchanged
+unless that specific content change is intended and authorized (DEC-034).
 
 ## 1. What we are building
 

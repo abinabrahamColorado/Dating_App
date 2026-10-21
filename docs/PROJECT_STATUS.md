@@ -5,7 +5,8 @@ Pilot proposal: Manhattan, New York City; ages 18–30.
 
 Permanent checkout: `E:\Buisness\Dating_App`.
 Remote: `https://github.com/abinabrahamColorado/Dating_App`.
-Current review branch: `codex/m1-audit-auth-delivery`, based on M1 head `3cc38d7`.
+Current review branch: `codex/m1-accounts-onboarding`, PR #3. PR #4 was merged into
+M1 with founder approval at `ade0c78`; main remains unchanged.
 
 ## Implemented and reviewed state
 
@@ -27,7 +28,7 @@ and 20 invariant mappings remain tracked. This audit adds a source-backed
 [competitor comparison](research/competitive-landscape-2026.md),
 [REA evaluation](research/rea-evaluation.md),
 [architecture gap analysis](architecture/review-2026-10-20.md),
-[milestone crosswalk](product/roadmap.md),
+[roadmap following CODEX_PROMPTS](product/roadmap.md),
 [threat model](security/threat-model.md) and
 [test strategy](testing/strategy.md).
 
@@ -54,9 +55,11 @@ and live checks before merging; publication and final CI results are recorded in
 that PR and the task handoff. The older open M0 PR #1 is a conflicting historical proposal and must
 not be mistaken for additional work to merge.
 
-Nothing was merged, deployed, force-pushed or deleted in this audit. The founder's
-current directive requires explicit merge authorization (DEC-029). M2 starts
-after M1 review and an approved merge.
+PR #4 subsequently merged into M1 with explicit approval. The current M1 merge
+review records DEC-033/034, the complete Markdown-rewrite audit, a four-fail/four-pass
+auth regression proof and a disposable-database migration upgrade check. See
+[M1 merge review](testing/m1-merge-review.md). Final CI is recorded on PR #3 and in
+the task handoff. Do not merge PR #3 yet, close PR #1 or start M2 in this task.
 
 ## Release limits and next work
 
@@ -66,12 +69,14 @@ it does not erase data. Blocking/reporting/appeals, allocation, chat, joint plan
 feedback, erasure/restore and event Go remain unbuilt. No serving model, member
 GPS collection, real provider integration or live pilot is enabled.
 
-Next: review the M1 repair; then implement M2's independent block/report and
-reviewer-audit slice. Session/staff revocation races, client retry recovery and
+Next: finish the M1 merge review and await the founder's decision on PR #3.
+Session/staff revocation races, client retry recovery and
 ambiguous media-write compensation (G02/G03/G08/G09) remain release gates.
 Deletion/restore must pass before real enrollment; Go also requires staffed
-operations and explicit activation approval. The proposed numbering crosswalk
-preserves existing milestone IDs rather than postponing privacy work (DEC-031).
+operations and explicit activation approval. The founder rejected the crosswalk;
+CODEX_PROMPTS numbering and order govern. M5 deletion already precedes M6 Go.
+Ambiguous-send duplicate auth emails are accepted; REA stays uninstalled and
+competitor research is complete for now (DEC-033).
 
 Founder choices before launch include name/areas, relationship vocabulary,
 age-out/return policy, incident staffing, providers and privacy/retention review.

@@ -23,7 +23,8 @@ Migrations are the executable field/key/index schema.
 
 The [2026-10-20 gap analysis](architecture/review-2026-10-20.md) separates observed
 M1 behavior from proposals and remaining release gates. The
-[milestone crosswalk](product/roadmap.md) preserves existing IDs and deletion-before-pilot.
+[roadmap](product/roadmap.md) follows CODEX_PROMPTS numbering and order (DEC-033).
+The founder rejected the crosswalk and approved deletion/operations before real use.
 
 The web process uses separate identity/app/ops LOGIN pools with no administrator
 fallback. Identity owns encrypted email/DOB and hashed tokens. App owns the single

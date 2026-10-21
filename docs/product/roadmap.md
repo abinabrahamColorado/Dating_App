@@ -1,4 +1,4 @@
-# Execution roadmap and milestone crosswalk
+# Execution roadmap — CODEX_PROMPTS order
 
 Updated 2026-10-20. This expands the existing BACKLOG and CODEX_PROMPTS acceptance
 contracts; it does not renumber requirements or rewrite the authoritative PDF.
@@ -6,23 +6,23 @@ contracts; it does not renumber requirements or rewrite the authoritative PDF.
 revision; `complete` also requires review and the applicable merge/operations gates.
 Complexity is relative engineering uncertainty, not a delivery-date promise.
 
-## Reconciliation
+## Approved numbering and order
 
-| Existing repository ID | New directive's historical wording     | Preserved scope and dependency                                                         |
-| ---------------------- | -------------------------------------- | -------------------------------------------------------------------------------------- |
-| M0                     | M0 foundation                          | Same                                                                                   |
-| M1                     | M1 accounts/onboarding                 | Same; PR #3 unmerged                                                                   |
-| M2                     | M2 safety                              | Same                                                                                   |
-| M3                     | M3 reciprocal introductions            | Same                                                                                   |
-| M4                     | M4 chat/plans                          | Same                                                                                   |
-| M5                     | M5 feedback plus M6 deletion/privacy   | Keep feedback, metrics, erasure/restore together; privacy must precede real enrollment |
-| M6                     | Event-Go portion of M7                 | Event prototype only after base flow/deletion; flags off; operational readiness first  |
-| M7                     | Operations/hardening portions of M6/M7 | Cross-cutting work begins earlier; final release gate, not a reason to defer safety    |
+The founder rejected the crosswalk (DEC-031). CODEX_PROMPTS.md defines the sequence:
 
-This crosswalk is a reconciliation proposal (DEC-031), not approval to activate Go
-or recruit users. Deletion cannot be postponed by a numbering change. A concierge
-study under PDF P23 also needs secure tooling, reporting, erasure and staffed
-operations; a spreadsheet of real dating profiles is not a safe shortcut.
+1. M0 — Plan, trace and scaffold (no product features).
+2. M1 — Accounts, onboarding, profiles, public site.
+3. M2 — Safety core.
+4. M3 — Explore engine (the core of the product).
+5. M4 — Connections and meeting coordination.
+6. M5 — Feedback, outcomes, metrics, deletion.
+7. M6 — Events and the event-bound Go prototype (flags default off).
+8. M7 — Hardening and release readiness.
+
+Deletion and operational readiness before any real users or Go are approved
+(DEC-033). M5 already precedes M6; the requirement does not renumber or reorder
+milestones. A concierge study under PDF P23 also needs secure tooling, reporting,
+erasure and staffed operations. These are release gates, not approval to recruit.
 
 ## M0 — Engineering foundation
 
@@ -72,7 +72,7 @@ operations; a spreadsheet of real dating profiles is not a safe shortcut.
   own minimized status reads; assigned-reviewer case commands with version/receipt;
   explicit role-gated kill-switch command. Exact route names reconcile with the
   existing architecture contract before implementation; no bulk narrative endpoint.
-- **Security/tests:** I-04/I-11/I-12/I-19/I-20, report without block, block without report,
+- **Security/tests:** I04/I11/I12/I19/I20, report without block, block without report,
   cross-role/object denials, restricted/exited report access, duplicate submissions,
   reporter confidentiality and concurrent restriction/available-transition races.
 - **Acceptance:** functional UI backed by real cases; no unsafe state reachable in
@@ -92,7 +92,7 @@ operations; a spreadsheet of real dating profiles is not a safe shortcut.
   opportunity/decisions, feature/policy/exposure snapshots and transactional outbox.
 - **API proposal:** own finite introduction list/detail; versioned idempotent decision
   command; minimized connection read. No like inbox or arbitrary user search.
-- **Security/tests:** I-02/I-04–I-08/I-15/I-16; opposite lock ordering, simultaneous last-slot
+- **Security/tests:** I02/I04–I08/I15/I16; opposite lock ordering, simultaneous last-slot
   allocation, accept a held last slot, block/accept/expiry races, exact-once release,
   repeat No across routes, partial worker failures, `q` and feasible-set replay.
   Compare heuristic output with exact small graphs and sparse-pool coverage.
@@ -113,7 +113,7 @@ operations; a spreadsheet of real dating profiles is not a safe shortcut.
   versions and confirmations, cancellation and notification outbox.
 - **API proposal:** membership-gated message read/send; venue suggestions;
   idempotent plan propose/revise/confirm/cancel by version; minimized calendar export.
-- **Security/tests:** I-04/I-09/I-11/I-19; mismatched confirmations, venue closure versus
+- **Security/tests:** I04/I09/I11/I19; mismatched confirmations, venue closure versus
   confirm, cancel/block versus confirm, repeated requests, stale notifications,
   expired venue reviews, no private origin in DTO/email/calendar.
 - **Acceptance:** both confirm one still-valid plan, material edits invalidate prior
@@ -133,7 +133,7 @@ operations; a spreadsheet of real dating profiles is not a safe shortcut.
   snapshots/lineage, deletion jobs/tombstones/store receipts and scoped safety holds.
 - **API proposal:** own optional feedback/skip and separate reinvite; own deletion
   status/receipt; role-gated suppressed aggregate metrics; no other person's feedback.
-- **Security/tests:** I-10/I-12/I-18; no forbidden fields in exports/logs, fixture cohort
+- **Security/tests:** I10/I12/I18; no forbidden fields in exports/logs, fixture cohort
   denominators, missing/disputed outcomes, deletion retries and tombstones replayed
   after restore before serving, hold review and auth/media retention.
 - **Acceptance:** deletion proven across primary/media/cache/exports/snapshots;
@@ -153,7 +153,7 @@ operations; a spreadsheet of real dating profiles is not a safe shortcut.
   scoped leases/epochs and nearby offers tied to existing reservation semantics.
 - **API proposal:** separate RSVP/consent/check-in; versioned Go start/stop/accept
   using epoch+lease; minimal organizer attendance only.
-- **Security/tests:** I-04/I-05/I-06/I-14/I-17; stop/delivery/accept races, stale tokens,
+- **Security/tests:** I04/I05/I06/I14/I17; stop/delivery/accept races, stale tokens,
   expired leases, worker restart, unauthorized organizer reads and reused capacity
   for existing mutuals. No network response may reveal a stranger's location.
 - **Acceptance:** revocation measured against configured objective; base flow and
@@ -182,9 +182,9 @@ operations; a spreadsheet of real dating profiles is not a safe shortcut.
 
 ## Next execution sequence and five priorities
 
-1. Review this M1 email repair and audit; resolve explicit merge authorization for
-   the stacked PR and PR #3. PR #1 is an older conflicting M0 proposal, not another
-   foundation to merge. Closing it is a separate founder decision.
+1. Finish the M1 merge review on PR #3; PR #4's email repair is already merged into
+   M1. PR #3 is not authorized to merge yet. PR #1 is an older superseded M0 proposal;
+   leave it open as the founder requested. No M2 work starts during this review.
 2. Implement M2's smallest vertical slice: independent bilateral block plus a
    private report, reviewer authorization and audit, with functional UI on existing
    surfaces. Extend to appeals/kill switches before calling M2 complete.

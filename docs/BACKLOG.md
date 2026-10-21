@@ -6,7 +6,7 @@ pages and photo-review controls are implemented on `codex/m1-accounts-onboarding
 Review its tests, decisions and PR before merging and starting M2. The earlier
 hosted preview remains an independent design reference.
 
-Latest review: [execution roadmap/crosswalk](product/roadmap.md),
+Latest review: [execution roadmap](product/roadmap.md),
 [architecture gaps](architecture/review-2026-10-20.md),
 [competitive research](research/competitive-landscape-2026.md),
 [REA evaluation](research/rea-evaluation.md). DEC-029 requires explicit merge
@@ -15,6 +15,13 @@ auth mail failure isolation. Its CI exposed a PostgreSQL initialization race;
 DEC-032 switches readiness to TCP without relaxing the database assertions.
 PR #1 is an older conflicting M0 proposal; do not merge
 it over PR2's accepted foundation. Founder decision is needed to close it.
+
+PR #4 is now merged into M1; PR #3 remains open. The founder rejected DEC-031's
+crosswalk: CODEX_PROMPTS numbering and order govern. Deletion and operational
+readiness before real users or Go are approved; M5 already precedes M6. Duplicate
+auth emails after ambiguous sends are accepted. REA stays uninstalled; competitor
+research is complete for now (DEC-033). Complete the M1 merge review only; do not
+merge PR #3, close old M0 PR #1 or start M2 in this task.
 
 | Milestone | Deliverable                                                                                                                             | Gate before moving on                                                                                               |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
