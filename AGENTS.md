@@ -4,6 +4,13 @@ These are standing rules for every task in this repository. Read this file, then
 `docs/architecture-v0.2.txt`, before you write or change anything. If anything
 else conflicts with this file or the spec, stop and say so.
 
+The founder's 2026-10-20 execution directive governs authorization: do not merge
+PRs, force-push shared branches, delete branches, deploy, run irreversible
+production migrations, or change consequential product/privacy behavior without
+explicit approval. Prepare a concrete reviewed change first. Ordinary reversible
+development fixes remain authorized. See DEC-029 and the roadmap crosswalk in
+`docs/product/roadmap.md`; preserve the authoritative PDF and existing milestone IDs.
+
 ## 1. What we are building
 
 This is a web-first local introduction and meeting service. It gives members a

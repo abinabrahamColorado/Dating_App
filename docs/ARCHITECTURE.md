@@ -17,7 +17,13 @@ Migration 0002 adds identity users, consents, magic links, sessions, passkeys,
 challenges and rate limits; app members, encrypted profiles, immutable preference
 versions, media and command receipts; ops staff, audit and moderation receipts.
 Migration 0003 adds narrow owner-media locking without general app UPDATE access.
+Migration 0004 adds authentication delivery retry scheduling; per-message
+transactions isolate failures. See DEC-030 and operations/auth-delivery.md.
 Migrations are the executable field/key/index schema.
+
+The [2026-10-20 gap analysis](architecture/review-2026-10-20.md) separates observed
+M1 behavior from proposals and remaining release gates. The
+[milestone crosswalk](product/roadmap.md) preserves existing IDs and deletion-before-pilot.
 
 The web process uses separate identity/app/ops LOGIN pools with no administrator
 fallback. Identity owns encrypted email/DOB and hashed tokens. App owns the single

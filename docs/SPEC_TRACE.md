@@ -272,3 +272,15 @@ in `docs/PROJECT_STATUS.md` and reproduced by the Windows CI job.
 | Real verification, maps, payment or messaging-vendor integrations                       | AGENTS §3         | Explicit later task and reviewed contracts required                                                 |
 
 Parts 1–3, 27–28, 30 and 32 provide rationale, business context, change history and failure analysis. Their actionable safeguards are traced above under the governing product parts. Illustrative arithmetic, research sample sizes, legacy v0.1 claims and hypothetical business prices are not executable pilot settings.
+
+## 2026-10-20 audit and M1 reliability repair
+
+The original193 requirement rows and20 invariant IDs remain unchanged. No later
+milestone is marked implemented by a research document.
+
+| Scope                                       | Implementation / evidence                                                                                                        | Limits                                                                                                               |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Spec P22 durable auth delivery; DEC-026/030 | `packages/db/src/accounts.ts`, migration0004, `apps/web/server/mail.ts`; four tests in `tests/integration/auth-delivery.test.ts` | Per-row failure/commit recovery and concurrency; SMTP at-least-once, not a full process-crash or product outbox test |
+| Spec P3/P23/P25/P26 research/experiments    | `docs/research/competitive-landscape-2026.md`, `docs/product/roadmap.md`                                                         | Company claims distinguished from independently verified outcomes; no users recruited                                |
+| Spec P20–P22/P31 review                     | `docs/architecture/review-2026-10-20.md`, `docs/security/threat-model.md`, `docs/testing/strategy.md`                            | G01–G15 track remaining work; safety, erasure, matching and Go are not built                                         |
+| Founder authorized-tooling boundary         | `docs/research/rea-evaluation.md`                                                                                                | Read-only public source/metadata review; no installation or protected-target inspection                              |
