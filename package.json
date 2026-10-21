@@ -21,6 +21,7 @@
     "db:migrate": "tsx scripts/migrate.ts",
     "setup:accounts": "tsx scripts/setup-accounts.ts",
     "staff:grant": "tsx scripts/grant-staff.ts",
+    "staff:revoke": "tsx scripts/grant-staff.ts --revoke",
     "services:up": "docker compose up -d --wait",
     "services:down": "docker compose down",
     "setup:native": "bash scripts/setup-native.sh",

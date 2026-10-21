@@ -28,7 +28,7 @@ const set = (name: string, value: string) => {
 };
 const admin = new Pool({ connectionString: migration });
 try {
-  for (const boundary of ['identity', 'app', 'ops'] as const) {
+  for (const boundary of ['identity', 'app', 'ops', 'safety'] as const) {
     const envName = `${boundary.toUpperCase()}_DATABASE_URL`;
     const roleName = `meetwell_${boundary}_dev`;
     const connection = new URL(migration);
@@ -55,6 +55,7 @@ for (const key of [
   'IDENTITY_ENCRYPTION_KEY',
   'APP_ENCRYPTION_KEY',
   'MEDIA_ENCRYPTION_KEY',
+  'SAFETY_ENCRYPTION_KEY',
   'LOOKUP_KEY',
 ]) {
   set(key, values[key] ?? randomBytes(32).toString('base64'));

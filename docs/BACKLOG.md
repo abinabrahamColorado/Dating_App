@@ -1,10 +1,9 @@
 # Milestone backlog
 
-M0 was reviewed and merged in PR #2 (commit
-`16676f3b34020c0b626964f4063bb33f9cbd5cf1`). M1 accounts, onboarding, public
-pages and photo-review controls are implemented on `codex/m1-accounts-onboarding`.
-Review its tests, decisions and PR before merging and starting M2. The earlier
-hosted preview remains an independent design reference.
+M0 was reviewed and merged in PR #2. M1 was merged with explicit founder approval
+in PR #3 at `a4dee472951f4d11968de6613e6d416f0e227df8`; main CI is green.
+M2 safety work is on `codex/m2-safety-core`. Review its PR before any merge.
+Do not start M3. The earlier hosted preview remains an independent design reference.
 
 Latest review: [execution roadmap](product/roadmap.md),
 [architecture gaps](architecture/review-2026-10-20.md),
@@ -13,15 +12,14 @@ Latest review: [execution roadmap](product/roadmap.md),
 approval. Audit branch `codex/m1-audit-auth-delivery` is stacked on M1 and repairs
 auth mail failure isolation. Its CI exposed a PostgreSQL initialization race;
 DEC-032 switches readiness to TCP without relaxing the database assertions.
-PR #1 is an older conflicting M0 proposal; do not merge
-it over PR2's accepted foundation. Founder decision is needed to close it.
+PR #1 is the superseded M0 proposal, now closed without merging with the approved
+comment `Superseded by #2.`.
 
-PR #4 is now merged into M1; PR #3 remains open. The founder rejected DEC-031's
+PR #4 merged into M1; PR #3 subsequently merged into main. The founder rejected DEC-031's
 crosswalk: CODEX_PROMPTS numbering and order govern. Deletion and operational
 readiness before real users or Go are approved; M5 already precedes M6. Duplicate
 auth emails after ambiguous sends are accepted. REA stays uninstalled; competitor
-research is complete for now (DEC-033). Complete the M1 merge review only; do not
-merge PR #3, close old M0 PR #1 or start M2 in this task.
+research is complete for now (DEC-033). DEC-035 authorizes this M2 build only.
 
 | Milestone | Deliverable                                                                                                                             | Gate before moving on                                                                                               |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
@@ -50,22 +48,37 @@ Pricing/payments; demographic research; pooled models/embeddings; broad neighbor
 
 ## Release work retained from M1
 
-- M1 review: G07 auth delivery repair and its regression evidence; G08 stable
-  client retry keys/refresh recovery remain open. No unmerged work is discarded.
-- Before real accounts: G03 staff/disclosure revocation races and G09 ambiguous
-  media commit compensation; live enrollment remains disabled until resolved.
-- M2: G01 extract shared auth-mail wiring and minimize worker credentials;
-  G04 independent enforcement survives account exit/deletion/appeal.
+- Complete: G07 auth delivery repair/regression evidence; M2 fixes G02 session
+  revalidation and G03 staff-role revocation at protected operations, including
+  case access and staff media reads. M2 fixes G04 independent enforcement.
+- G08: M2 command keys survive ambiguous-response retries while the page remains
+  open. M1's other command keys and swallowed refresh failures remain open;
+  page-reload recovery of pending M2 commands also remains open (DEC-038).
+- Before real accounts: G09 ambiguous media-upload commit compensation remains
+  open. M2 did not change upload writes. Live enrollment remains disabled.
+- G01 shared auth-mail wiring and least-privilege worker credentials remain open;
+  M2 adds no worker jobs and does not require this unrelated refactor.
 
-- M2: reporting/appeal access for restricted and exited members, assigned safety
-  cases and atomic enforcement/discovery integration. No case narratives in ops.
+- M2 complete: reporting/appeals for restricted/exited members, separate safety
+  and integrity queues, audited safety-role access, bilateral profile/photo denial,
+  precaution/lift, account and stored venue/event/Go controls. Before live use:
+  named reviewers, per-case assignment/workload routing (REQ-150), incident lead,
+  support hours, escalation and case-retention review. Appeals require a different
+  reviewer from the challenged decision maker.
+- M3: issue profile-access grants only with real introductions and enforce denial
+  at retrieval/reservation/delivery/acceptance. Add block-vs-reservation/acceptance/
+  product-outbox races; no such handlers or fake tests were added in M2.
+- M4: enforce denial in chat and plans; add block-vs-message/delivery/confirmation
+  races and concern links on these surfaces. Enforce stored venue shutdowns.
+- M5/M6: add post-meeting concern links and enforce stored event/Go shutdowns;
+  retain report/help access during every shutdown. M5 retains erasure/restore work.
 - M3: compose the tested bilateral preference function with blocks, capacity and
   actual travel/availability feasibility. Add exposure logging and closed-pair memory.
 - M5: erase stores/exports, reconcile encrypted media orphans, expire auth/outbox/
   rate-limit records, apply tombstones on restore and prove retention deadlines.
 - M7: passkey listing/removal/recovery with recent authentication; production
   KMS/key rotation, scoped object-storage credentials, real mail transport, strict
-  CSP, per-request body deadlines, broader abuse budgets, staff-role revocation races,
+  CSP, per-request body deadlines, broader abuse budgets, additional staff abuse scenarios,
   manual screen-reader testing and accessibility audit. Keep live enrollment closed.
 - Founder review: provisional vocabulary, age-out/return policy, operational support,
   name/areas, privacy review and production providers. See DEC-024–028.

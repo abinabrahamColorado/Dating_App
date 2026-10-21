@@ -17,6 +17,7 @@ import { store, appOrigin, requireDevelopmentEnrollment } from './runtime';
 import { sanitizePhoto, putPhoto, getPhoto, deletePhoto } from './media';
 import { deliverAuthMail } from './mail';
 import { passkeyOptions, verifyPasskey } from './passkeys';
+import { handleSafety } from './safety-api';
 import type { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/server';
 
 export const SESSION_COOKIE = 'meetwell_session';
@@ -98,6 +99,7 @@ function key(request: Request) {
 const errors: Record<string, [number, string]> = {
   UNAUTHORIZED: [401, 'Sign in to continue.'],
   FORBIDDEN: [403, 'This action is not available to this account.'],
+  INDEPENDENT_REVIEW_REQUIRED: [403, 'A different safety reviewer must decide this appeal.'],
   INVALID_INPUT: [400, 'Check the form and try again.'],
   AGE_INELIGIBLE: [422, 'This pilot is for adults aged 18–30.'],
   INVALID_LINK: [400, 'This link is unavailable. Request a new link in this browser.'],
@@ -183,161 +185,190 @@ export async function handle(request: Request, path: string[]) {
         .strict()
         .parse(await body(request));
       const auth = await authority(data.kind === 'register');
-      if (data.kind === 'register' && auth) {
-        registered(auth);
-        recent(auth);
-      }
-      const browser = await browserToken();
-      if (!(await db.rateLimit(`passkey:${db.lookup(browser)}`, c.WRITE_REQUESTS_PER_MINUTE, 60)))
-        throw new StoreError('RATE_LIMITED');
-      if (route === 'auth/passkey/options')
-        return json(await passkeyOptions(data.kind, browser, auth ?? undefined));
-      if (route !== 'auth/passkey/verify' || !data.id || !data.response)
-        throw new StoreError('INVALID_INPUT');
-      // The WebAuthn library validates the cryptographic response; malformed shape is a generic failure.
-      const result = await verifyPasskey(
-        data.kind,
-        data.id,
-        browser,
-        data.response as unknown as RegistrationResponseJSON | AuthenticationResponseJSON,
-        auth ?? undefined,
-      );
-      if ('token' in result && result.token)
-        await setCookie(SESSION_COOKIE, result.token, c.SESSION_DAYS * 86400);
-      return json({ verified: true });
+      const run = async () => {
+        if (data.kind === 'register' && auth) {
+          registered(auth);
+          recent(auth);
+        }
+        const browser = await browserToken();
+        if (!(await db.rateLimit(`passkey:${db.lookup(browser)}`, c.WRITE_REQUESTS_PER_MINUTE, 60)))
+          throw new StoreError('RATE_LIMITED');
+        if (route === 'auth/passkey/options')
+          return json(await passkeyOptions(data.kind, browser, auth ?? undefined));
+        if (route !== 'auth/passkey/verify' || !data.id || !data.response)
+          throw new StoreError('INVALID_INPUT');
+        // The WebAuthn library validates the cryptographic response; malformed shape is a generic failure.
+        const result = await verifyPasskey(
+          data.kind,
+          data.id,
+          browser,
+          data.response as unknown as RegistrationResponseJSON | AuthenticationResponseJSON,
+          auth ?? undefined,
+        );
+        if ('token' in result && result.token)
+          await setCookie(SESSION_COOKIE, result.token, c.SESSION_DAYS * 86400);
+        return json({ verified: true });
+      };
+      return auth ? await db.withSession(auth, run) : await run();
     }
     const auth = (await authority())!;
-    if (
-      request.method === 'POST' &&
-      !(await db.rateLimit(`write:${auth.memberId}`, c.WRITE_REQUESTS_PER_MINUTE, 60))
-    )
-      throw new StoreError('RATE_LIMITED');
-    if (route === 'me' && request.method === 'GET') {
-      return json({
-        registered: auth.registered,
-        age: auth.age,
-        cohortEligible: withinCohort(auth.age),
-        policy: await db.policy(auth.memberId),
-        profile: await db.profile(auth.memberId),
-        preferences: await db.preferenceHistory(auth.memberId),
-        photos: await db.photos(auth.memberId),
-        roles: await db.staffRoles(auth.memberId),
-      });
-    }
-    if (route === 'account/register' && request.method === 'POST') {
-      await db.register(auth.memberId, await body(request));
-      return json({ registered: true });
-    }
-    if (route === 'auth/signout' && request.method === 'POST') {
-      await db.revokeSessions(auth, false);
-      await setCookie(SESSION_COOKIE, '', 0);
-      return json({ signedOut: true });
-    }
-    if (route === 'account/sessions' && request.method === 'GET')
-      return json(await db.sessions(auth));
-    if (route === 'account/sessions/revoke-others' && request.method === 'POST') {
-      await db.revokeSessions(auth, true);
-      return json({ revoked: true });
-    }
-    if (route === 'account/policy' && request.method === 'POST') {
-      const command = policyCommandSchema.parse(await body(request));
-      if (command.action === 'DELETE') recent(auth);
-      const next = await db.changePolicy(auth, key(request), command);
-      if (next.deletionRequested) await setCookie(SESSION_COOKIE, '', 0);
-      return json(next);
-    }
-    registered(auth);
-    if (route === 'profile' && request.method === 'POST') {
-      const data = z
-        .object({ version: z.number().int().nonnegative(), data: profileSchema })
-        .strict()
-        .parse(await body(request));
-      return json(await db.saveProfile(auth.memberId, key(request), data.version, data.data));
-    }
-    if (route === 'preferences' && request.method === 'POST') {
-      const data = z
-        .object({ version: z.number().int().nonnegative(), data: preferencesSchema })
-        .strict()
-        .parse(await body(request));
-      return json(await db.savePreferences(auth.memberId, key(request), data.version, data.data));
-    }
-    if (route === 'photos' && request.method === 'POST') {
+    return await db.withSession(auth, async () => {
       if (
-        !['image/jpeg', 'image/png', 'image/webp'].includes(
-          request.headers.get('content-type') ?? '',
-        )
-      )
-        throw new StoreError('INVALID_INPUT');
-      let photo: Buffer;
-      try {
-        photo = await sanitizePhoto(await boundedBody(request, c.PHOTO_MAX_BYTES));
-      } catch (error) {
-        if (error instanceof StoreError) throw error;
-        throw new StoreError('INVALID_INPUT');
-      }
-      let written: string | undefined;
-      try {
-        return json(
-          await db.addPhoto(
-            auth.memberId,
-            key(request),
-            db.lookup(photo.toString('base64')),
-            async (id) => {
-              await putPhoto(id, photo);
-              written = id;
-            },
-          ),
-        );
-      } catch (error) {
-        if (written) await deletePhoto(written).catch(() => undefined);
-        throw error;
-      }
-    }
-    if (path[0] === 'photos' && path[1] && path.length <= 3) {
-      const photoId = uuid.parse(path[1]);
-      if (path.length === 2 && request.method === 'GET') {
-        await db.photoAccess(auth, photoId, false, requestId);
-        return new Response(new Uint8Array(await getPhoto(photoId)), {
-          headers: { ...headers, 'Content-Type': 'image/jpeg', 'Content-Disposition': 'inline' },
+        path[0] === 'safety' ||
+        path[0] === 'members' ||
+        (path[0] === 'ops' && path[1] === 'safety')
+      ) {
+        registered(auth);
+        const result = await handleSafety({
+          auth,
+          request,
+          path,
+          requestId,
+          body: () => body(request),
+          key: () => key(request),
         });
-      }
-      if (path[2] === 'remove' && request.method === 'POST') {
-        const result = await db.removePhoto(auth.memberId, key(request), photoId);
-        await deletePhoto(photoId);
+        if (Buffer.isBuffer(result))
+          return new Response(new Uint8Array(result), {
+            headers: { ...headers, 'Content-Type': 'image/jpeg' },
+          });
         return json(result);
       }
-    }
-    if (route === 'ops/photos' && request.method === 'GET')
-      return json(await db.moderationQueue(auth.memberId, requestId));
-    if (route === 'ops/audit' && request.method === 'GET')
-      return json(await db.auditLog(auth.memberId, requestId));
-    if (path[0] === 'ops' && path[1] === 'photos' && path[2] && path.length === 3) {
-      const photoId = uuid.parse(path[2]);
-      if (request.method === 'GET') {
-        await db.photoAccess(auth, photoId, true, requestId);
-        return new Response(new Uint8Array(await getPhoto(photoId)), {
-          headers: { ...headers, 'Content-Type': 'image/jpeg' },
+      if (
+        request.method === 'POST' &&
+        !(await db.rateLimit(`write:${auth.memberId}`, c.WRITE_REQUESTS_PER_MINUTE, 60))
+      )
+        throw new StoreError('RATE_LIMITED');
+      if (route === 'me' && request.method === 'GET') {
+        return json({
+          registered: auth.registered,
+          age: auth.age,
+          cohortEligible: withinCohort(auth.age),
+          policy: await db.policy(auth.memberId),
+          profile: await db.profile(auth.memberId),
+          preferences: await db.preferenceHistory(auth.memberId),
+          photos: await db.photos(auth.memberId),
+          roles: await db.staffRoles(auth.memberId),
         });
       }
-      if (request.method === 'POST') {
-        recent(auth);
+      if (route === 'account/register' && request.method === 'POST') {
+        await db.register(auth.memberId, await body(request));
+        return json({ registered: true });
+      }
+      if (route === 'auth/signout' && request.method === 'POST') {
+        await db.revokeSessions(auth, false);
+        await setCookie(SESSION_COOKIE, '', 0);
+        return json({ signedOut: true });
+      }
+      if (route === 'account/sessions' && request.method === 'GET')
+        return json(await db.sessions(auth));
+      if (route === 'account/sessions/revoke-others' && request.method === 'POST') {
+        await db.revokeSessions(auth, true);
+        return json({ revoked: true });
+      }
+      if (route === 'account/policy' && request.method === 'POST') {
+        const command = policyCommandSchema.parse(await body(request));
+        if (command.action === 'DELETE') recent(auth);
+        const next = await db.changePolicy(auth, key(request), command);
+        if (next.deletionRequested) await setCookie(SESSION_COOKIE, '', 0);
+        return json(next);
+      }
+      registered(auth);
+      if (route === 'profile' && request.method === 'POST') {
         const data = z
-          .object({ version: z.number().int().nonnegative(), approve: z.boolean() })
+          .object({ version: z.number().int().nonnegative(), data: profileSchema })
           .strict()
           .parse(await body(request));
-        return json(
-          await db.moderate(
-            auth.memberId,
-            key(request),
-            photoId,
-            data.version,
-            data.approve,
-            requestId,
-          ),
-        );
+        return json(await db.saveProfile(auth.memberId, key(request), data.version, data.data));
       }
-    }
-    throw new StoreError('NOT_FOUND');
+      if (route === 'preferences' && request.method === 'POST') {
+        const data = z
+          .object({ version: z.number().int().nonnegative(), data: preferencesSchema })
+          .strict()
+          .parse(await body(request));
+        return json(await db.savePreferences(auth.memberId, key(request), data.version, data.data));
+      }
+      if (route === 'photos' && request.method === 'POST') {
+        if (
+          !['image/jpeg', 'image/png', 'image/webp'].includes(
+            request.headers.get('content-type') ?? '',
+          )
+        )
+          throw new StoreError('INVALID_INPUT');
+        let photo: Buffer;
+        try {
+          photo = await sanitizePhoto(await boundedBody(request, c.PHOTO_MAX_BYTES));
+        } catch (error) {
+          if (error instanceof StoreError) throw error;
+          throw new StoreError('INVALID_INPUT');
+        }
+        let written: string | undefined;
+        try {
+          return json(
+            await db.addPhoto(
+              auth.memberId,
+              key(request),
+              db.lookup(photo.toString('base64')),
+              async (id) => {
+                await putPhoto(id, photo);
+                written = id;
+              },
+            ),
+          );
+        } catch (error) {
+          if (written) await deletePhoto(written).catch(() => undefined);
+          throw error;
+        }
+      }
+      if (path[0] === 'photos' && path[1] && path.length <= 3) {
+        const photoId = uuid.parse(path[1]);
+        if (path.length === 2 && request.method === 'GET') {
+          const bytes = await db.photoAccess(auth, photoId, false, requestId, () =>
+            getPhoto(photoId),
+          );
+          return new Response(new Uint8Array(bytes), {
+            headers: { ...headers, 'Content-Type': 'image/jpeg', 'Content-Disposition': 'inline' },
+          });
+        }
+        if (path[2] === 'remove' && request.method === 'POST') {
+          const result = await db.removePhoto(auth.memberId, key(request), photoId);
+          await deletePhoto(photoId);
+          return json(result);
+        }
+      }
+      if (route === 'ops/photos' && request.method === 'GET')
+        return json(await db.moderationQueue(auth.memberId, requestId));
+      if (route === 'ops/audit' && request.method === 'GET')
+        return json(await db.auditLog(auth.memberId, requestId));
+      if (path[0] === 'ops' && path[1] === 'photos' && path[2] && path.length === 3) {
+        const photoId = uuid.parse(path[2]);
+        if (request.method === 'GET') {
+          const bytes = await db.photoAccess(auth, photoId, true, requestId, () =>
+            getPhoto(photoId),
+          );
+          return new Response(new Uint8Array(bytes), {
+            headers: { ...headers, 'Content-Type': 'image/jpeg' },
+          });
+        }
+        if (request.method === 'POST') {
+          recent(auth);
+          const data = z
+            .object({ version: z.number().int().nonnegative(), approve: z.boolean() })
+            .strict()
+            .parse(await body(request));
+          return json(
+            await db.moderate(
+              auth.memberId,
+              key(request),
+              photoId,
+              data.version,
+              data.approve,
+              requestId,
+            ),
+          );
+        }
+      }
+      throw new StoreError('NOT_FOUND');
+    });
   } catch (error) {
     const code =
       error instanceof z.ZodError

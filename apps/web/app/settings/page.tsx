@@ -1,4 +1,5 @@
 'use client';
+import { SafetyLink } from '../../components/safety';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -51,6 +52,9 @@ export default function Page() {
   }
   return (
     <Shell member>
+      <div className="dashboard">
+        <SafetyLink surface="settings" />
+      </div>
       <section className="form-page wide">
         <p className="eyebrow">YOUR CHOICES</p>
         <h1>

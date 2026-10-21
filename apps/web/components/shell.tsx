@@ -15,6 +15,7 @@ export function Shell({ children, member = false }: { children: ReactNode; membe
             <>
               <Link href="/app">My profile</Link>
               <Link href="/settings">Settings</Link>
+              <Link href="/safety/cases">Reports & review</Link>
             </>
           ) : (
             <>

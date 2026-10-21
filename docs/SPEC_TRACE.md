@@ -304,3 +304,20 @@ pre-fix `accounts.ts` blob from `3cc38d7`, then pass after restoration. Migratio
 0004 upgrades a disposable M1 schema, preserving 15 application-table snapshots
 and role grants; rollback and migration-runner replay are verified. No later
 milestone implementation or production readiness is implied by these checks.
+
+## M2 safety implementation and evidence (2026-10-21)
+
+The original requirement IDs and milestone order remain unchanged. DEC-035 records
+M1 merge authorization; DEC-036–038 document the M2 choices and explicit limits.
+
+| Invariant / requirements                   | Implemented module                                                                                                           | Executable evidence and boundary                                                                                                                                                                                                                                                                        |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| I-04; P20/P21/P22 block and deny rules     | `core/safety.isDenied`, `db/member-access`, migrations 0005–0007                                                             | `tests/unit/safety.test.ts`, `tests/unit/safety-architecture.test.ts`, `tests/integration/safety.test.ts`, `tests/e2e/safety.spec.ts`: bilateral profile/photo denial, authoritative fresh checks, both profile race orderings, report/block concurrency; future M3/M4 transition races remain deferred |
+| I-11; REQ-117/149 and P17/P20 concern flow | `web/components/safety`, `/safety/concern`, `/safety/help`, `/safety/cases`, `db/safety`                                     | Independent help/report/block/acknowledgement, no-description report, lost-response retry, post-deletion subject and restricted reporter; current profile/settings entry points. Future chat/plan/card/post-meeting surfaces belong to their milestones                                                 |
+| I-12; REQ-148/157 safety boundary scope    | `safety.report`, `safety_signal`, `integrity_signal`, `enforcement`, `appeal`; dedicated login/key; `app.enforcement_status` | Real database tests deny app/learning/ops/identity roles access, verify encrypted detail and separate integrity storage; reported-member DTOs omit reporter/case narrative. No claim that later learning/reliability/exports are implemented                                                            |
+| I-20; P20/P21 reviewer access              | `AccountStore.withSession/withStaff`, `SafetyStore`, `/ops/safety`, `case_access_audit`                                      | Every case view audited; runtime audit mutation denied; role/session revoked after login denies old authority; controlled revocation/read races; safety role required even for admins                                                                                                                   |
+| P20 precaution/appeals/kill switches       | `core/safety`, `db/safety`, `config/safety`, `/ops/safety`                                                                   | Versioned account restriction/lift, independent enforcement after Exit, appeal review, switch persistence and no automatic count-based ban. Config keeps Go off; venue/event enforcement deliberately waits for M4/M6                                                                                   |
+
+Full test totals and CI evidence are recorded in PROJECT_STATUS.md and the M2 PR.
+M5 deletion orchestration and M7 human accessibility/security review remain release
+gates. An automated axe pass does not certify all of WCAG or operational readiness.

@@ -27,7 +27,7 @@ export class ApiError extends Error {
     super(message);
   }
 }
-export async function api<T>(path: string, data?: unknown): Promise<T> {
+export async function api<T>(path: string, data?: unknown, commandKey?: string): Promise<T> {
   const response = await fetch(`/api/v1/${path}`, {
     method: data === undefined ? 'GET' : 'POST',
     credentials: 'same-origin',
@@ -35,7 +35,10 @@ export async function api<T>(path: string, data?: unknown): Promise<T> {
     ...(data === undefined
       ? {}
       : {
-          headers: { 'Content-Type': 'application/json', 'Idempotency-Key': crypto.randomUUID() },
+          headers: {
+            'Content-Type': 'application/json',
+            'Idempotency-Key': commandKey ?? crypto.randomUUID(),
+          },
           body: JSON.stringify(data),
         }),
   });
