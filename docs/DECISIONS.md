@@ -154,3 +154,67 @@ is claimed implemented by this milestone. Review and merge M1 before M2.
 7. Who reviews privacy/retention and venue accessibility before live enrollment? Confirm case-hold and age-out decisions before implementation.
 
 These questions do not block a synthetic scaffold. Unresolved operational choices block the relevant live feature, not reporting, cancellation or deletion access.
+
+## Founder execution directive and approval boundary (DEC-029)
+
+2026-10-20: The founder's Meetwell principal-engineering directive is the latest
+work instruction. Preserve the PDF, current project root and existing M0/M1 work;
+verify historical claims, perform dated competitor/REA research and execute a safe
+focused slice. Explicit founder approval is required for merges, shared force-push,
+branch deletion, deployment, irreversible production migration and consequential
+product/privacy changes. Research recommendations are proposals, not approvals.
+No REA installation is justified now; its evaluation is in docs/research.
+
+## Isolate durable authentication delivery failures (DEC-030)
+
+2026-10-20, Spec P22; refinement of DEC-026. The M1 sender transmitted a batch in one
+transaction. A later SMTP/decryption failure rolled back earlier sent markers and
+could repeatedly delay later requests. Commit one message at a time under SKIP
+LOCKED. Persist attempt count and next-attempt time for failure; cap attempts and
+batch size in account configuration. Migration0004 is additive. SMTP adapter
+timeouts include greeting; operational logs contain counts only, never provider
+errors, email or token. Four PostgreSQL regressions cover poison/failure isolation,
+retry/expiry/exhaustion, concurrent runners and COMMIT failure after SMTP acceptance.
+
+Alternative: a lease/fencing outbox avoids network-held transactions but is larger
+than this local M1 repair. Retain one bounded row lock for now; socket idle timeout
+is not a total delivery deadline. SMTP can duplicate after ambiguous delivery or
+commit; token consumption remains single-use. No exactly-once delivery claim.
+No public API/UI behavior or vendor changed. Operational details and rollback are
+in docs/operations/auth-delivery.md. Whole-process crash/transport fault tests and
+product-notification authorization remain later release work. PR merge is pending
+explicit approval; no production migration was performed.
+
+## Milestone crosswalk and pre-pilot privacy gates (DEC-031)
+
+2026-10-20, Spec P23/P31/P32. The directive's historical M5–M7 labels differ from
+CODEX_PROMPTS: repository M5 already includes deletion, M6 event Go, M7 hardening.
+Preserve repository IDs and their trace links, document the crosswalk in
+docs/product/roadmap.md, and retain deletion/restore before live enrollment/Go.
+This is a reconciliation proposal, not silent approval of a different launch
+sequence. Hardening and human operations begin before M7's final gate. The PDF's
+timeline assumes people/budget that have not been committed; no date is promised.
+
+Alternatives were to renumber all existing trace rows or move deletion later;
+neither improves correctness. Architecture findings G01–G15 distinguish current
+code, proposed fixes, migration/test impact and required decisions. No ML, Rust,
+GPS processing, paid exposure, live enrollment or consequential matching policy
+change was introduced by this audit.
+
+## Wait for final PostgreSQL initialization (DEC-032)
+
+2026-10-20, Spec P22/P31 infrastructure reliability. PR #4's first remote run
+39541603202 failed its real Compose assertion: `postgis_version()` did not exist
+after a socket-based `pg_isready` probe reported healthy. The upstream image uses
+a socket-only temporary server during initialization, then starts the TCP server
+after its scripts complete. Use `pg_isready -h 127.0.0.1` in Compose and the CI
+service container. Retain both database assertions; do not mask this with a sleep
+or weaken the PostGIS requirement. No schema, product policy or data migration.
+
+Source: [upstream PostgreSQL entrypoint](https://github.com/docker-library/postgres/blob/master/docker-entrypoint.sh),
+`docker_temp_server_start` and initialization ordering. Verification is the real
+fresh-volume `dev-services` job and application checks on the new PR head. Docker
+is unavailable locally; native Windows checks do not substitute for this job.
+The broader option is a schema-aware readiness probe; TCP plus the existing SQL
+assertions is sufficient for this initialization race. Rollback only changes the
+probe and reintroduces that race. No data cleanup or production operation occurs.

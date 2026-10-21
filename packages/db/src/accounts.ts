@@ -148,27 +148,48 @@ export class AccountStore {
     );
     return id;
   }
-  /** Durable auth outbox. Keep generic mail outside product queues; encrypted token is short-lived.
-   * Network failure leaves pending rows retriable; SMTP cannot promise exactly-once delivery.
+  /** Each message commits independently, so a poison row cannot roll back prior sends.
+   * The adapter MUST bound SMTP waits. SKIP LOCKED permits concurrent runners without
+   * holding a whole batch. A crash after SMTP acceptance can still duplicate mail;
+   * single-use authentication tokens, not exactly-once SMTP, enforce login authority.
    */
-  async deliverMagicLinks(send: (email: string, token: string) => Promise<void>): Promise<void> {
-    await transaction(this.identity, async (db) => {
-      const pending = await db.query<{ id: string; payload_cipher: string }>(`
-        SELECT id,payload_cipher FROM identity.magic_links
-        WHERE sent_at IS NULL AND consumed_at IS NULL AND expires_at > now()
-        ORDER BY created_at LIMIT 10 FOR UPDATE SKIP LOCKED`);
-      for (const row of pending.rows) {
-        const payload = this.identityCipher.open<{ email: string; token: string }>(
-          row.payload_cipher,
-          `magic:${row.id}`,
+  async deliverMagicLinks(send: (email: string, token: string) => Promise<void>) {
+    const result = { sent: 0, failed: 0 };
+    for (let i = 0; i < config.AUTH_OUTBOX_BATCH_SIZE; i++) {
+      const outcome = await transaction(this.identity, async (db) => {
+        const pending = await db.query<{ id: string; payload_cipher: string }>(
+          `SELECT id,payload_cipher FROM identity.magic_links
+           WHERE sent_at IS NULL AND consumed_at IS NULL AND expires_at > now()
+             AND next_attempt_at <= now() AND attempts < $1
+           ORDER BY created_at,id LIMIT 1 FOR UPDATE SKIP LOCKED`,
+          [config.AUTH_OUTBOX_MAX_ATTEMPTS],
         );
-        await send(payload.email, payload.token);
+        const row = pending.rows[0];
+        if (!row) return null;
+        let delivered = false;
+        try {
+          const payload = this.identityCipher.open<{ email: string; token: string }>(
+            row.payload_cipher,
+            `magic:${row.id}`,
+          );
+          await send(payload.email, payload.token);
+          delivered = true;
+        } catch {
+          // Persist only retry metadata. Provider errors may contain emails or tokens.
+        }
+        // DB errors must propagate: never report a committed outcome after an uncertain write.
         await db.query(
-          'UPDATE identity.magic_links SET sent_at=now(),attempts=attempts+1 WHERE id=$1',
-          [row.id],
+          `UPDATE identity.magic_links SET attempts=attempts+1,
+             sent_at=CASE WHEN $2 THEN clock_timestamp() ELSE NULL END,
+             next_attempt_at=clock_timestamp()+$3*interval '1 second' WHERE id=$1`,
+          [row.id, delivered, config.AUTH_OUTBOX_RETRY_SECONDS],
         );
-      }
-    });
+        return delivered ? 'sent' : 'failed';
+      });
+      if (!outcome) break;
+      result[outcome]++;
+    }
+    return result;
   }
   async consumeMagicLink(
     token: string,

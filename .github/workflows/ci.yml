@@ -61,7 +61,7 @@ jobs:
           POSTGRES_DB: meetwell_test
         ports: ['5432:5432']
         options: >-
-          --health-cmd "pg_isready -U meetwell_test_admin -d meetwell_test"
+          --health-cmd "pg_isready -h 127.0.0.1 -U meetwell_test_admin -d meetwell_test"
           --health-interval 2s --health-timeout 3s --health-retries 30
     env:
       CI: 'true'

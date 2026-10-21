@@ -6,6 +6,16 @@ pages and photo-review controls are implemented on `codex/m1-accounts-onboarding
 Review its tests, decisions and PR before merging and starting M2. The earlier
 hosted preview remains an independent design reference.
 
+Latest review: [execution roadmap/crosswalk](product/roadmap.md),
+[architecture gaps](architecture/review-2026-10-20.md),
+[competitive research](research/competitive-landscape-2026.md),
+[REA evaluation](research/rea-evaluation.md). DEC-029 requires explicit merge
+approval. Audit branch `codex/m1-audit-auth-delivery` is stacked on M1 and repairs
+auth mail failure isolation. Its CI exposed a PostgreSQL initialization race;
+DEC-032 switches readiness to TCP without relaxing the database assertions.
+PR #1 is an older conflicting M0 proposal; do not merge
+it over PR2's accepted foundation. Founder decision is needed to close it.
+
 | Milestone | Deliverable                                                                                                                             | Gate before moving on                                                                                               |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | M0        | Requirement map, architecture, config, pnpm scaffold, real infrastructure/migration/test setup                                          | Green quality gates; founder review of decisions and scope                                                          |
@@ -33,6 +43,13 @@ Pricing/payments; demographic research; pooled models/embeddings; broad neighbor
 
 ## Release work retained from M1
 
+- M1 review: G07 auth delivery repair and its regression evidence; G08 stable
+  client retry keys/refresh recovery remain open. No unmerged work is discarded.
+- Before real accounts: G03 staff/disclosure revocation races and G09 ambiguous
+  media commit compensation; live enrollment remains disabled until resolved.
+- M2: G01 extract shared auth-mail wiring and minimize worker credentials;
+  G04 independent enforcement survives account exit/deletion/appeal.
+
 - M2: reporting/appeal access for restricted and exited members, assigned safety
   cases and atomic enforcement/discovery integration. No case narratives in ops.
 - M3: compose the tested bilateral preference function with blocks, capacity and
@@ -45,6 +62,13 @@ Pricing/payments; demographic research; pooled models/embeddings; broad neighbor
   manual screen-reader testing and accessibility audit. Keep live enrollment closed.
 - Founder review: provisional vocabulary, age-out/return policy, operational support,
   name/areas, privacy review and production providers. See DEC-024–028.
+
+- M3–M7: whole-process worker crash/slow transport tests, body deadlines, queue
+  monitoring, test-fixture isolation under repeated auth budgets, immutable CI
+  action revisions and automated secret/dependency scanning (G07/G13/G15).
+- Product research: proposed comprehension/coverage/planning/Go/cost experiments
+  need a reviewed protocol and relevant live safety/privacy gates. No competitor
+  outcome, unique algorithm or market advantage has been established by desk research.
 
 ## Infrastructure verification
 

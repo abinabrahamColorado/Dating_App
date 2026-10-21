@@ -4,6 +4,14 @@ M1 accounts and onboarding for a Manhattan, NYC pilot, ages 18–30. Meetwell is
 
 Start with [AGENTS.md](AGENTS.md), then read the authoritative [architecture PDF](docs/architecture-v0.2.pdf) and its [extracted text](docs/architecture-v0.2.txt). [CODEX_PROMPTS.md](CODEX_PROMPTS.md) defines M0–M7. Run one milestone at a time and review/merge its PR before the next.
 
+Merges require explicit founder approval (DEC-029). Resume from
+[project status](docs/PROJECT_STATUS.md), the [roadmap/crosswalk](docs/product/roadmap.md)
+and [repository audit](docs/testing/repository-audit-2026-10-20.md).
+The latest [competitive research](docs/research/competitive-landscape-2026.md),
+[REA evaluation](docs/research/rea-evaluation.md) and
+[architecture review](docs/architecture/review-2026-10-20.md) distinguish verified
+implementation, published claims and proposals. The PDF remains authoritative.
+
 - [Current status and next step](docs/PROJECT_STATUS.md).
 - [Windows development](docs/DEVELOPMENT_WINDOWS.md): setup and daily start/stop commands.
 - [Engineering workflow](CONTRIBUTING.md): branches, reviews, verification, and source ownership.

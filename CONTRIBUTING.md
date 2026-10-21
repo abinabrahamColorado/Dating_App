@@ -7,8 +7,12 @@ Use `docs/PROJECT_STATUS.md` to resume work and `docs/BACKLOG.md` for milestone 
 
 Keep `main` as the reviewed baseline. Work on a `codex/<milestone>-<change>` branch,
 make a focused commit, and open a pull request that explains behavior and validation.
-Do not force-push or mix unrelated milestones. Review and merge one milestone before
-starting the next. Do not represent a green scaffold as a completed product.
+Do not force-push or mix unrelated milestones. Review one milestone and obtain
+explicit founder authorization to merge before starting the next. Merges, branch
+deletion, deployment and irreversible production migrations are approval-only
+(DEC-029). A green check is not merge authorization or a completed product.
+Stack a focused correction on an unmerged milestone when necessary; name its base
+and dependency in the PR. Never overwrite another branch to fold in the correction.
 
 Run `corepack pnpm check` sequentially: Next.js build and route generation share
 generated files and must not run concurrently in the same checkout.
