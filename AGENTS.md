@@ -4,6 +4,18 @@ These are standing rules for every task in this repository. Read this file, then
 `docs/architecture-v0.2.txt`, before you write or change anything. If anything
 else conflicts with this file or the spec, stop and say so.
 
+The founder's 2026-10-20 execution directive governs authorization: do not merge
+PRs, force-push shared branches, delete branches, deploy, run irreversible
+production migrations, or change consequential product/privacy behavior without
+explicit approval. Prepare a concrete reviewed change first. Ordinary reversible
+development fixes remain authorized. See DEC-029 and DEC-033. The founder rejected
+the roadmap crosswalk: use the numbering and order in `CODEX_PROMPTS.md` exactly.
+Deletion and operational readiness must precede real users or Go. Preserve the PDF.
+
+Never run blanket regex rewrites over documents. Make explicit, reviewed edits
+and verify numbers, times, versions, identifiers, URLs and quotations unchanged
+unless that specific content change is intended and authorized (DEC-034).
+
 ## 1. What we are building
 
 This is a web-first local introduction and meeting service. It gives members a
@@ -26,8 +38,11 @@ Because of that, domain logic must never live in UI components.
 
 ## 2. Source of truth
 
-- `docs/architecture-v0.2.txt` (text extracted from
-  `docs/architecture-v0.2.pdf`) is the product and engineering specification.
+- `docs/architecture-v0.2.pdf` is the founder-designated authoritative product
+  and engineering specification. Read its extracted text in
+  `docs/architecture-v0.2.txt`, and inspect the PDF for diagrams or layout-sensitive
+  meaning. The PDF wins if extraction differs. Preserve both source files;
+  record justified implementation improvements in `docs/DECISIONS.md`.
   Cite it in code and tests as `Spec P<n>`. For example, `Spec P5` is Part 5,
   the modes and state machine.
 - Where the spec states a numeric value (caps, timers, retention), treat it as

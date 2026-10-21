@@ -13,6 +13,7 @@ corepack pnpm install --frozen-lockfile
 corepack pnpm setup:windows
 corepack pnpm db:migrate
 corepack pnpm db:grant-local-worker
+corepack pnpm setup:accounts
 corepack pnpm check
 ```
 
@@ -52,11 +53,11 @@ corepack pnpm worker
 
 | Service             | Local address                             |
 | ------------------- | ----------------------------------------- |
-| Web scaffold        | `http://127.0.0.1:3000`                   |
+| Member web app      | `http://localhost:3000`                   |
 | Mailpit inbox       | `http://127.0.0.1:8025`                   |
 | MinIO console       | `http://127.0.0.1:9001`                   |
 | PostgreSQL          | `127.0.0.1:55432`                         |
-| Test browser server | `127.0.0.1:3100` (test runner manages it) |
+| Test browser server | `localhost:3100` (test runner manages it) |
 
 Stop the foreground web/worker with Ctrl+C. Manage the background services with:
 
@@ -91,3 +92,31 @@ before restarting; never point test commands at a live member database.
 Keep `corepack pnpm check` sequential because the Next build and type generation
 share generated files. The repository enforces LF line endings for migration hashes.
 Do not copy `.local`, `.env`, or `node_modules` to GitHub.
+
+## Accounts and a synthetic photo reviewer
+
+Run `corepack pnpm setup:accounts` with services running after pulling M1.
+It migrates dev/test, provisions separate identity/app/ops logins, generates
+encryption keys, and creates private buckets. Keys/passwords remain in ignored
+`.env`; never replace them casually or encrypted local data becomes unreadable.
+For local development only, storage uses the loopback MinIO administrator.
+
+Open `http://localhost:3000`, sign in with a synthetic address, retrieve the email
+from Mailpit and open its link in the same browser. Use a synthetic adult date and
+synthetic images. Create a second registered account for photo moderation, then:
+
+```powershell
+corepack pnpm staff:grant reviewer@synthetic.invalid operator
+# Optional audit-review access for this synthetic staff account:
+corepack pnpm staff:grant reviewer@synthetic.invalid admin
+```
+
+The command accepts a registered local UUID or synthetic email and audits grants.
+It only accepts a loopback `_dev` database. There is no public staff-assignment or
+email-search endpoint. Open `/ops` as the reviewer; review another account's photos.
+The member then refreshes `/app` and completes onboarding. Moderators cannot
+approve their own photos. Browser tests use isolated `_test` storage/database.
+
+Development terms/privacy and self-asserted age are not launch-ready legal or
+verification controls. Deletion disables immediately; complete erasure is M5.
+The code refuses account APIs on a non-loopback application origin.

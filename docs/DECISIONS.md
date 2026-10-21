@@ -59,7 +59,91 @@ restricted role. Configure `createSchema: false` because migration 0001 already 
 the queue schema. Verify that real jobs execute while the worker still lacks database
 CREATE privilege; do not fix initialization by widening runtime privileges.
 
-## Founder questions before M1 (still open)
+## Authoritative source and local release gate (DEC-024)
+
+2026-10-20, Spec P4/P22/P23/P31: The founder explicitly designated the supplied
+67-page PDF as the main architecture and authorized justified improvements.
+The supplied PDF and `docs/architecture-v0.2.pdf` are byte-identical (SHA-256
+`c4c27ec3560cee9855d4129e06769e10330e87e0dff86935d4206740c77dd4a0`).
+All 32 parts of the extracted text were read; the state-machine diagram (page 12)
+and architecture diagram with its continuation (pages 61–62) were inspected visually.
+Preserve the original PDF and text. The PDF governs if extraction differs.
+
+M1 permits accounts only with explicit local/test mode and a loopback application
+origin. The web server binds to loopback. Use synthetic data; production enrollment
+remains disabled until safety, erasure/restore, operations and legal review are ready.
+Development terms/privacy are versioned acknowledgements, not launch-ready legal
+documents. Birth-date entry is self-asserted adult eligibility, not identity verification.
+
+## Explicit preferences and state authority (DEC-025)
+
+2026-10-20, Spec P4/P5/P11/P12: Use provisional, explicitly stated gender,
+relationship intention/structure, smoking and interest options from
+`packages/config/src/accounts.ts`. No attribute is inferred. Optional smoking
+supports unknown; unknown fails a hard exclusion. Who-to-meet is a required
+structural eligibility choice. Age, intention, structure and smoking expose all
+three exact preference labels. Store immutable encrypted USER revisions, prior
+version and future-introduction scope. Richer taxonomies need pilot review.
+
+`app.members` owns account state/version/policy epoch; identity owns credentials,
+birth date and consent. A single state authority avoids competing cross-schema
+copies. Mutation receipts and row locks protect retries and racing edits.
+Activation/resumption recheck age, profile/preferences and reviewed photos.
+Removing any photo moves an active account back to onboarding, conservatively
+requiring a fresh readiness check. Exit has no self-service restoration in M1.
+Deletion immediately disables authority and revokes sessions; M5 performs erasure.
+
+## Authentication, encryption and local adapters (DEC-026)
+
+2026-10-20, Spec P8/P21/P22: Magic links are short-lived, single-use, browser-bound
+and explicitly submitted after opening. Keep tokens in URL fragments to avoid
+request/referrer logging. Pending email uses an encrypted identity outbox; failures
+retry through pg-boss. SMTP retries may duplicate a generic email, never a login.
+Optional resident passkeys require user verification and bound one-time challenges.
+Sensitive operations require recent authentication. Active sessions can be inspected
+and revoked. Passkey removal/recovery management remains a release-hardening item.
+
+Use AES-256-GCM envelope encryption with random per-record data keys, separate
+identity/profile/media wrapping keys, and authenticated row/field context. Lookup
+tokens use a separate keyed HMAC; random session/link tokens are hashed. Generated
+keys and role passwords stay only in ignored `.env`. These local keys are not a
+production KMS or tested key-rotation deployment. MinIO and Mailpit are local adapters;
+MinIO development root credentials are confined to loopback synthetic storage.
+Production purpose-scoped object credentials, mail transport and key custody require
+review before the local gate is changed.
+
+New operational limits live in `packages/config/src/accounts.ts`; spec-supplied
+numeric pilot hypotheses remain in `pilot.ts`. Dependency release-age enforcement
+was retained: AWS S3 client 3.1152.0 was selected because 3.1153.0 was too new.
+
+## Private media and staff controls (DEC-027)
+
+2026-10-20, Spec P4/P20/P21/P22: Decode uploaded images, bound bytes/pixels,
+reject animation, orient and re-encode to JPEG without metadata, then encrypt before
+private S3 storage. Random object IDs never authorize retrieval. Owners may preview
+their uploads; photo reviewers receive only the pending queue and audited reads.
+Operators/admins may review; safety-reviewer status alone grants no photo access.
+Audit-log reads require admin. Exited/restricted staff lose role authorization;
+moderators cannot approve their own uploads. No public staff-assignment endpoint.
+
+Real PostgreSQL tests showed media row locking requires UPDATE privilege.
+Forward migration 0003 adds a narrow owner-media locking function instead of
+granting the application role permission to approve photos. The removal function
+can only mark REMOVED. Audit/preference/consent histories are append-only to runtime.
+S3 write and database commit cannot be one transaction: ordinary failures compensate,
+but a crash may leave an encrypted orphan. M5 must reconcile orphans and deletion.
+
+## Verification scope and remaining gates (DEC-028)
+
+2026-10-20: M1 tests use real PostgreSQL/PostGIS, a private test bucket, Mailpit,
+synthetic images and Chromium's virtual authenticator. Scripted onboarding latency
+does not measure human comprehension or moderation turnaround. Axe and keyboard/
+mobile checks provide automated evidence, not a completed assistive-technology audit.
+The full I-19 route matrix and I-20 case-access controls expand with later milestones.
+No report, allocator, chat, plan, feedback, erasure job, event-Go or serving model
+is claimed implemented by this milestone. Review and merge M1 before M2.
+
+## Founder questions before live enrollment (still open)
 
 1. Keep **Meetwell** as the working name, and keep all eight provisional areas? A narrower catchment may be easier to operate.
 2. Confirm ages18–30 inclusive and the proposed policy when an active member turns31.
@@ -70,3 +154,102 @@ CREATE privilege; do not fix initialization by widening runtime privileges.
 7. Who reviews privacy/retention and venue accessibility before live enrollment? Confirm case-hold and age-out decisions before implementation.
 
 These questions do not block a synthetic scaffold. Unresolved operational choices block the relevant live feature, not reporting, cancellation or deletion access.
+
+## Founder execution directive and approval boundary (DEC-029)
+
+2026-10-20: The founder's Meetwell principal-engineering directive is the latest
+work instruction. Preserve the PDF, current project root and existing M0/M1 work;
+verify historical claims, perform dated competitor/REA research and execute a safe
+focused slice. Explicit founder approval is required for merges, shared force-push,
+branch deletion, deployment, irreversible production migration and consequential
+product/privacy changes. Research recommendations are proposals, not approvals.
+No REA installation is justified now; its evaluation is in docs/research.
+
+## Isolate durable authentication delivery failures (DEC-030)
+
+2026-10-20, Spec P22; refinement of DEC-026. The M1 sender transmitted a batch in one
+transaction. A later SMTP/decryption failure rolled back earlier sent markers and
+could repeatedly delay later requests. Commit one message at a time under SKIP
+LOCKED. Persist attempt count and next-attempt time for failure; cap attempts and
+batch size in account configuration. Migration0004 is additive. SMTP adapter
+timeouts include greeting; operational logs contain counts only, never provider
+errors, email or token. Four PostgreSQL regressions cover poison/failure isolation,
+retry/expiry/exhaustion, concurrent runners and COMMIT failure after SMTP acceptance.
+
+Alternative: a lease/fencing outbox avoids network-held transactions but is larger
+than this local M1 repair. Retain one bounded row lock for now; socket idle timeout
+is not a total delivery deadline. SMTP can duplicate after ambiguous delivery or
+commit; token consumption remains single-use. No exactly-once delivery claim.
+No public API/UI behavior or vendor changed. Operational details and rollback are
+in docs/operations/auth-delivery.md. Whole-process crash/transport fault tests and
+product-notification authorization remain later release work. PR merge is pending
+explicit approval; no production migration was performed.
+
+## Milestone crosswalk and pre-pilot privacy gates (DEC-031)
+
+**REJECTED by the founder; superseded by DEC-033.** The text below records the
+historical proposal only. It is not the approved roadmap.
+
+2026-10-20, Spec P23/P31/P32. The directive's historical M5–M7 labels differ from
+CODEX_PROMPTS: repository M5 already includes deletion, M6 event Go, M7 hardening.
+Preserve repository IDs and their trace links, document the crosswalk in
+docs/product/roadmap.md, and retain deletion/restore before live enrollment/Go.
+This is a reconciliation proposal, not silent approval of a different launch
+sequence. Hardening and human operations begin before M7's final gate. The PDF's
+timeline assumes people/budget that have not been committed; no date is promised.
+
+Alternatives were to renumber all existing trace rows or move deletion later;
+neither improves correctness. Architecture findings G01–G15 distinguish current
+code, proposed fixes, migration/test impact and required decisions. No ML, Rust,
+GPS processing, paid exposure, live enrollment or consequential matching policy
+change was introduced by this audit.
+
+## Wait for final PostgreSQL initialization (DEC-032)
+
+2026-10-20, Spec P22/P31 infrastructure reliability. PR #4's first remote run
+39541603202 failed its real Compose assertion: `postgis_version()` did not exist
+after a socket-based `pg_isready` probe reported healthy. The upstream image uses
+a socket-only temporary server during initialization, then starts the TCP server
+after its scripts complete. Use `pg_isready -h 127.0.0.1` in Compose and the CI
+service container. Retain both database assertions; do not mask this with a sleep
+or weaken the PostGIS requirement. No schema, product policy or data migration.
+
+Source: [upstream PostgreSQL entrypoint](https://github.com/docker-library/postgres/blob/master/docker-entrypoint.sh),
+`docker_temp_server_start` and initialization ordering. Verification is the real
+fresh-volume `dev-services` job and application checks on the new PR head. Docker
+is unavailable locally; native Windows checks do not substitute for this job.
+The broader option is a schema-aware readiness probe; TCP plus the existing SQL
+assertions is sufficient for this initialization race. Rollback only changes the
+probe and reintroduces that race. No data cleanup or production operation occurs.
+
+## Founder decisions for the M1 merge review (DEC-033)
+
+2026-10-20, Spec P22/P23/P31. The founder explicitly rejected the roadmap crosswalk.
+Keep the milestone numbering and order in CODEX_PROMPTS.md without reinterpretation:
+M0 foundation, M1 accounts/onboarding, M2 safety, M3 Explore, M4 connections/plans,
+M5 feedback/outcomes/metrics/deletion, M6 events/Go prototype, M7 hardening/release.
+Deletion and operational readiness before any real users or Go are approved.
+M5 before M6 already satisfies the deletion order; no renumbering is required.
+Synthetic development may continue in that order; live use remains gated.
+
+The founder accepted possible duplicate magic-link emails after an ambiguous
+SMTP send as a documented limitation. Tokens remain expiring, browser-bound and
+single-use; this does not authorize duplicate product notifications or relax consent.
+REA stays uninstalled. Competitor research is complete for now; no further research
+or tool installation is part of this task. PR #3 must not be merged yet; do not
+start M2 or close the superseded open M0 PR #1.
+
+## Correct and audit the Markdown rewrite (DEC-034)
+
+2026-10-20. The earlier broad text rewrite was inappropriate. Recover the original
+creation text from this task's execution record, compare all eight affected
+documents with commit 90b371f and inspect every non-formatting difference. Restore
+the altered Mailpit URL, Timeleft +1 identifier and five lines of invariant-ID
+spelling. Other changes only separate prose labels from unchanged numbers/versions
+or format unchanged PR references; no changed thousand separators, clock times,
+version values or quoted sentences were found. The complete line-by-line inventory
+is in docs/testing/markdown-rewrite-audit.md. No source PDF or prompt was changed.
+
+Never run blanket regex rewrites over documents again. Use explicit edits and
+review the diff for numbers, times, versions, identifiers, URLs and quotations.
+The regression proof and migration review are in docs/testing/m1-merge-review.md.

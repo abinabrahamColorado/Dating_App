@@ -10,9 +10,18 @@
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "3.1152.0",
     "@meetwell/config": "workspace:*",
+    "@meetwell/core": "workspace:*",
+    "@meetwell/db": "workspace:*",
+    "@simplewebauthn/browser": "14.0.0",
+    "@simplewebauthn/server": "14.0.3",
     "next": "16.4.1",
+    "nodemailer": "10.1.7",
+    "pg": "8.23.1",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "sharp": "0.35.5",
+    "zod": "4.6.7"
   }
 }

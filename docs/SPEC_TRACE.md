@@ -1,6 +1,34 @@
-# Specification trace — M0 baseline
+# Specification trace — M1 evidence
 
 Source: `docs/architecture-v0.2.txt` (all 32 parts read) and `AGENTS.md`. `P<n>` below means **Spec P<n>**. This is an implementation plan, not a claim that these features are complete. Every product row is **PLANNED** until its milestone supplies the named executable test. M0 implements only the infrastructure checks listed at the end. Module names are planned paths beneath `packages/` or `apps/`; learning is a restricted DB/export module, not a model service.
+
+## M1 implementation and executable evidence
+
+The founder-designated PDF is authoritative; its extracted text is the reading
+aid. The complete 193-row plan below is retained. Except for the bounded evidence
+in this table, requirements remain planned. Test files are
+`tests/unit/accounts.test.ts`, `tests/integration/accounts.test.ts` and
+`tests/e2e/accounts.spec.ts`. Modules are `packages/core/src/accounts.ts`,
+`packages/db/src/accounts.ts`, `apps/web/server` and the corresponding UI pages.
+
+| Requirements                | Executable evidence and limits                                                                                                                                                                      |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| REQ-001 / I-01              | Unit date/leap/timezone checks; DB adult registration, versioned consent and birth-date isolation; browser underage rejection and own DTO checks. Self-assertion, not vendor identity verification. |
+| REQ-002 / I-02              | Bilateral preference symmetry property test and all hard gates including unknown values. M1 function only; M3 adds safety, capacity and feasibility.                                                |
+| REQ-003 / I-03              | DB concurrent edits, replay, prior versions, USER source and denied UPDATE. UI exposes all three exact labels and history.                                                                          |
+| REQ-013 / I-13; REQ-029–032 | Unit precedence/readiness; DB activation, stale updates, Focus/Pause/resume, restrictions and deletion disable. No future chat/plan behavior claimed; Exit return workflow remains deferred.        |
+| REQ-017 / I-17              | Strict schemas reject location/birth fields; unit EXIF removal; browser rejects coordinates. Queue/export/telemetry audits expand in M6/M7.                                                         |
+| REQ-019 / I-19              | DB ownership/role tests; browser anonymous/cross-origin/field/object matrix, passkeys and fresh-auth deletion. Extend this matrix with every new route.                                             |
+| REQ-020 / I-20              | DB audited media access/review, immutable audit, role isolation, self-review and restricted-staff denial; browser admin audit. Case access is M2.                                                   |
+| REQ-021/022/026             | Real Mailpit-to-onboarding browser flow under configured three-minute target; explicit fields and optional availability. Script timing is not human usability research.                             |
+| REQ-023/024/027             | Browser minimized own DTO and photo-gated activation; DB upload retry/cap/removal; unit metadata stripping. Introduction cards arrive in M3.                                                        |
+| `REQ-025`                   | Axe on every new page, keyboard skip link, reduced-motion/mobile overflow checks and visual review. Manual screen-reader audit is M7.                                                               |
+| `REQ-028`                   | Public page browser coverage and copy review; no fabricated counts, testimonials, scores or success claims.                                                                                         |
+
+REQ-033 reporting/appeals belongs to M2 despite its original M1 assignment.
+REQ-018/I-18 remains M5: M1 records deletion and disables authority only.
+This table supersedes the original blanket PLANNED status only for the stated
+implemented portions; it does not mark future behavior complete.
 
 ## Required invariants
 
@@ -244,3 +272,35 @@ in `docs/PROJECT_STATUS.md` and reproduced by the Windows CI job.
 | Real verification, maps, payment or messaging-vendor integrations                       | AGENTS §3         | Explicit later task and reviewed contracts required                                                 |
 
 Parts 1–3, 27–28, 30 and 32 provide rationale, business context, change history and failure analysis. Their actionable safeguards are traced above under the governing product parts. Illustrative arithmetic, research sample sizes, legacy v0.1 claims and hypothetical business prices are not executable pilot settings.
+
+## 2026-10-20 audit and M1 reliability repair
+
+The original 193 requirement rows and 20 invariant IDs remain unchanged. No later
+milestone is marked implemented by a research document.
+
+| Scope                                       | Implementation / evidence                                                                                                        | Limits                                                                                                               |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Spec P22 durable auth delivery; DEC-026/030 | `packages/db/src/accounts.ts`, migration0004, `apps/web/server/mail.ts`; four tests in `tests/integration/auth-delivery.test.ts` | Per-row failure/commit recovery and concurrency; SMTP at-least-once, not a full process-crash or product outbox test |
+| Spec P3/P23/P25/P26 research/experiments    | `docs/research/competitive-landscape-2026.md`, `docs/product/roadmap.md`                                                         | Company claims distinguished from independently verified outcomes; no users recruited                                |
+| Spec P20–P22/P31 review                     | `docs/architecture/review-2026-10-20.md`, `docs/security/threat-model.md`, `docs/testing/strategy.md`                            | G01–G15 track remaining work; safety, erasure, matching and Go are not built                                         |
+| Founder authorized-tooling boundary         | `docs/research/rea-evaluation.md`                                                                                                | Read-only public source/metadata review; no installation or protected-target inspection                              |
+
+DEC-032 corrects development/CI PostgreSQL readiness: TCP checks avoid the temporary
+socket-only initialization server. The existing `dev-services` job still asserts
+PostGIS availability and separate development/test databases; it remains the
+executable integration gate. Docker is unavailable on this PC, so this check runs
+on the disposable GitHub Linux runner, not the local native Windows services.
+
+## M1 merge review requested by the founder
+
+DEC-033 rejects the crosswalk and retains CODEX_PROMPTS numbering/order; deletion
+and operational readiness before real users or Go are approved. DEC-034 documents
+the scoped text corrections. The [complete rewrite audit](testing/markdown-rewrite-audit.md)
+and [merge review](testing/m1-merge-review.md) record the evidence. All 193 requirement
+rows and 20 canonical invariant IDs above remain unchanged.
+
+Spec P22 auth regression proof: the four delivery tests fail against the exact
+pre-fix `accounts.ts` blob from `3cc38d7`, then pass after restoration. Migration
+0004 upgrades a disposable M1 schema, preserving 15 application-table snapshots
+and role grants; rollback and migration-runner replay are verified. No later
+milestone implementation or production readiness is implied by these checks.
