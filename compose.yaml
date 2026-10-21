@@ -11,7 +11,8 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./scripts/dev-init.sql:/docker-entrypoint-initdb.d/01-dev.sql:ro
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U meetwell_dev -d meetwell_dev']
+      # Initialization uses a socket-only server; TCP is ready after init scripts finish.
+      test: ['CMD-SHELL', 'pg_isready -h 127.0.0.1 -U meetwell_dev -d meetwell_dev']
       interval: 2s
       timeout: 3s
       retries: 30

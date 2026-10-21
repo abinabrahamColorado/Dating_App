@@ -275,7 +275,7 @@ Parts 1–3, 27–28, 30 and 32 provide rationale, business context, change hist
 
 ## 2026-10-20 audit and M1 reliability repair
 
-The original193 requirement rows and20 invariant IDs remain unchanged. No later
+The original 193 requirement rows and 20 invariant IDs remain unchanged. No later
 milestone is marked implemented by a research document.
 
 | Scope                                       | Implementation / evidence                                                                                                        | Limits                                                                                                               |
@@ -284,3 +284,9 @@ milestone is marked implemented by a research document.
 | Spec P3/P23/P25/P26 research/experiments    | `docs/research/competitive-landscape-2026.md`, `docs/product/roadmap.md`                                                         | Company claims distinguished from independently verified outcomes; no users recruited                                |
 | Spec P20–P22/P31 review                     | `docs/architecture/review-2026-10-20.md`, `docs/security/threat-model.md`, `docs/testing/strategy.md`                            | G01–G15 track remaining work; safety, erasure, matching and Go are not built                                         |
 | Founder authorized-tooling boundary         | `docs/research/rea-evaluation.md`                                                                                                | Read-only public source/metadata review; no installation or protected-target inspection                              |
+
+DEC-032 corrects development/CI PostgreSQL readiness: TCP checks avoid the temporary
+socket-only initialization server. The existing `dev-services` job still asserts
+PostGIS availability and separate development/test databases; it remains the
+executable integration gate. Docker is unavailable on this PC, so this check runs
+on the disposable GitHub Linux runner, not the local native Windows services.

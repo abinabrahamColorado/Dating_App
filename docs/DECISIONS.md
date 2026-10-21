@@ -200,3 +200,21 @@ neither improves correctness. Architecture findings G01–G15 distinguish curren
 code, proposed fixes, migration/test impact and required decisions. No ML, Rust,
 GPS processing, paid exposure, live enrollment or consequential matching policy
 change was introduced by this audit.
+
+## Wait for final PostgreSQL initialization (DEC-032)
+
+2026-10-20, Spec P22/P31 infrastructure reliability. PR #4's first remote run
+39541603202 failed its real Compose assertion: `postgis_version()` did not exist
+after a socket-based `pg_isready` probe reported healthy. The upstream image uses
+a socket-only temporary server during initialization, then starts the TCP server
+after its scripts complete. Use `pg_isready -h 127.0.0.1` in Compose and the CI
+service container. Retain both database assertions; do not mask this with a sleep
+or weaken the PostGIS requirement. No schema, product policy or data migration.
+
+Source: [upstream PostgreSQL entrypoint](https://github.com/docker-library/postgres/blob/master/docker-entrypoint.sh),
+`docker_temp_server_start` and initialization ordering. Verification is the real
+fresh-volume `dev-services` job and application checks on the new PR head. Docker
+is unavailable locally; native Windows checks do not substitute for this job.
+The broader option is a schema-aware readiness probe; TCP plus the existing SQL
+assertions is sufficient for this initialization race. Rollback only changes the
+probe and reintroduces that race. No data cleanup or production operation occurs.

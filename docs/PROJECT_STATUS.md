@@ -45,11 +45,13 @@ query time. Test counts are not a production safety certification.
 
 PR #3's inspected run [39384006645](https://github.com/abinabrahamColorado/Dating_App/actions/runs/39384006645)
 passed `windows`, `dev-services` and `verify`; it had no submitted review. Those
-checks validate its old head, not this repair. This branch is prepared as a
-separate PR targeting the M1 branch; inspect its exact head and live checks in the
-[repository pull requests](https://github.com/abinabrahamColorado/Dating_App/pulls)
-before merging. Publication and CI results are recorded in that PR and the task
-handoff. The older open M0 PR #1 is a conflicting historical proposal and must
+checks validate its old head, not this repair. This branch is published as
+[PR #4](https://github.com/abinabrahamColorado/Dating_App/pull/4) targeting the M1
+branch. Its initial run 39541603202 exposed a Compose initialization race:
+`postgis_version()` was unavailable after the socket health check passed. DEC-032
+changes readiness to TCP and retains the SQL assertions. Inspect the final PR head
+and live checks before merging; publication and final CI results are recorded in
+that PR and the task handoff. The older open M0 PR #1 is a conflicting historical proposal and must
 not be mistaken for additional work to merge.
 
 Nothing was merged, deployed, force-pushed or deleted in this audit. The founder's

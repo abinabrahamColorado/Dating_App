@@ -11,7 +11,9 @@ Latest review: [execution roadmap/crosswalk](product/roadmap.md),
 [competitive research](research/competitive-landscape-2026.md),
 [REA evaluation](research/rea-evaluation.md). DEC-029 requires explicit merge
 approval. Audit branch `codex/m1-audit-auth-delivery` is stacked on M1 and repairs
-auth mail failure isolation. PR1 is an older conflicting M0 proposal; do not merge
+auth mail failure isolation. Its CI exposed a PostgreSQL initialization race;
+DEC-032 switches readiness to TCP without relaxing the database assertions.
+PR #1 is an older conflicting M0 proposal; do not merge
 it over PR2's accepted foundation. Founder decision is needed to close it.
 
 | Milestone | Deliverable                                                                                                                             | Gate before moving on                                                                                               |
