@@ -5,7 +5,8 @@ Pilot proposal: Manhattan, New York City; ages 18–30.
 
 Permanent checkout: `E:\Buisness\Dating_App`.
 Remote: `https://github.com/abinabrahamColorado/Dating_App`.
-Current review branch: `codex/m2-safety-core`. PR #3 merged with explicit founder
+Current review branch: `codex/m2-safety-core`, [PR #5](https://github.com/abinabrahamColorado/Dating_App/pull/5).
+PR #3 merged with explicit founder
 approval at `a4dee472951f4d11968de6613e6d416f0e227df8`. Main CI
 [39547453037](https://github.com/abinabrahamColorado/Dating_App/actions/runs/39547453037)
 is green. PR #1 is closed without merging, with `Superseded by #2.`. M2 must remain
