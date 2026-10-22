@@ -375,3 +375,99 @@ own shutdown by changing a header. Database failure denies ordinary activity.
 D9 enforcement belongs to M5: 24 calendar months after closure, annual review,
 shorter retention where unneeded and scoped legal holds. No retention completion
 is claimed in M2. Migrations 0001–0008 and the source architecture remain unchanged.
+
+## M2 merge and M3 allocation scope (DEC-040)
+
+2026-10-22, Spec P5/P6/P10/P13/P15/P16. The founder's conditional M2 merge was
+completed after 67 local tests and both PR/push CI runs passed. PR #5 merged with
+merge commit `5711fe60dfdec9e9ffa6a2f50b2ea38dea2ecb0f`; main CI run 39723068853
+passed before `codex/m3-explore-engine` was created. M3 must be reviewed in one PR
+and remain unmerged. M4 is not authorized by this task.
+
+The pilot uses exhaustive general-graph retrieval for at most 200 review members.
+Larger snapshots fail explicitly instead of silently excluding people. The worker
+prepares one weekly review at 14:00 America/New_York on Monday; human approval is
+required before outbox delivery. Unserved reasons retain the original generation
+snapshot. An explicit operator-selected cohort, concierge addition or removal marks
+the whole batch as operator policy with unknown propensity. Unedited full-cohort
+allocation logs the exact conditional mixture probability at each step, never a
+marginal inclusion probability or a probability of attraction.
+
+Waiting priority uses the longer wait of the two endpoints, bucketed weekly.
+Travel uses public area/venue centroids, configurable mode speeds and a detour
+factor; it is an estimate, not routing. No member coordinates are accepted. The
+pure heuristic supports strong weight 2 and soft weight 1; M1's explicit settings
+currently supply only strong inputs. Interests are self-description and are not
+silently converted into soft preferences. Unknown descriptions contribute to neither
+numerator nor denominator. No heuristic value is sent to a member or shown in ops.
+The exact small-graph benchmark optimizes cardinality, then heuristic sum; it does
+not establish fairness or predict attraction. The fixed 20-case run matched exact
+cardinality in 14 cases and trailed by one edge in six.
+
+## M3 capacity, grants and private decisions (DEC-041)
+
+2026-10-22, Spec P5/P6/P13/P16, I-04/I-05/I-06/I-07/I-08/I-09/I-20. Reservations
+hold a slot and pending weekly allowance for both members atomically. The pilot
+reservation lease is 24 hours; proposed introductions last 48 hours. Delivery
+creates both profile grants and consumes weekly delivered allowance. Passing frees
+capacity but never refunds a delivered exposure. Week rollover checks the new
+week's allowance before delivery. Lowering a personal cap applies prospectively;
+existing held introductions remain answerable. Mutual acceptance keeps the held
+slots until close, block, restriction or exit.
+
+Every gate uses `isDenied` under `app.lock_pair`. Multi-pair operations acquire the
+union of member IDs in ascending order before visiting pairs; ledgers use the same
+order. A block either commits before a transition and denies it, or waits for that
+transition and then revokes its resulting grants/slots. Data already disclosed
+cannot be recalled. Database triggers remove grants and close held opportunities
+on directional block, restriction and account invalidation. The slot-held guard
+and version compare-and-swap release exactly once. Migrations 0010/0011 are new;
+previous applied migrations remain unchanged.
+
+Each member has a separate decision version. The other's first acceptance changes
+neither that version nor their card DTO, preventing a response-version side channel.
+Pass is neutral unavailability to the other member; expiry is EXPIRED without a
+negative learning label; a closed connection has its own CLOSED presentation.
+Permanent pair history prevents resurfacing, including after operator removal or
+reservation expiry. Profile/preference/epoch edits or removal of approved media
+cancel pending introductions rather than deliver stale snapshots. This is a
+protective pilot choice; retained mutual connections still obey the shared deny gate.
+Operator views and edits require current roles and append an audit with batch ID.
+Operators cannot review or curate their own introductions.
+
+## M3 durable notification and runtime boundary (DEC-042)
+
+2026-10-22, Spec P8/P20/P22. Weekly batch, delivery, maintenance and mail are real
+pg-boss jobs with empty payloads. The web and worker share server-only runtime/mail
+adapters. Worker construction has app/identity credentials and a separate queue
+login, without operator/safety credentials. Serving never reads safety narratives.
+Release shutdown gates batch, delivery and mail; maintenance continues to expire
+authority. Report/help paths retain their independent M2 access.
+
+Product mail is generic and rechecks the pair under locks immediately before SMTP.
+A durable SENDING claim precedes external I/O. Only definitely-unsent failures
+retry, with configured delay/budget. Ambiguous SMTP, process loss or uncertain
+commit becomes UNCERTAIN for manual verification, without automatic resend.
+This deliberately differs from the accepted M1 duplicate magic-link limitation.
+Already-accepted SMTP cannot be recalled; holding the pair lock orders a concurrent
+block after an in-flight authorized send. There is no exactly-once SMTP claim.
+An opted-in member may receive one unanswered-introduction reminder; no opt-in
+means no reminder. Failed rows do not prevent other outbox rows from progressing.
+
+## M3 experience and remaining release gates (DEC-043)
+
+2026-10-22, Spec P4/P6/P17/P22. `/explore` lists a finite set of introduction links;
+each opportunity has one full-page profile with approved photos, name/age,
+intention, interests and one prompt. Private Accept/Pass, truthful empty text,
+capacity settings, opt-in reminders, mutual connection and closure are working.
+Concern/help links survive unavailable or closed cards using the member's existing
+opportunity context. No chat, plan, swipe stack, comparison screen or score is added.
+
+M3 provides a public-venue read model and an explicit local-only synthetic fixture
+command. It does not approve real meeting places; venue review and venue shutdown
+enforcement belong to M4, as already agreed. M5 retains erasure/restore, D9 retention
+and legal holds. Production enrollment remains disabled. In-memory command keys
+survive an ambiguous response while a page remains open; reload recovery and the
+remaining M1 upload/retry issues remain in the backlog. Live release still needs
+the founder's approved venue inventory, staffed safety coverage, privacy/retention
+review and the later milestone gates.

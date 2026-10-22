@@ -18,6 +18,7 @@ import { sanitizePhoto, putPhoto, getPhoto, deletePhoto } from './media';
 import { deliverAuthMail } from './mail';
 import { passkeyOptions, verifyPasskey } from './passkeys';
 import { handleSafety } from './safety-api';
+import { handleExplore } from './explore-api';
 import { requireSupportedClient } from '@meetwell/db/client-policy';
 import type { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/server';
 
@@ -115,6 +116,13 @@ const errors: Record<string, [number, string]> = {
   PHOTO_LIMIT: [422, 'Remove a photo before adding another.'],
   PAYLOAD_TOO_LARGE: [413, 'The upload is too large. Choose a smaller file.'],
   NOT_FOUND: [404, 'This page or item is unavailable.'],
+  PAIR_INELIGIBLE: [422, 'This introduction is not currently eligible.'],
+  CAPACITY: [409, 'An introduction slot or weekly allowance is no longer available.'],
+  BATCH_TOO_LARGE: [
+    422,
+    'This cohort exceeds the pilot review limit. Use a smaller operator-scoped batch.',
+  ],
+  SELF_REVIEW: [403, 'A different operator must review this batch.'],
   RATE_LIMITED: [429, 'Please wait a little before trying again.'],
   CLIENT_VERSION_DISABLED: [
     426,
@@ -224,6 +232,19 @@ export async function handle(request: Request, path: string[]) {
     }
     const auth = (await authority())!;
     return await db.withSession(auth, async () => {
+      if (path[0] === 'explore' || (path[0] === 'ops' && path[1] === 'explore')) {
+        registered(auth);
+        return json(
+          await handleExplore({
+            auth,
+            request,
+            path,
+            requestId,
+            body: () => body(request),
+            key: () => key(request),
+          }),
+        );
+      }
       if (
         path[0] === 'safety' ||
         path[0] === 'members' ||

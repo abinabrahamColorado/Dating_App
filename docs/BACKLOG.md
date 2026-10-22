@@ -2,8 +2,9 @@
 
 M0 was reviewed and merged in PR #2. M1 was merged with explicit founder approval
 in PR #3 at `a4dee472951f4d11968de6613e6d416f0e227df8`; main CI is green.
-M2 safety work is on `codex/m2-safety-core`. Review its PR before any merge.
-Do not start M3. The earlier hosted preview remains an independent design reference.
+M2 merged in PR #5 at `5711fe60dfdec9e9ffa6a2f50b2ea38dea2ecb0f`; main CI
+39723068853 passed. M3 is on `codex/m3-explore-engine` for review. Do not merge
+its PR or start M4. The earlier hosted preview remains an independent design reference.
 
 Latest review: [execution roadmap](product/roadmap.md),
 [architecture gaps](architecture/review-2026-10-20.md),
@@ -56,8 +57,9 @@ Pricing/payments; demographic research; pooled models/embeddings; broad neighbor
   page-reload recovery of pending M2 commands also remains open (DEC-038).
 - Before real accounts: G09 ambiguous media-upload commit compensation remains
   open. M2 did not change upload writes. Live enrollment remains disabled.
-- G01 shared auth-mail wiring and least-privilege worker credentials remain open;
-  M2 adds no worker jobs and does not require this unrelated refactor.
+- G01 shared auth-mail wiring is fixed in M3: web and worker use `packages/runtime`;
+  the worker has queue, app and identity access but no ops/safety login or case key.
+  Production secret isolation and purpose-scoped identity delivery remain M7 work.
 
 - M2 complete: reporting/appeals for restricted/exited members, separate safety
   and integrity queues, audited safety-role access, bilateral profile/photo denial,
@@ -65,15 +67,20 @@ Pricing/payments; demographic research; pooled models/embeddings; broad neighbor
   named reviewers, per-case assignment/workload routing (REQ-150), incident lead,
   support hours, escalation and case-retention review. Appeals require a different
   reviewer from the challenged decision maker.
-- M3: issue profile-access grants only with real introductions and enforce denial
-  at retrieval/reservation/delivery/acceptance. Add block-vs-reservation/acceptance/
-  product-outbox races; no such handlers or fake tests were added in M2.
+- M3 implemented: bilateral grants on delivery, revocation on terminal transitions,
+  locked denial at retrieval/reservation/delivery/acceptance; both orderings of
+  block-vs-reservation/delivery/acceptance are tested on Postgres. Queued product
+  mail is checked again under the pair lock. SMTP already accepted by a transport
+  cannot be recalled; see DEC-042.
 - M4: enforce denial in chat and plans; add block-vs-message/delivery/confirmation
   races and concern links on these surfaces. Enforce stored venue shutdowns.
 - M5/M6: add post-meeting concern links and enforce stored event/Go shutdowns;
   retain report/help access during every shutdown. M5 retains erasure/restore work.
-- M3: compose the tested bilateral preference function with blocks, capacity and
-  actual travel/availability feasibility. Add exposure logging and closed-pair memory.
+- M3 implemented: bilateral preference/block/capacity/travel/availability gates,
+  conditional exposure logging, permanent pair history and a synthetic exact benchmark.
+  Before scaling beyond 200 review members: load-test retrieval/lock duration and
+  introduce a reviewed bounded retrieval policy with explicit retrieval-miss accounting.
+  Do not silently truncate the exhaustive pilot cohort (DEC-040).
 - M5: erase stores/exports, reconcile encrypted media orphans, expire auth/outbox/
   rate-limit records, apply tombstones on restore and prove retention deadlines.
 - M5: enforce D9 safety retention: 24 calendar months after case closure, annual

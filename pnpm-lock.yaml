@@ -238,6 +238,9 @@ importers:
       '@meetwell/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@meetwell/runtime':
+        specifier: workspace:*
+        version: link:../../packages/runtime
       '@simplewebauthn/browser':
         specifier: 14.0.0
         version: 14.0.0
@@ -274,6 +277,9 @@ importers:
       '@meetwell/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@meetwell/runtime':
+        specifier: workspace:*
+        version: link:../../packages/runtime
       dotenv:
         specifier: 18.0.8
         version: 18.0.8
@@ -306,6 +312,21 @@ importers:
       drizzle-orm:
         specifier: 0.45.4
         version: 0.45.4(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(pg@8.23.1)
+      pg:
+        specifier: 8.23.1
+        version: 8.23.1
+
+  packages/runtime:
+    dependencies:
+      '@meetwell/config':
+        specifier: workspace:*
+        version: link:../config
+      '@meetwell/db':
+        specifier: workspace:*
+        version: link:../db
+      nodemailer:
+        specifier: 10.1.7
+        version: 10.1.7
       pg:
         specifier: 8.23.1
         version: 8.23.1

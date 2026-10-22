@@ -40,38 +40,43 @@ export async function withMemberPair<T>(
     }),
   );
 }
+/** Internal allowlist reader: caller must hold the pair guard through this read.
+ * Only memberProfile and the M3 guarded card may call it (architecture test). */
+export async function approvedProfileFields(store: AccountStore, db: PoolClient, subject: string) {
+  const row = await db.query<{ body_cipher: string }>(
+    'SELECT body_cipher FROM app.profiles WHERE member_id=$1',
+    [subject],
+  );
+  if (!row.rowCount) throw new StoreError('NOT_FOUND');
+  const p = store.appCipher.open<Profile>(row.rows[0]!.body_cipher, `profile:${subject}`);
+  const identity = await store.identity.query<{ birth_cipher: string }>(
+    'SELECT birth_cipher FROM identity.users WHERE id=$1',
+    [subject],
+  );
+  if (!identity.rows[0]?.birth_cipher) throw new StoreError('NOT_FOUND');
+  const age = ageOn(
+    store.identityCipher.open<string>(identity.rows[0].birth_cipher, `birth:${subject}`),
+    localDate(new Date()),
+  );
+  const photos = await db.query<{ id: string }>(
+    "SELECT id FROM app.media WHERE member_id=$1 AND status='APPROVED' ORDER BY created_at,id",
+    [subject],
+  );
+  // Explicit allowlist: no birth date, area, availability, preferences, roles or enforcement reasons.
+  return {
+    id: subject,
+    displayName: p.displayName,
+    age,
+    intention: p.intention,
+    interests: p.interests,
+    prompt: p.prompt,
+    photos: photos.rows,
+  };
+}
 export async function memberProfile(store: AccountStore, auth: Authority, subject: string) {
-  return withMemberPair(store, auth, subject, async (db) => {
-    const row = await db.query<{ body_cipher: string }>(
-      'SELECT body_cipher FROM app.profiles WHERE member_id=$1',
-      [subject],
-    );
-    if (!row.rowCount) throw new StoreError('NOT_FOUND');
-    const p = store.appCipher.open<Profile>(row.rows[0]!.body_cipher, `profile:${subject}`);
-    const identity = await store.identity.query<{ birth_cipher: string }>(
-      'SELECT birth_cipher FROM identity.users WHERE id=$1',
-      [subject],
-    );
-    if (!identity.rows[0]?.birth_cipher) throw new StoreError('NOT_FOUND');
-    const age = ageOn(
-      store.identityCipher.open<string>(identity.rows[0].birth_cipher, `birth:${subject}`),
-      localDate(new Date()),
-    );
-    const photos = await db.query<{ id: string }>(
-      "SELECT id FROM app.media WHERE member_id=$1 AND status='APPROVED' ORDER BY created_at,id",
-      [subject],
-    );
-    // Explicit allowlist: no birth date, area, availability, preferences, roles or enforcement reasons.
-    return {
-      id: subject,
-      displayName: p.displayName,
-      age,
-      intention: p.intention,
-      interests: p.interests,
-      prompt: p.prompt,
-      photos: photos.rows,
-    };
-  });
+  return withMemberPair(store, auth, subject, async (db) =>
+    approvedProfileFields(store, db, subject),
+  );
 }
 export async function memberPhoto<T>(
   store: AccountStore,

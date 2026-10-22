@@ -11,6 +11,7 @@
     "@meetwell/db": "workspace:*",
     "dotenv": "18.0.8",
     "pg-boss": "12.38.0",
-    "tsx": "4.23.15"
+    "tsx": "4.23.15",
+    "@meetwell/runtime": "workspace:*"
   }
 }

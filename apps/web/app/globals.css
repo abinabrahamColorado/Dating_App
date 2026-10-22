@@ -6,6 +6,28 @@
   --olive: #e4e8ce;
   --accent: #a3412a;
 }
+.introduction {
+  max-width: 850px;
+  margin: auto;
+}
+.intro-list {
+  padding: 0;
+  list-style: none;
+}
+.intro-list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  padding: 1rem 0;
+}
+.review-pair {
+  padding: 1.5rem;
+  border: 1px solid var(--line);
+  margin: 1rem 0;
+  overflow-wrap: anywhere;
+}
 * {
   box-sizing: border-box;
 }

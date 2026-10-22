@@ -124,7 +124,10 @@ export default function Page() {
                   </button>
                 </div>
                 <div className="notice">
-                  <strong>Introductions are not open yet.</strong>
+                  <strong>Introductions are available in this development preview.</strong>
+                  <p>
+                    <Link href="/explore">Open your introductions</Link>
+                  </p>
                   <p>
                     This development preview is for synthetic profiles. We’ll finish safety, meeting
                     and deletion flows before a live pilot.
