@@ -53,10 +53,10 @@ export async function loadExploreMember(
     [id],
   );
   const identity = (
-    await store.identity.query<{ birth_cipher: string | null; registered_at: Date | null }>(
-      'SELECT birth_cipher,registered_at FROM identity.users WHERE id=$1',
-      [id],
-    )
+    await store.identityConnection.query<{
+      birth_cipher: string | null;
+      registered_at: Date | null;
+    }>('SELECT birth_cipher,registered_at FROM identity.users WHERE id=$1', [id])
   ).rows[0];
   if (!identity?.birth_cipher || !identity.registered_at) return null;
   let profile, preferences, age;

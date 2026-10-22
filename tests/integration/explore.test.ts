@@ -31,13 +31,12 @@ const app = role('app'),
   safety = role('safety'),
   learning = role('learning');
 const key = () => randomBytes(32).toString('base64');
+const keys = { identityKey: key(), appKey: key(), lookupKey: key() };
 const accounts = new AccountStore({
   app,
   identity,
   ops,
-  identityKey: key(),
-  appKey: key(),
-  lookupKey: key(),
+  ...keys,
 });
 const db = new ExploreStore(accounts),
   safetyDb = new SafetyStore(accounts, safety, key());
@@ -183,6 +182,26 @@ it('I-05 I-06 two racing batches reserve each pair once without exceeding either
     ).rowCount,
   ).toBe(1);
   expect(await counts(a, b)).toEqual([1, 1]);
+});
+it('I-04 I-19 guarded card reads reuse the checked identity connection under pool saturation', async () => {
+  const a = await member(),
+    b = await member(),
+    staff = await member(true),
+    r = await delivered(a, b, staff);
+  const limitedUrl = new URL(url);
+  limitedUrl.searchParams.set('options', '-c role=meetwell_identity');
+  const limited = new Pool({
+    connectionString: limitedUrl.toString(),
+    max: 1,
+    connectionTimeoutMillis: 300,
+  });
+  try {
+    const constrained = new AccountStore({ identity: limited, app, ops, ...keys });
+    const result = await new ExploreStore(constrained).card(a, r.id);
+    expect(result.subjectId).toBe(b.memberId);
+  } finally {
+    await limited.end();
+  }
 });
 it('I-07 I-06 blind per-member versions permit mutual acceptance at capacity; close releases exactly once', async () => {
   const a = await member(),

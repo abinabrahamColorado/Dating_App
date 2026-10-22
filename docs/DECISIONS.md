@@ -435,6 +435,11 @@ protective pilot choice; retained mutual connections still obey the shared deny 
 Operator views and edits require current roles and append an audit with batch ID.
 Operators cannot review or curate their own introductions.
 
+Guarded identity reads reuse the transaction that already checked the session.
+Borrowing a second identity-pool slot can deadlock when all slots hold sessions;
+a one-connection real-Postgres regression first reproduced the timeout, then passed
+with reuse. Worker reads outside a session continue to use their own identity pool.
+
 ## M3 durable notification and runtime boundary (DEC-042)
 
 2026-10-22, Spec P8/P20/P22. Weekly batch, delivery, maintenance and mail are real

@@ -31,7 +31,7 @@ passed all three jobs before branching M3.
 
 ## Validation record
 
-Targeted pure/architecture checks passed: 32 unit tests. Eleven new real-Postgres
+Targeted pure/architecture checks passed: 32 unit tests. Twelve new real-Postgres
 tests passed, including both lock orderings for block versus reservation, delivery
 and acceptance, racing batches, accept versus expiry, private DTOs, exact-once slot
 release, weekly caps, current staff roles, operator propensity and real queue jobs.
@@ -47,10 +47,13 @@ the first full suite reached tests; the corrected full result is recorded below.
 The full integration run also exposed an obsolete M2 expectation that lifting
 enforcement restored profile access. The updated regression proves the restriction
 lifts while the old grant remains revoked, as required by the M3 grant lifecycle.
+A final pool-saturation regression failed against the initial PR code with an
+identity-connection timeout, then passed after guarded reads reused the checked
+session transaction. This also repairs the existing shared profile-reader path.
 
 Full `pnpm check` passed on 2026-10-22: typecheck, lint, formatting, 32 unit/property
-tests, 45 real PostgreSQL integration tests, production build and 13 Chromium tests
-with axe checks — 90 tests total. Generated-key/runtime-password scanning found no
+tests, 46 real PostgreSQL integration tests, production build and 13 Chromium tests
+with axe checks — 91 tests total. Generated-key/runtime-password scanning found no
 matches in staged source; no ignored environment, service data or browser traces are
 published. CI is a separate exact-head gate: use the M3 PR checks and handoff for
 the final GitHub run links. Local checks alone do not claim CI success.

@@ -808,7 +808,7 @@ export class ExploreStore {
         return;
       }
       const identity = (
-        await this.accounts.identity.query<{ email_cipher: string }>(
+        await this.accounts.identityConnection.query<{ email_cipher: string }>(
           'SELECT email_cipher FROM identity.users WHERE id=$1',
           [mail.member_id],
         )

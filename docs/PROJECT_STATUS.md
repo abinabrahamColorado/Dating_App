@@ -61,8 +61,8 @@ and 20 invariant mappings remain tracked. This audit adds a source-backed
 ## Verification and GitHub review
 
 M3 full `corepack pnpm check` passed: typecheck, lint, formatting, 32 unit/property
-tests, 45 real PostgreSQL integration tests, production build and 13 Chromium tests
-with axe (90 total). See [M3 review](testing/m3-review.md) and the PR's exact-head
+tests, 46 real PostgreSQL integration tests, production build and 13 Chromium tests
+with axe (91 total). See [M3 review](testing/m3-review.md) and the PR's exact-head
 checks for CI results. The branch remains unmerged for founder review.
 
 Full `corepack pnpm check` passed on the M2 review branch: typecheck, lint, formatting,

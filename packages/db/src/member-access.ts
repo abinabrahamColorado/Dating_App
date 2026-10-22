@@ -49,7 +49,7 @@ export async function approvedProfileFields(store: AccountStore, db: PoolClient,
   );
   if (!row.rowCount) throw new StoreError('NOT_FOUND');
   const p = store.appCipher.open<Profile>(row.rows[0]!.body_cipher, `profile:${subject}`);
-  const identity = await store.identity.query<{ birth_cipher: string }>(
+  const identity = await store.identityConnection.query<{ birth_cipher: string }>(
     'SELECT birth_cipher FROM identity.users WHERE id=$1',
     [subject],
   );
