@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Shell } from '../../components/shell';
 import { useMember, api, Notice, messageOf } from '../../components/client';
 import { pilot } from '@meetwell/config/pilot';
+import { intentionLabels, structureLabels } from '@meetwell/config/accounts';
 import { SafetyLink } from '../../components/safety';
 export default function Page() {
   const { me, error: loadError, refresh } = useMember();
@@ -53,7 +54,7 @@ export default function Page() {
                   {profile.displayName}, {me.age}
                 </h2>
                 <p>
-                  {profile.intention.replace('-', ' ')} · {profile.structure.replace('-', ' ')}
+                  {intentionLabels[profile.intention]} · {structureLabels[profile.structure]}
                 </p>
                 <div className="tags">
                   {profile.interests.map((interest) => (

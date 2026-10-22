@@ -478,3 +478,11 @@ survive an ambiguous response while a page remains open; reload recovery and the
 remaining M1 upload/retry issues remain in the backlog. Live release still needs
 the founder's approved venue inventory, staffed safety coverage, privacy/retention
 review and the later milestone gates.
+
+## Founder profile preview and navigation copy (DEC-044)
+
+2026-10-22, Spec P4/P20, I-11. The profile preview uses the same typed intention
+and structure labels as the profile editor, for example "A long-term relationship
+· Monogamous". The member navigation label is "My reports". Stored values and
+report routing are unchanged. This founder-requested copy follow-up is included
+in M3 PR #6 because M2 PR #5 had already merged; PR #6 remains unmerged.

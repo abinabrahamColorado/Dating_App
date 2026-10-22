@@ -372,3 +372,8 @@ DEC-040–043 record interpretations and scope; M4/M5/M6 paths remain deferred.
 Full totals and CI links are recorded in `testing/m3-review.md` and the M3 PR.
 Synthetic venue feasibility is not real venue approval; chat/plan block races
 belong to M4, and post-meeting/erasure/retention gates belong to M5.
+
+DEC-044 copy follow-up (P4/P20, I-11): `config/accounts` supplies typed labels to
+the profile editor and `/app` preview; `components/shell` names the existing
+report-status link "My reports". Existing accounts and safety browser workflows
+cover these surfaces and their accessibility; stored values and routes are unchanged.

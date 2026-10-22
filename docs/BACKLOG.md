@@ -35,6 +35,10 @@ research is complete for now (DEC-033). DEC-035 authorizes this M2 build only.
 
 ## Dependency refinements
 
+- Completed in the open M3 PR #6: founder-requested human-readable profile preview
+  labels and "My reports" member navigation (DEC-044). M2 PR #5 had already merged
+  when this follow-up arrived. No remaining work or milestone change for this copy.
+
 - M2 defines reusable safety interfaces; M3/M4/M5/M6 must add the relevant race and reachability tests when their paths exist. Do not ship fake plan/chat handlers in M2 merely to make its full future matrix appear complete.
 - M1 records deletion and immediately disables discovery; M5 completes orchestration. Do not open live enrollment before deletion and safety flows are ready.
 - M3 may introduce a public-venue read model/seed contract solely to test feasibility; full operator venue management belongs to M4. Synthetic venues must not be presented as reviewed real locations.
