@@ -1,4 +1,5 @@
 import { Shell } from '../../components/shell';
+import Link from 'next/link';
 export default function Page() {
   return (
     <Shell>
@@ -29,10 +30,19 @@ export default function Page() {
         </p>
         <h2>Before live introductions</h2>
         <p>
-          Independent blocking and “Something felt off” reporting, staffed review, appeals, and
-          deletion processing must be ready before enrollment opens. These services are not
-          operating in this development preview.
+          Independent blocking, “Something felt off” reporting, case status and appeals are
+          available for synthetic testing. Human safety coverage and complete deletion processing
+          must be ready before enrollment opens. This development preview is not monitored for
+          emergencies.
         </p>
+        <div className="actions">
+          <Link className="button" href="/safety/help">
+            Get help now
+          </Link>
+          <Link className="button secondary" href="/safety/concern">
+            Something felt off
+          </Link>
+        </div>
         <div className="notice">
           Meetwell is not an emergency service. If you are in immediate danger, contact your local
           emergency services.

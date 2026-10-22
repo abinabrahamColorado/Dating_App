@@ -253,3 +253,125 @@ is in docs/testing/markdown-rewrite-audit.md. No source PDF or prompt was change
 Never run blanket regex rewrites over documents again. Use explicit edits and
 review the diff for numbers, times, versions, identifiers, URLs and quotations.
 The regression proof and migration review are in docs/testing/m1-merge-review.md.
+
+## M1 merge and M2 authorization (DEC-035)
+
+2026-10-21, Spec P17/P20/P21/P22. The founder approved merging PR #3 with a
+merge commit, closing PR #1 with `Superseded by #2.`, and building M2 on
+`codex/m2-safety-core`. PR #3 merged at `a4dee472951f4d11968de6613e6d416f0e227df8`;
+main CI run [39547453037](https://github.com/abinabrahamColorado/Dating_App/actions/runs/39547453037)
+passed Windows, Linux verification and development-service checks. PR #1 is closed
+and unmerged. This supersedes only the earlier task's stop instructions in DEC-033.
+Milestone numbering/order, the real-user/Go gates, accepted ambiguous SMTP duplicates,
+uninstalled REA and completed research scope are unchanged. Do not merge M2 or start M3.
+
+## Immediate denial and bounded profile access (DEC-036)
+
+2026-10-21, Spec P20/P21/P22, I-04/I-19. `core/safety.isDenied(u,v)` is the single
+pure bilateral policy. The database gateway locks both member rows in ascending
+UUID order, loads fresh block/state/enforcement facts and checks explicit disclosure
+authority before producing an allowlisted profile or approved photo. Block and
+restriction writes take the same locks. A read already holding the locks orders
+before a block; a block acknowledgement means subsequent reads are denied. Already
+delivered or in-flight authorized bytes cannot be recalled from a member's device.
+This is a transaction ordering guarantee, not a claim to control network delivery.
+
+M2 must not create a discovery feed or fake introductions. Cross-member profile
+access therefore requires an unexpired `app.profile_access` grant; there is no M2
+runtime writer or member-search endpoint. Real PostgreSQL/browser fixtures supply
+synthetic grants to prove the boundary. M3 will issue grants atomically with real
+introductions. The existing own-profile preview and settings expose the reusable
+concern flow today; unavailable profile pages preserve its reporting entry point.
+This is a protective scope choice, not an implemented M3 feature.
+
+The architecture test inventories all HTTP/worker entry points, seals reviewed
+self/infrastructure handlers against unclassified changes, and checks that both
+member-data handlers return through the policy gateway. A bypass mutation is
+rejected. Future routes/jobs must extend the classification and race suite after
+review; never refresh the baseline hashes automatically. Static checks complement
+database/browser denial tests and do not replace code review.
+
+## Revocation, safety storage and reviewer authority (DEC-037)
+
+2026-10-21, Spec P17/P20/P21/P22, I-11/I-12/I-20. Every authenticated HTTP operation
+revalidates its session under a PostgreSQL transaction lock; per-member advisory
+locking orders concurrent sessions and revocation without lock upgrades across
+connections. Staff operations lock current role rows and account state through the
+protected operation. Revoking a role or session waits for an already-authorized
+operation and denies every subsequent operation, including requests carrying an old
+Authority object. Safety review requires `safety_reviewer`; `admin` and `operator`
+alone never grant case access. Local grants/revocations are explicitly audited.
+M2 review scope is the explicitly assigned safety role. Finer per-case assignment
+and workload routing (REQ-150) remain a pre-release operations design item; no live
+safety service is claimed by this development console.
+
+Report, SafetySignal, Enforcement, Appeal and CaseAccessAudit live in `safety` and
+use its dedicated runtime login. Report, integrity and appeal descriptions use a
+separate encryption key. IntegritySignal has a separate table and queue; it is not
+matching feedback, a safety report or a reliability score. Report subjects have no
+account foreign key so deletion cannot destroy the reporting route. Reporter identity
+is omitted from reported-member responses and routine triage DTOs. No case export,
+learning integration, narrative logging, permanent ban or count-based enforcement exists.
+
+Serving reads only a boolean through the fixed-search-path SECURITY DEFINER
+`app.enforcement_status` function. Enforcement is independent of account state, so
+Exit cannot clear it. Precaution/lift and appeal decisions use version checks and
+idempotency receipts; an older appeal cannot lift a newer restriction. The reviewer
+who issued the challenged restriction cannot decide its appeal, and unknown decision
+provenance fails closed. Two trained reviewers are needed for independent appeals.
+Queue summaries,
+case views, appeal views and own-status views are audited before response. Audit
+history is append-only to runtime roles. Report/help paths never consult interaction
+denial or shutdown switches. Requests may still fail closed on an unavailable store.
+
+## M2 help, operational switches and retry scope (DEC-038)
+
+2026-10-21, Spec P17/P20/P21. NYC resources are configured in `packages/config`:
+911 verified against [NYC emergency guidance](https://www.nyc.gov/main/your-government/contact-nyc-government)
+and 988 Suicide & Crisis Lifeline verified with the US helpline connector. No other
+local number is included. Help is public and independent of sign-in, report/block
+choices and switches. Support hours are not promised; founder confirmation of the
+incident lead, reviewer roster, coverage and escalation process remains a release gate.
+
+The console can restrict/lift one account and store versioned venue/event/Go
+shutdowns. Config keeps Go and new-person Go disabled; clearing a console shutdown
+cannot enable a config-disabled feature. Venue/event enforcement belongs to M4/M6,
+as explicitly requested. Introductions/acceptance/outbox block races belong to M3;
+chat/delivery/plan-confirmation races belong to M4. No placeholder handlers were built.
+
+M2 commands retain a failed request's idempotency key in component memory until
+acknowledgement. A browser test drops the first successful report response and proves
+retry creates one report. Narratives are never persisted to browser storage. Reloading
+the page loses that pending key; members can check their case list before resubmitting.
+G08's broader M1 retry/refresh work and G09's upload compensation remain in the backlog.
+Staff media reads now retain the role lock while fetching bytes because the shared
+revocation boundary changed; unrelated media-write behavior is unchanged.
+
+## M2 review corrections and conditional merge approval (DEC-039)
+
+2026-10-21, Spec P20/P22, I-04/I-11/I-12. The founder approved merging PR #5
+with a merge commit after clean help links, directional block ownership, client
+version shutdown and the D9 backlog entry pass full checks and CI. Main CI must
+then pass before branching M3. This supersedes the earlier M2 merge stop only;
+the new M3 PR must remain unmerged.
+
+988 links/source use the exact query-free canonical values requested. Every help
+href/source is tested for query/tracking leakage. Migration 0009 preserves earlier
+unordered blocks in `app.legacy_pair_denials`: their initiator was not stored, so
+assigning one would fabricate provenance. Those denials remain bilateral and have
+no runtime removal privilege. New `app.blocks` rows require `blocker_id`, one row
+per direction and a pair lookup index. No block-list or removal API/UI is added;
+future removal must authorize the blocker and cannot erase the opposite direction.
+The migration is tested on a disposable real Postgres database upgraded from 0008.
+
+CLIENT_VERSION shutdowns use a bounded release identifier. The HTTP gate checks
+both the supplied version and the server's configured web release, with no cached
+permit. Authentication, registration needed for reporting, own member bootstrap,
+report/block/appeal/status routes and public help remain available. Other APIs are
+refused with HTTP 426. A claimed version is release metadata, not authentication;
+identity/object authorization still applies. The current build cannot bypass its
+own shutdown by changing a header. Database failure denies ordinary activity.
+
+D9 enforcement belongs to M5: 24 calendar months after closure, annual review,
+shorter retention where unneeded and scoped legal holds. No retention completion
+is claimed in M2. Migrations 0001–0008 and the source architecture remain unchanged.

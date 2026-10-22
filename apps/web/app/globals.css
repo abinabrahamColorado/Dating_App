@@ -648,3 +648,13 @@ details > .form-stack {
     animation: none !important;
   }
 }
+/* Safety narratives are plain text, wrapped without horizontal scrolling. */
+.report-detail {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.case-row {
+  padding-block: 1rem;
+  border-bottom: 1px solid #d5d8cd;
+  overflow-wrap: anywhere;
+}

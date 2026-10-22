@@ -1,6 +1,6 @@
 # Meetwell — Human Connection Platform
 
-M1 accounts and onboarding for a Manhattan, NYC pilot, ages 18–30. Meetwell is a working name. **This is a loopback-only development build using synthetic data.** Public pages, authentication, profiles, preferences, private photo review and account controls work. Safety, matching, chat, plans and complete erasure arrive in later milestones.
+M2 safety core for a Manhattan, NYC pilot, ages 18–30. Meetwell is a working name. **This is a loopback-only development build using synthetic data.** Accounts, private photo review, blocking, independent reporting/help, case status, safety review, appeals and shutdown controls work. Matching, chat, plans and complete erasure arrive in later milestones. M1 is merged; the M2 PR requires founder review and must remain unmerged.
 
 Start with [AGENTS.md](AGENTS.md), then read the authoritative [architecture PDF](docs/architecture-v0.2.pdf) and its [extracted text](docs/architecture-v0.2.txt). [CODEX_PROMPTS.md](CODEX_PROMPTS.md) defines M0–M7. Run one milestone at a time and review/merge its PR before the next.
 
@@ -43,6 +43,14 @@ corepack pnpm dev
 After the first setup, use `corepack pnpm services:windows:start` and
 `corepack pnpm dev`. Run `corepack pnpm worker` in a second terminal at the root.
 Stop the background services with `corepack pnpm services:windows:stop`.
+
+For M2, rerun `corepack pnpm setup:accounts` to apply additive migrations and generate
+the separate safety login/key in ignored `.env`. Open `/safety/concern`,
+`/safety/help` or `/safety/cases`. `/ops/safety` requires a separately assigned
+`safety_reviewer` role; admin alone is insufficient. Local synthetic staff access:
+`corepack pnpm staff:grant <member-id-or-synthetic-email> safety_reviewer`;
+revoke with `corepack pnpm staff:revoke <member-id-or-synthetic-email> safety_reviewer`.
+See [M2 safety operations](docs/operations/safety.md) for boundaries and review steps.
 The [Windows guide](docs/DEVELOPMENT_WINDOWS.md) documents ports, data, and diagnostics.
 
 ## Repository map

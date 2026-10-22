@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Shell } from '../../components/shell';
 import { useMember, api, Notice, messageOf } from '../../components/client';
 import { pilot } from '@meetwell/config/pilot';
+import { SafetyLink } from '../../components/safety';
 export default function Page() {
   const { me, error: loadError, refresh } = useMember();
   const [error, setError] = useState(''),
@@ -62,6 +63,9 @@ export default function Page() {
                 <p className="eyebrow">A SMALL THING THAT MAKES MY DAY</p>
                 <p className="prompt-answer">{profile.prompt}</p>
                 <Link href="/settings">Edit profile and preferences</Link>
+                <p>
+                  <SafetyLink surface="profile" />
+                </p>
               </article>
               <aside className="form-stack">
                 <div className="panel">

@@ -14,6 +14,7 @@ export default defineConfig({
       IDENTITY_DATABASE_URL: process.env.TEST_IDENTITY_DATABASE_URL ?? '',
       APP_DATABASE_URL: process.env.TEST_APP_DATABASE_URL ?? '',
       OPS_DATABASE_URL: process.env.TEST_OPS_DATABASE_URL ?? '',
+      SAFETY_DATABASE_URL: process.env.TEST_SAFETY_DATABASE_URL ?? '',
       MEDIA_BUCKET: 'meetwell-private-test',
     },
     url: 'http://localhost:3100/api/v1/health',

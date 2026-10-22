@@ -95,8 +95,8 @@ Do not copy `.local`, `.env`, or `node_modules` to GitHub.
 
 ## Accounts and a synthetic photo reviewer
 
-Run `corepack pnpm setup:accounts` with services running after pulling M1.
-It migrates dev/test, provisions separate identity/app/ops logins, generates
+Run `corepack pnpm setup:accounts` with services running after pulling M2.
+It migrates dev/test, provisions separate identity/app/ops/safety logins, generates
 encryption keys, and creates private buckets. Keys/passwords remain in ignored
 `.env`; never replace them casually or encrypted local data becomes unreadable.
 For local development only, storage uses the loopback MinIO administrator.
@@ -120,3 +120,9 @@ approve their own photos. Browser tests use isolated `_test` storage/database.
 Development terms/privacy and self-asserted age are not launch-ready legal or
 verification controls. Deletion disables immediately; complete erasure is M5.
 The code refuses account APIs on a non-loopback application origin.
+
+For `/ops/safety`, grant the separate `safety_reviewer` role. Admin alone cannot
+read cases. An appeal must be decided by a different reviewer than the challenged
+decision maker. Revoke a local role with
+`corepack pnpm staff:revoke reviewer@synthetic.invalid safety_reviewer`.
+See [safety operations](operations/safety.md) for M2 paths and limits.

@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useEffect, useState, useCallback } from 'react';
 import type { Photo } from '@meetwell/db/accounts';
 import { canModerate } from '@meetwell/core/accounts';
@@ -31,12 +32,15 @@ export default function Page() {
           <em>second look.</em>
         </h1>
         <Notice error={loadError || error} />
+        <p>
+          <Link href="/ops/safety">Open safety console</Link>
+        </p>
         {!me ? (
           <p role="status">Checking access…</p>
         ) : !permitted ? (
           <p>
-            Photo review is available to assigned operators and administrators. Safety case tools
-            belong to the next milestone.
+            Photo review is available to assigned operators and administrators. Safety cases require
+            a separate safety reviewer role.
           </p>
         ) : (
           <>

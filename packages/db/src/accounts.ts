@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import type { Pool, PoolClient } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { eq } from 'drizzle-orm';
@@ -14,7 +15,6 @@ import {
   preferencesSchema,
   registerSchema,
   transitionPolicy,
-  canModerate,
   staffAccessAllowed,
   type Policy,
   type PolicyCommand,
@@ -91,6 +91,7 @@ export type StoreOptions = {
 };
 /** Boundary-specific pools are distinct LOGIN identities in runtime; no administrator fallback. */
 export class AccountStore {
+  private readonly sessionScope = new AsyncLocalStorage<{ auth: Authority; client: PoolClient }>();
   readonly identity: Pool;
   readonly app: Pool;
   readonly ops: Pool;
@@ -107,6 +108,49 @@ export class AccountStore {
   }
   lookup(value: string) {
     return lookupToken(this.lookupKey, value);
+  }
+  /** I-19/I-20: serialize a member's authenticated operations and revocations.
+   * Row locks also interlock with administrative SQL revocation. A stale Authority
+   * is never sufficient. Nested safety calls reuse the checked transaction.
+   */
+  async withSession<T>(auth: Authority, run: () => Promise<T>): Promise<T> {
+    const current = this.sessionScope.getStore();
+    if (current) {
+      if (current.auth.sessionId !== auth.sessionId) throw new StoreError('UNAUTHORIZED');
+      return run();
+    }
+    return transaction(this.identity, async (client) => {
+      await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1, 19))', [auth.memberId]);
+      const session = await client.query<{ authenticated_at: Date }>(
+        `SELECT authenticated_at FROM identity.sessions WHERE id=$1 AND member_id=$2
+         AND revoked_at IS NULL AND expires_at>clock_timestamp() FOR SHARE`,
+        [auth.sessionId, auth.memberId],
+      );
+      if (!session.rowCount || (await this.policy(auth.memberId)).deletionRequested)
+        throw new StoreError('UNAUTHORIZED');
+      auth.authenticatedAt = session.rows[0]!.authenticated_at;
+      return this.sessionScope.run({ auth, client }, run);
+    });
+  }
+  /** I-20: DELETE/UPDATE of a staff assignment waits for this operation, and a
+   * request started after revocation sees no role. No cached role authorizes work. */
+  async withStaff<T>(
+    actor: string,
+    allowed: readonly StaffRole[],
+    run: (db: PoolClient) => Promise<T>,
+  ): Promise<T> {
+    return transaction(this.ops, async (db) => {
+      const roles = await db.query<{ role: StaffRole }>('SELECT role FROM ops.lock_staff($1)', [
+        actor,
+      ]);
+      if (!roles.rows.some((r) => allowed.includes(r.role))) throw new StoreError('FORBIDDEN');
+      const restriction = await db.query<{ denied: boolean }>(
+        'SELECT app.enforcement_status($1) AS denied',
+        [actor],
+      );
+      if (restriction.rows[0]!.denied) throw new StoreError('FORBIDDEN');
+      return run(db);
+    });
   }
   /** Atomic DB budget; contains keyed tokens, never raw email/IP/location. */
   async rateLimit(bucket: string, maximum: number, seconds: number): Promise<boolean> {
@@ -499,7 +543,7 @@ export class AccountStore {
       true,
     );
     if (result.deletionRequested) {
-      await this.identity.query(
+      await (this.sessionScope.getStore()?.client ?? this.identity).query(
         'UPDATE identity.sessions SET revoked_at=now() WHERE member_id=$1 AND revoked_at IS NULL',
         [authority.memberId],
       );
@@ -520,11 +564,13 @@ export class AccountStore {
     }));
   }
   async revokeSessions(authority: Authority, others: boolean) {
-    await this.identity.query(
-      `UPDATE identity.sessions SET revoked_at=now()
+    return this.withSession(authority, async () => {
+      await this.sessionScope.getStore()!.client.query(
+        `UPDATE identity.sessions SET revoked_at=now()
       WHERE member_id=$1 AND ${others ? 'id<>$2' : 'id=$2'}`,
-      [authority.memberId, authority.sessionId],
-    );
+        [authority.memberId, authority.sessionId],
+      );
+    });
   }
   async staffRoles(memberId: string): Promise<StaffRole[]> {
     if (!staffAccessAllowed(await this.policy(memberId))) return [];
@@ -546,12 +592,8 @@ export class AccountStore {
       [randomUUID(), actor, action, subject, requestId],
     );
   }
-  private async requireModerator(memberId: string) {
-    if (!canModerate(await this.staffRoles(memberId))) throw new StoreError('FORBIDDEN');
-  }
   async moderationQueue(actor: string, requestId: string) {
-    await this.requireModerator(actor);
-    return transaction(this.ops, async (db) => {
+    return this.withStaff(actor, ['operator', 'admin'], async (db) => {
       await this.audit(db, actor, 'QUEUE_READ', null, requestId);
       return (
         await db.query<Photo>(
@@ -562,21 +604,22 @@ export class AccountStore {
       ).rows;
     });
   }
-  async photoAccess(
+  async photoAccess<T = void>(
     authority: Authority,
     photoId: string,
     review: boolean,
     requestId: string,
-  ): Promise<void> {
+    consume: () => Promise<T> = async () => undefined as T,
+  ): Promise<T> {
     if (review) {
-      await this.requireModerator(authority.memberId);
-      await transaction(this.ops, async (db) => {
+      return this.withStaff(authority.memberId, ['operator', 'admin'], async (db) => {
         const row = await db.query(
           "SELECT id FROM app.media WHERE id=$1 AND status='PENDING' FOR SHARE",
           [photoId],
         );
         if (!row.rowCount) throw new StoreError('NOT_FOUND');
         await this.audit(db, authority.memberId, 'MEDIA_READ', photoId, requestId);
+        return consume();
       });
     } else {
       const row = await this.app.query(
@@ -584,6 +627,7 @@ export class AccountStore {
         [photoId, authority.memberId],
       );
       if (!row.rowCount) throw new StoreError('NOT_FOUND');
+      return consume();
     }
   }
   async moderate(
@@ -594,8 +638,7 @@ export class AccountStore {
     approve: boolean,
     requestId: string,
   ) {
-    await this.requireModerator(actor);
-    return transaction(this.ops, async (db) => {
+    return this.withStaff(actor, ['operator', 'admin'], async (db) => {
       const hash = this.lookup(JSON.stringify({ photoId, version, approve }));
       const photo = await db.query<Photo & { member_id: string }>(
         'SELECT id,status,version,member_id FROM app.media WHERE id=$1 FOR UPDATE',
@@ -637,8 +680,7 @@ export class AccountStore {
     });
   }
   async auditLog(actor: string, requestId: string) {
-    if (!(await this.staffRoles(actor)).includes('admin')) throw new StoreError('FORBIDDEN');
-    return transaction(this.ops, async (db) => {
+    return this.withStaff(actor, ['admin'], async (db) => {
       await this.audit(db, actor, 'AUDIT_READ', null, requestId);
       return (
         await db.query(
