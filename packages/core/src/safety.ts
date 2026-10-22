@@ -71,15 +71,35 @@ export const appealSchema = z
 export const appealDecisionSchema = z
   .object({ version: z.number().int().nonnegative(), decision: z.enum(['UPHELD', 'LIFTED']) })
   .strict();
+export const clientVersionSchema = z
+  .string()
+  .min(1)
+  .max(80)
+  .regex(/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/);
+/** Authentication and own safety assistance remain usable during client shutdowns. */
+export function isSafetyAssistanceRoute(route: string, method: string) {
+  return (
+    route.startsWith('safety/') ||
+    route.startsWith('auth/') ||
+    (route === 'me' && method === 'GET') ||
+    (route === 'account/register' && method === 'POST')
+  );
+}
 export const switchSchema = z
   .object({
-    scope: z.enum(['VENUE', 'EVENT', 'ALL_GO', 'NEW_PERSON_GO']),
-    target: z.uuid().nullable(),
+    scope: z.enum(['VENUE', 'EVENT', 'ALL_GO', 'NEW_PERSON_GO', 'CLIENT_VERSION']),
+    target: z.string().nullable(),
     disabled: z.boolean(),
     version: z.number().int().nonnegative(),
   })
   .strict()
-  .refine((v) => ['VENUE', 'EVENT'].includes(v.scope) === (v.target !== null));
+  .refine((v) =>
+    v.scope === 'CLIENT_VERSION'
+      ? clientVersionSchema.safeParse(v.target).success && v.target !== 'GLOBAL'
+      : ['VENUE', 'EVENT'].includes(v.scope)
+        ? z.uuid().safeParse(v.target).success
+        : v.target === null,
+  );
 export function precautionAllowed(actor: string, subject: string) {
   return actor !== subject;
 }

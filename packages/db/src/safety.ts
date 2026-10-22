@@ -477,7 +477,13 @@ export class SafetyStore {
           'INSERT INTO safety.kill_switch(scope,target,disabled,version) VALUES($1,$2,$3,$4) ON CONFLICT(scope,target) DO UPDATE SET disabled=EXCLUDED.disabled,version=EXCLUDED.version',
           [d.scope, target, d.disabled, d.version + 1],
         );
-        await this.audit(db, auth.memberId, d.target, 'SWITCH_UPDATED', requestId);
+        await this.audit(
+          db,
+          auth.memberId,
+          d.scope === 'CLIENT_VERSION' ? null : d.target,
+          'SWITCH_UPDATED',
+          requestId,
+        );
         return { version: d.version + 1 };
       }),
     );

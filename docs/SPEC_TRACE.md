@@ -321,3 +321,12 @@ M1 merge authorization; DEC-036–038 document the M2 choices and explicit limit
 Full test totals and CI evidence are recorded in PROJECT_STATUS.md and the M2 PR.
 M5 deletion orchestration and M7 human accessibility/security review remain release
 gates. An automated axe pass does not certify all of WCAG or operational readiness.
+
+M2 review correction (DEC-039): migration 0009 records directional blocker ownership
+and preserves legacy denial without invented provenance. `directional-migration.test.ts`
+proves the upgrade from 0008 on real PostgreSQL; `safety.test.ts` proves bilateral
+effect, separate direction rows and removal privilege denial (I-04). Unit tests check
+all help href/source values for tracking/query leakage (I-11). `db/client-policy`,
+the API dispatcher and console enforce CLIENT_VERSION shutdowns; integration and
+browser tests prove refusal with reporting/help available (P20/I-11). D9 retention
+enforcement, including legal holds, remains M5 backlog work (P22/I-18).

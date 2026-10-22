@@ -91,6 +91,46 @@ async function post(page: Page, path: string, data: unknown, key = randomUUID())
     data,
   });
 }
+test('I-11 P20 client-version shutdown is enforced over HTTP while reporting and public help work', async ({
+  page,
+  browser,
+}) => {
+  await seed(page, true);
+  const version = `retired-${randomUUID()}`;
+  const context = await browser.newContext({
+    extraHTTPHeaders: { 'X-Meetwell-Client-Version': version },
+  });
+  const memberPage = await context.newPage();
+  try {
+    await seed(memberPage);
+    expect((await memberPage.request.get('/api/v1/account/sessions')).status()).toBe(200);
+    await page.goto('/ops/safety');
+    await page.getByLabel('Switch type').selectOption('CLIENT_VERSION');
+    await page.getByLabel('Client version', { exact: true }).fill(version);
+    await page.getByRole('button', { name: 'Save shutdown' }).click();
+    await expect(page.getByRole('status')).toContainText('Shutdown saved');
+    expect((await memberPage.request.get('/api/v1/account/sessions')).status()).toBe(426);
+    const report = await post(memberPage, 'safety/reports', {
+      subjectId: null,
+      context: { surface: 'settings' },
+    });
+    expect(report.status()).toBe(200);
+    const result = await report.json();
+    expect((await memberPage.request.get(`/api/v1/safety/cases/${result.id}`)).status()).toBe(200);
+    expect((await memberPage.request.get('/api/v1/safety/blocks')).status()).toBe(404);
+    expect((await post(memberPage, 'safety/unblock', { subjectId: randomUUID() })).status()).toBe(
+      404,
+    );
+    await memberPage.goto('/safety/help');
+    await expect(memberPage.getByRole('link', { name: '988', exact: true })).toHaveAttribute(
+      'href',
+      'tel:988',
+    );
+    await axe(memberPage);
+  } finally {
+    await context.close();
+  }
+});
 test('I-11 independent public help, settings report without block/detail, acknowledgement and lost-response retry are accessible', async ({
   page,
 }) => {
@@ -247,7 +287,9 @@ test('I-12 I-20 audited console, separate integrity, precaution, appeal, lift, s
     await staffPage.getByRole('button', { name: 'Save shutdown' }).click();
     await expect(staffPage.getByRole('status')).toContainText('Shutdown saved');
     await staffPage.getByRole('button', { name: 'Review access audit' }).click();
-    await expect(staffPage.getByText(/REPORT CASE VIEW/).first()).toBeVisible();
+    // The audit is paginated: assert the recent integrity view, not an older
+    // report view that can legitimately be beyond the first 30 rows.
+    await expect(staffPage.getByText(/INTEGRITY CASE VIEW/).first()).toBeVisible();
     await admin.query('DELETE FROM ops.staff WHERE member_id=$1', [independent.id]);
     expect((await staffPage.request.get(`/api/v1/ops/safety/reports/${report.id}`)).status()).toBe(
       403,

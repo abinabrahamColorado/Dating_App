@@ -18,6 +18,7 @@ import { sanitizePhoto, putPhoto, getPhoto, deletePhoto } from './media';
 import { deliverAuthMail } from './mail';
 import { passkeyOptions, verifyPasskey } from './passkeys';
 import { handleSafety } from './safety-api';
+import { requireSupportedClient } from '@meetwell/db/client-policy';
 import type { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/server';
 
 export const SESSION_COOKIE = 'meetwell_session';
@@ -115,6 +116,10 @@ const errors: Record<string, [number, string]> = {
   PAYLOAD_TOO_LARGE: [413, 'The upload is too large. Choose a smaller file.'],
   NOT_FOUND: [404, 'This page or item is unavailable.'],
   RATE_LIMITED: [429, 'Please wait a little before trying again.'],
+  CLIENT_VERSION_DISABLED: [
+    426,
+    'This app version is temporarily unavailable. Update or reload the app. Reporting and help remain available.',
+  ],
 };
 export async function handle(request: Request, path: string[]) {
   const requestId = randomUUID();
@@ -129,6 +134,12 @@ export async function handle(request: Request, path: string[]) {
       )
         throw new StoreError('FORBIDDEN');
     }
+    await requireSupportedClient(
+      db,
+      route,
+      request.method,
+      request.headers.get('x-meetwell-client-version'),
+    );
     if (route === 'auth/request' && request.method === 'POST') {
       const data = z
         .object({

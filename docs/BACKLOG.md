@@ -76,6 +76,10 @@ Pricing/payments; demographic research; pooled models/embeddings; broad neighbor
   actual travel/availability feasibility. Add exposure logging and closed-pair memory.
 - M5: erase stores/exports, reconcile encrypted media orphans, expire auth/outbox/
   rate-limit records, apply tombstones on restore and prove retention deadlines.
+- M5: enforce D9 safety retention: 24 calendar months after case closure, annual
+  review and shorter retention where unneeded; case-specific legal holds prevent
+  deletion only for their documented scope/duration. Add expiry, hold/release and
+  restored-backup tests. M2 stores cases but does not run this retention job.
 - M7: passkey listing/removal/recovery with recent authentication; production
   KMS/key rotation, scoped object-storage credentials, real mail transport, strict
   CSP, per-request body deadlines, broader abuse budgets, additional staff abuse scenarios,

@@ -79,4 +79,27 @@ waits for M4/M6. M2 retry keys survive retries in the open page, not browser rel
 Deferred races: M3 reservation/acceptance/introduction delivery and outbox; M4 chat
 delivery and plan confirmation. No placeholder versions were built. G01 worker wiring,
 broader G08 M1 retry recovery, G09 media-write compensation, M5 erasure/restore and M7
-hardening remain in BACKLOG. Do not begin M3 or merge M2 without the next authorization.
+hardening remain in BACKLOG. The later authorization and verification below govern
+the M2 merge and M3 start.
+
+## Founder review corrections (DEC-039)
+
+The founder conditionally authorized the M2 merge after four corrections and green
+CI, then M3 after green main CI. Canonical help URLs have no tracking query; 0009
+records directional blocks while preserving unknown historical denials separately;
+CLIENT_VERSION is enforced by the HTTP gate and controlled from the console; D9
+24-month post-closure retention and legal holds are explicitly M5 backlog work.
+No prior migration or source architecture was edited.
+
+The complete local `pnpm check` passed again: typecheck, lint, formatting, 22 unit
+tests, 34 real Postgres integration tests, production build and 11 Chromium/axe
+tests (67 total). A disposable real database proves upgrade from 0008 preserves
+legacy denials and accepts independent directional rows with a pair index. SQL
+permissions reject runtime removal or reassignment. HTTP tests prove a disabled
+client is refused ordinary activity while reports, case status and public help work.
+
+An initial browser assertion expected an old report view in the first audit page;
+the new tests generated enough audit rows to paginate it out. It now checks the
+most recent integrity view; the same test still verifies the specific report-view
+row in Postgres. The complete suite passed after the correction. Exact remote
+head, CI and merge evidence are recorded in PR #5 and the task handoff.

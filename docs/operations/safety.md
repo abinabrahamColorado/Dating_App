@@ -1,6 +1,6 @@
 # M2 safety operations
 
-Spec P17/P20/P21/P22; DEC-035–038. Synthetic loopback development only.
+Spec P17/P20/P21/P22; DEC-035–039. Synthetic loopback development only.
 
 ## Member paths
 
@@ -35,6 +35,19 @@ Go configuration remains disabled. Console shutdowns add a stop, never override 
 configuration disable. Venue/event shutdown references are stored now; enforcement is
 M4/M6 work. Reporting/help do not consult these switches. Access audit review is itself
 audited. There is no report-count ban, public rating, narrative export or analytics feed.
+
+CLIENT_VERSION is enforced now. Choose Client version in the shutdown controls and
+enter the exact release identifier from `packages/config/src/safety.ts` or the
+affected client. The API refuses ordinary activity with 426; authentication and
+own safety assistance remain usable. A disabled current web release cannot bypass
+the stop by claiming another version. Remediation requires a new reviewed release
+identifier or an authorized administrator clearing the exact stored shutdown after
+review; a blocked client cannot use the operator console to clear its own stop.
+
+Blocks record the initiating member and retain two independent directions. There
+is no block-list/unblock endpoint. Historical pre-0009 rows retain denial separately
+because their initiator was not stored. Never infer ownership when reviewing those
+rows. Future removal must check blocker ownership and preserve opposite/legacy denials.
 
 ## Boundaries, concurrency and failure
 

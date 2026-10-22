@@ -2,6 +2,7 @@ import { features } from './pilot';
 
 /** Spec P17/P20/P22. Pilot bounds, not operational response promises. */
 export const safetyConfig = {
+  CLIENT_VERSION: 'web-m2-1', // Spec P20; bump deliberately for each remediated client release.
   DETAIL_MAX: 4000,
   CASE_PAGE_SIZE: 30,
   REQUESTS_PER_HOUR: 30,
@@ -40,14 +41,14 @@ export const helpResources: Record<string, { name: string; resources: HelpResour
         name: '988 Suicide & Crisis Lifeline',
         description: 'Support for suicidal crisis or emotional distress in the United States.',
         links: [
-          { label: '988', href: 'tel:988?oai_link_source=model_response_hotline' },
-          { label: 'Text 988', href: 'sms:988?oai_link_source=model_response_hotline' },
+          { label: '988', href: 'tel:988' },
+          { label: 'Text 988', href: 'sms:988' },
           {
             label: 'Online chat',
-            href: 'https://988lifeline.org/chat/?oai_link_source=model_response_hotline',
+            href: 'https://988lifeline.org/chat/',
           },
         ],
-        source: 'https://988lifeline.org?oai_link_source=model_response_hotline',
+        source: 'https://988lifeline.org',
         verified: true,
       },
     ],

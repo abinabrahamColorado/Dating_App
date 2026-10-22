@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Policy, Profile, Preferences, StaffRole } from '@meetwell/core/accounts';
 import type { Photo } from '@meetwell/db/accounts';
+import { safetyConfig } from '@meetwell/config/safety';
 export type Me = {
   registered: boolean;
   age: number | null;
@@ -32,10 +33,12 @@ export async function api<T>(path: string, data?: unknown, commandKey?: string):
     method: data === undefined ? 'GET' : 'POST',
     credentials: 'same-origin',
     cache: 'no-store',
+    headers: { 'X-Meetwell-Client-Version': safetyConfig.CLIENT_VERSION },
     ...(data === undefined
       ? {}
       : {
           headers: {
+            'X-Meetwell-Client-Version': safetyConfig.CLIENT_VERSION,
             'Content-Type': 'application/json',
             'Idempotency-Key': commandKey ?? crypto.randomUUID(),
           },

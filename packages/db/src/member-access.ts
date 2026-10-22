@@ -23,8 +23,9 @@ export async function withMemberPair<T>(
       const members = await db.query<PairMember>(
         `SELECT id,state,deletion_requested_at IS NOT NULL AS deleted,
        app.enforcement_status(id) AS restricted,
-       EXISTS(SELECT 1 FROM app.blocks WHERE low_id=least($1::uuid,$2::uuid) AND high_id=greatest($1::uuid,$2::uuid)) AS "blocksOther"
-       FROM app.members WHERE id IN($1,$2)`,
+       (EXISTS(SELECT 1 FROM app.blocks WHERE low_id=least($1::uuid,$2::uuid) AND high_id=greatest($1::uuid,$2::uuid) AND blocker_id=m.id)
+        OR EXISTS(SELECT 1 FROM app.legacy_pair_denials WHERE low_id=least($1::uuid,$2::uuid) AND high_id=greatest($1::uuid,$2::uuid))) AS "blocksOther"
+       FROM app.members m WHERE id IN($1,$2)`,
         [auth.memberId, subject],
       );
       const u = members.rows.find((r) => r.id === auth.memberId),
@@ -107,7 +108,7 @@ export async function blockMember(
         throw new StoreError('IDEMPOTENCY_CONFLICT');
       if (!prior.rowCount) {
         await db.query(
-          'INSERT INTO app.blocks(low_id,high_id) VALUES(least($1::uuid,$2::uuid),greatest($1::uuid,$2::uuid)) ON CONFLICT DO NOTHING',
+          'INSERT INTO app.blocks(low_id,high_id,blocker_id) VALUES(least($1::uuid,$2::uuid),greatest($1::uuid,$2::uuid),$1) ON CONFLICT DO NOTHING',
           [auth.memberId, subject],
         );
         await db.query(

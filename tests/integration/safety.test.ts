@@ -8,6 +8,8 @@ import { hashToken } from '../../packages/db/src/encryption';
 import { migrate } from '../../packages/db/src/migrate';
 import { syntheticProfile } from '../fixtures/accounts';
 import { accountConfig } from '../../packages/config/src/accounts';
+import { requireSupportedClient } from '../../packages/db/src/client-policy';
+import { safetyConfig } from '../../packages/config/src/safety';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url || !new URL(url).pathname.endsWith('_test'))
@@ -124,6 +126,83 @@ it('I-04 authoritative bilateral block denies both profile directions and stale 
       )
     ).rowCount,
   ).toBe(1);
+});
+it('I-04 directional rows retain the blocker; neither the subject nor runtime can remove another block', async () => {
+  const a = await member(),
+    b = await member();
+  await access(a, b);
+  await blockMember(accounts, a, b.memberId, randomUUID());
+  expect(
+    (await admin.query('SELECT blocker_id FROM app.blocks WHERE blocker_id=$1', [a.memberId])).rows,
+  ).toEqual([{ blocker_id: a.memberId }]);
+  await blockMember(accounts, b, a.memberId, randomUUID());
+  expect(
+    (
+      await admin.query(
+        'SELECT blocker_id FROM app.blocks WHERE low_id=least($1::uuid,$2::uuid) AND high_id=greatest($1::uuid,$2::uuid)',
+        [a.memberId, b.memberId],
+      )
+    ).rows
+      .map((r) => r.blocker_id)
+      .sort(),
+  ).toEqual([a.memberId, b.memberId].sort());
+  await expect(
+    app.query('DELETE FROM app.blocks WHERE blocker_id=$1', [a.memberId]),
+  ).rejects.toMatchObject({ code: '42501' });
+  await expect(
+    app.query('UPDATE app.blocks SET blocker_id=$1 WHERE blocker_id=$2', [b.memberId, a.memberId]),
+  ).rejects.toMatchObject({ code: '42501' });
+  await expect(
+    admin.query(
+      'INSERT INTO app.blocks(low_id,high_id,blocker_id) VALUES(least($1::uuid,$2::uuid),greatest($1::uuid,$2::uuid),$3)',
+      [a.memberId, b.memberId, randomUUID()],
+    ),
+  ).rejects.toMatchObject({ code: '23514' });
+  await expect(memberProfile(accounts, a, b.memberId)).rejects.toThrow('NOT_FOUND');
+  await expect(memberProfile(accounts, b, a.memberId)).rejects.toThrow('NOT_FOUND');
+  const c = await member(),
+    d = await member();
+  await access(c, d);
+  await admin.query(
+    'INSERT INTO app.legacy_pair_denials VALUES(least($1::uuid,$2::uuid),greatest($1::uuid,$2::uuid),now())',
+    [c.memberId, d.memberId],
+  );
+  await expect(memberProfile(accounts, c, d.memberId)).rejects.toThrow('NOT_FOUND');
+  await expect(memberProfile(accounts, d, c.memberId)).rejects.toThrow('NOT_FOUND');
+});
+it('I-11 P20 client shutdown refuses activity but preserves reporting and assistance', async () => {
+  const staff = await member(true),
+    reporter = await member(),
+    version = `test-${randomUUID()}`;
+  await db.switch(
+    staff,
+    randomUUID(),
+    { scope: 'CLIENT_VERSION', target: version, disabled: true, version: 0 },
+    randomUUID(),
+  );
+  await expect(requireSupportedClient(accounts, 'members/subject', 'GET', version)).rejects.toThrow(
+    'CLIENT_VERSION_DISABLED',
+  );
+  await expect(
+    requireSupportedClient(accounts, 'account/sessions', 'GET', version),
+  ).rejects.toThrow('CLIENT_VERSION_DISABLED');
+  await expect(
+    requireSupportedClient(accounts, 'members/subject', 'GET', safetyConfig.CLIENT_VERSION),
+  ).resolves.toBeUndefined();
+  for (const route of ['safety/reports', 'safety/block', 'safety/appeal', 'auth/request'])
+    await expect(requireSupportedClient(accounts, route, 'POST', version)).resolves.toBeUndefined();
+  expect(await db.report(reporter, randomUUID(), input(null), randomUUID())).toMatchObject({
+    status: 'RECEIVED',
+  });
+  await db.switch(
+    staff,
+    randomUUID(),
+    { scope: 'CLIENT_VERSION', target: version, disabled: false, version: 1 },
+    randomUUID(),
+  );
+  await expect(
+    requireSupportedClient(accounts, 'account/sessions', 'GET', version),
+  ).resolves.toBeUndefined();
 });
 it('I-11 report, block, acknowledgement and case status are independent, object authorized and idempotent', async () => {
   const a = await member(),

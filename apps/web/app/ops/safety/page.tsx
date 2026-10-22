@@ -373,24 +373,29 @@ export default function Page() {
                     </div>
                   );
                 })}
-                <h3>Venue and event shutdowns</h3>
+                <h3>Venue, event and client shutdowns</h3>
                 <p>
                   Save shutdowns now. Venue and event features will enforce them when those features
-                  open.
+                  open. Client version shutdowns apply now; reporting and help remain available.
                 </p>
                 <label>
                   Switch type
                   <select value={scope} onChange={(e) => setScope(e.target.value)}>
                     <option value="VENUE">Venue</option>
                     <option value="EVENT">Event</option>
+                    <option value="CLIENT_VERSION">Client version</option>
                   </select>
                 </label>
                 <label>
-                  Venue or event reference
+                  {scope === 'CLIENT_VERSION' ? 'Client version' : 'Venue or event reference'}
                   <input
                     value={target}
                     onChange={(e) => setTarget(e.target.value)}
-                    placeholder="Reference from the venue or event record"
+                    placeholder={
+                      scope === 'CLIENT_VERSION'
+                        ? safetyConfig.CLIENT_VERSION
+                        : 'Reference from the venue or event record'
+                    }
                   />
                 </label>
                 <button
@@ -409,7 +414,7 @@ export default function Page() {
                   Save shutdown
                 </button>
                 {switches.overrides
-                  .filter((r) => ['VENUE', 'EVENT'].includes(r.scope))
+                  .filter((r) => ['VENUE', 'EVENT', 'CLIENT_VERSION'].includes(r.scope))
                   .map((s) => (
                     <div className="case-row" key={`${s.scope}:${s.target}`}>
                       <p>

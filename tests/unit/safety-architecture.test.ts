@@ -50,7 +50,8 @@ it('I-04 architecture: every HTTP entry and worker is inventoried; new surfaces 
   // disclosure under an old name. Review any diff before updating these baselines;
   // a new member-data path must use withMemberPair and get a negative race test.
   const reviewedSelfAndInfrastructure: Record<string, string> = {
-    'apps/web/server/api.ts': 'd7a41e7d84a71704dd12126f1237acbe61de6d10532362921f521b7fc2881696',
+    // DEC-039 review: added only the release shutdown gate/error, no new disclosure.
+    'apps/web/server/api.ts': '20f42a4b3d0119923aec957c80a852b10d3b0e67fab77fdacb7818c640d0ee2c',
     'apps/web/server/passkeys.ts':
       'b4f7600984751171bf430f0d4afe7760d26ba284fce4f5f90ccb3c1d151caa64',
     'apps/web/server/mail.ts': '3412a014fd66e8790e27bdcd0dbf348dd564d46b7d20da2c0120e7ed2d918f2a',

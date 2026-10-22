@@ -9,8 +9,9 @@ Current review branch: `codex/m2-safety-core`, [PR #5](https://github.com/abinab
 PR #3 merged with explicit founder
 approval at `a4dee472951f4d11968de6613e6d416f0e227df8`. Main CI
 [39547453037](https://github.com/abinabrahamColorado/Dating_App/actions/runs/39547453037)
-is green. PR #1 is closed without merging, with `Superseded by #2.`. M2 must remain
-unmerged until founder review; do not start M3.
+is green. PR #1 is closed without merging, with `Superseded by #2.`. The founder
+conditionally approved M2 merge after the DEC-039 corrections pass checks and CI;
+M3 starts only after the merge and green main CI. Its PR must remain unmerged.
 
 ## Implemented and reviewed state
 
@@ -26,6 +27,8 @@ encrypted safety storage, an audited safety console, precaution/lift, independen
 appeal review and stored account/venue/event/Go shutdown controls. Session/staff
 revocation is rechecked under locks at protected operations. Only a safety reviewer
 can read cases; admin alone cannot. See [safety operations](operations/safety.md).
+DEC-039 adds query-free help links, directional block ownership with preserved
+legacy denials, enforced client-version shutdown and an explicit M5 D9 retention item.
 
 This review branch isolates authentication email failures: each message commits
 independently, failed attempts persist with a retry delay and budget, and a corrupt
@@ -46,8 +49,8 @@ and 20 invariant mappings remain tracked. This audit adds a source-backed
 ## Verification and GitHub review
 
 Full `corepack pnpm check` passed on the M2 review branch: typecheck, lint, formatting,
-21 unit/property tests, 31 real PostgreSQL integration tests, production build and
-10 Chromium tests with axe checks (62 tests total). Its PR and final handoff record
+22 unit/property tests, 34 real PostgreSQL integration tests, production build and
+11 Chromium tests with axe checks (67 tests total, including DEC-039 corrections). Its PR and final handoff record
 the exact head and CI results. The tests include real
 PostgreSQL role denial, session/staff revocation races, both block/profile orderings,
 simultaneous block/report, independent appeal decisions and Chromium/axe workflows.

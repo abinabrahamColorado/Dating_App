@@ -7,6 +7,24 @@ import {
   reportSchema,
 } from '../../packages/core/src/safety';
 import { helpResources } from '../../packages/config/src/safety';
+it('I-11 every help link and source is query-free and has no tracking parameters', () => {
+  for (const jurisdiction of Object.values(helpResources)) {
+    for (const resource of jurisdiction.resources) {
+      for (const href of [...resource.links.map((link) => link.href), resource.source]) {
+        expect(new URL(href).search, href).toBe('');
+        expect(href, href).not.toMatch(/[?&#](?:oai_|utm_|gclid|fbclid|msclkid)/i);
+        if (/^(tel|sms):/.test(href)) expect(href).not.toContain('?');
+      }
+    }
+  }
+  const lifeline = helpResources['US-NYC']!.resources.find((r) => r.name.startsWith('988'))!;
+  expect(lifeline.links.map((l) => l.href)).toEqual([
+    'tel:988',
+    'sms:988',
+    'https://988lifeline.org/chat/',
+  ]);
+  expect(lifeline.source).toBe('https://988lifeline.org');
+});
 it('I-04 deny policy is symmetric and authoritative for every blocked pair', () => {
   fc.assert(
     fc.property(fc.uuid(), fc.uuid(), fc.boolean(), (a, b, blocked) => {

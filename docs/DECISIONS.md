@@ -346,3 +346,32 @@ the page loses that pending key; members can check their case list before resubm
 G08's broader M1 retry/refresh work and G09's upload compensation remain in the backlog.
 Staff media reads now retain the role lock while fetching bytes because the shared
 revocation boundary changed; unrelated media-write behavior is unchanged.
+
+## M2 review corrections and conditional merge approval (DEC-039)
+
+2026-10-21, Spec P20/P22, I-04/I-11/I-12. The founder approved merging PR #5
+with a merge commit after clean help links, directional block ownership, client
+version shutdown and the D9 backlog entry pass full checks and CI. Main CI must
+then pass before branching M3. This supersedes the earlier M2 merge stop only;
+the new M3 PR must remain unmerged.
+
+988 links/source use the exact query-free canonical values requested. Every help
+href/source is tested for query/tracking leakage. Migration 0009 preserves earlier
+unordered blocks in `app.legacy_pair_denials`: their initiator was not stored, so
+assigning one would fabricate provenance. Those denials remain bilateral and have
+no runtime removal privilege. New `app.blocks` rows require `blocker_id`, one row
+per direction and a pair lookup index. No block-list or removal API/UI is added;
+future removal must authorize the blocker and cannot erase the opposite direction.
+The migration is tested on a disposable real Postgres database upgraded from 0008.
+
+CLIENT_VERSION shutdowns use a bounded release identifier. The HTTP gate checks
+both the supplied version and the server's configured web release, with no cached
+permit. Authentication, registration needed for reporting, own member bootstrap,
+report/block/appeal/status routes and public help remain available. Other APIs are
+refused with HTTP 426. A claimed version is release metadata, not authentication;
+identity/object authorization still applies. The current build cannot bypass its
+own shutdown by changing a header. Database failure denies ordinary activity.
+
+D9 enforcement belongs to M5: 24 calendar months after closure, annual review,
+shorter retention where unneeded and scoped legal holds. No retention completion
+is claimed in M2. Migrations 0001–0008 and the source architecture remain unchanged.
