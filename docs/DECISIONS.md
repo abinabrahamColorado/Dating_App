@@ -444,8 +444,10 @@ with reuse. Worker reads outside a session continue to use their own identity po
 
 2026-10-22, Spec P8/P20/P22. Weekly batch, delivery, maintenance and mail are real
 pg-boss jobs with empty payloads. The web and worker share server-only runtime/mail
-adapters. Worker construction has app/identity credentials and a separate queue
-login, without operator/safety credentials. Serving never reads safety narratives.
+adapters. Worker construction uses app/identity pools and a separate queue login,
+without constructing operator/safety pools or using the case key. Local processes
+still load the shared ignored `.env`; isolated production process secrets remain
+M7 work. Serving never reads safety narratives.
 Release shutdown gates batch, delivery and mail; maintenance continues to expire
 authority. Report/help paths retain their independent M2 access.
 

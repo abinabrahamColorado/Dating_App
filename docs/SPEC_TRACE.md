@@ -362,7 +362,8 @@ DEC-040–043 record interpretations and scope; M4/M5/M6 paths remain deferred.
 - I-11/I-12/I-17/I-20: card/past-opportunity concern links, existing independent
   safety routes, generic SMTP, no member geometry or case narrative in learning,
   current-role operator access and append-only batch audits. M2 isolation tests
-  continue to apply. Runtime construction separates worker from ops/safety keys.
+  continue to apply. Worker construction does not use ops/safety pools or the case
+  key; isolating process secrets beyond the shared local `.env` remains M7 work.
 - I-16, P4/P6: `/explore`, `/explore/[id]`, `/ops/explore` have truthful empty
   and capacity states, one full-page profile and no scores/feeds. Two browser
   workflows run axe and real Postgres/MinIO/Mailpit. A real pg-boss integration

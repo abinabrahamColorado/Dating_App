@@ -58,8 +58,9 @@ Pricing/payments; demographic research; pooled models/embeddings; broad neighbor
 - Before real accounts: G09 ambiguous media-upload commit compensation remains
   open. M2 did not change upload writes. Live enrollment remains disabled.
 - G01 shared auth-mail wiring is fixed in M3: web and worker use `packages/runtime`;
-  the worker has queue, app and identity access but no ops/safety login or case key.
-  Production secret isolation and purpose-scoped identity delivery remain M7 work.
+  worker construction uses queue, app and identity pools, not ops/safety pools.
+  Local processes still share ignored `.env`; production process-secret isolation
+  and purpose-scoped identity delivery remain M7 work.
 
 - M2 complete: reporting/appeals for restricted/exited members, separate safety
   and integrity queues, audited safety-role access, bilateral profile/photo denial,

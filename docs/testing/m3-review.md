@@ -24,8 +24,9 @@ passed all three jobs before branching M3.
 - Per-member decision versions keep the first acceptance private. Pass, expiry,
   block, restriction and close revoke grants and release held slots once.
 - Real pg-boss jobs run generation, delivery, maintenance and generic mail. Ambiguous
-  SMTP is held for review; opt-in controls reminders. Runtime has no worker safety
-  key or operator login. HTTP client shutdown and existing safety paths remain intact.
+  SMTP is held for review; opt-in controls reminders. Worker stores do not construct
+  operator/safety pools or use the case key. Local processes share ignored `.env`;
+  production secret isolation remains M7. Existing safety paths remain intact.
 - `/explore`, `/explore/[id]` and `/ops/explore` provide the finite member and staff
   workflows, with concern/help links and no M4 chat/plan placeholders.
 
