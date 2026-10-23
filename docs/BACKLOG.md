@@ -46,6 +46,8 @@ research is complete for now (DEC-033). DEC-035 authorizes this M2 build only.
 
 Pricing/payments; demographic research; pooled models/embeddings; broad neighborhood GPS; native apps/background permissions; real verification/map vendors; open event marketplace; booking integrations; automated trusted-contact escalation. Each needs a separate authorized milestone and explicit privacy/operations gates.
 
+- V1/V2 matching work: [Algorithm literature and build cards A1–A10](research/algorithm-literature.md); each card requires its data threshold to be met and explicit founder approval before implementation.
+
 ## Release work retained from M1
 
 - Complete: G07 auth delivery repair/regression evidence; M2 fixes G02 session
