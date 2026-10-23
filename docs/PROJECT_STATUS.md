@@ -1,17 +1,20 @@
 # Project status
 
-Updated 2026-10-21 (America/Chicago). Working name: **Meetwell**.
+Updated 2026-10-22 (America/Chicago). Working name: **Meetwell**.
 Pilot proposal: Manhattan, New York City; ages 18–30.
 
 Permanent checkout: `E:\Buisness\Dating_App`.
 Remote: `https://github.com/abinabrahamColorado/Dating_App`.
-Current review branch: `codex/m2-safety-core`, [PR #5](https://github.com/abinabrahamColorado/Dating_App/pull/5).
+Current review branch: `codex/m3-explore-engine`. M3 will remain unmerged for review.
 PR #3 merged with explicit founder
 approval at `a4dee472951f4d11968de6613e6d416f0e227df8`. Main CI
 [39547453037](https://github.com/abinabrahamColorado/Dating_App/actions/runs/39547453037)
 is green. PR #1 is closed without merging, with `Superseded by #2.`. The founder
-conditionally approved M2 merge after the DEC-039 corrections pass checks and CI;
-M3 starts only after the merge and green main CI. Its PR must remain unmerged.
+approved M2 after the DEC-039 corrections passed 67 local tests and green CI.
+[PR #5](https://github.com/abinabrahamColorado/Dating_App/pull/5) merged at
+`5711fe60dfdec9e9ffa6a2f50b2ea38dea2ecb0f`; main CI
+[39723068853](https://github.com/abinabrahamColorado/Dating_App/actions/runs/39723068853)
+passed before the M3 branch was created. M3's PR must remain unmerged.
 
 ## Implemented and reviewed state
 
@@ -30,6 +33,15 @@ can read cases; admin alone cannot. See [safety operations](operations/safety.md
 DEC-039 adds query-free help links, directional block ownership with preserved
 legacy denials, enforced client-version shutdown and an explicit M5 D9 retention item.
 
+M3 adds bilateral eligibility, centroid travel and recurring-window feasibility,
+the deterministic stated-fit heuristic, greedy allocation with exact conditional
+propensity logs, atomic bilateral reservations, permanent pair history, audited
+operator/concierge review, approval outbox and durable jobs. Members have finite
+full-page cards, blind decisions, distinct expiry, opt-in reminders, mutual
+connections and closure. Delivery grants both profiles; terminal transitions revoke
+grants and release slots once. See [Explore operations](operations/explore.md),
+DEC-040–043 and [M3 review](testing/m3-review.md).
+
 This review branch isolates authentication email failures: each message commits
 independently, failed attempts persist with a retry delay and budget, and a corrupt
 message cannot undo earlier successful delivery markers. Migration `0004` is
@@ -47,6 +59,11 @@ and 20 invariant mappings remain tracked. This audit adds a source-backed
 [test strategy](testing/strategy.md).
 
 ## Verification and GitHub review
+
+M3 full `corepack pnpm check` passed: typecheck, lint, formatting, 32 unit/property
+tests, 46 real PostgreSQL integration tests, production build and 13 Chromium tests
+with axe (91 total). See [M3 review](testing/m3-review.md) and the PR's exact-head
+checks for CI results. The branch remains unmerged for founder review.
 
 Full `corepack pnpm check` passed on the M2 review branch: typecheck, lint, formatting,
 22 unit/property tests, 34 real PostgreSQL integration tests, production build and
@@ -89,14 +106,14 @@ founder's explicit M1 merge and M2 authorization in DEC-035.
 
 Account APIs require local/test mode and a loopback origin. Use synthetic accounts.
 Birth-date entry is not identity verification. Deletion currently disables access;
-it does not erase data. Allocation, chat, joint plans,
+it does not erase data. Chat, joint plans,
 feedback, erasure/restore and event Go remain unbuilt. No serving model, member
 GPS collection, real provider integration or live pilot is enabled.
 
-Next: review the M2 PR; do not merge it automatically or start M3.
+Next: review the M3 PR; do not merge it or start M4 without further authorization.
 M1 client retry recovery and ambiguous media-write compensation (G08/G09) remain
-release gates. M2 fixes G02/G03 for current request/case boundaries; future M3/M4
-transitions must add their own denial checks and races.
+release gates. M2 fixes G02/G03 for current request/case boundaries; M3 now tests
+reservation/delivery/acceptance races. Chat and plan races remain M4 work.
 Deletion/restore must pass before real enrollment; Go also requires staffed
 operations and explicit activation approval. The founder rejected the crosswalk;
 CODEX_PROMPTS numbering and order govern. M5 deletion already precedes M6 Go.

@@ -330,3 +330,50 @@ all help href/source values for tracking/query leakage (I-11). `db/client-policy
 the API dispatcher and console enforce CLIENT_VERSION shutdowns; integration and
 browser tests prove refusal with reporting/help available (P20/I-11). D9 retention
 enforcement, including legal holds, remains M5 backlog work (P22/I-18).
+
+## M3 Explore implementation and evidence (2026-10-22)
+
+The 193 original requirement rows and canonical invariant IDs are preserved.
+DEC-040–043 record interpretations and scope; M4/M5/M6 paths remain deferred.
+
+- I-02, P6/P10/P11/P15: `core/explore`, `db/explore-policy` compose bilateral
+  stated boundaries, active Explore readiness, approved media, centroid travel
+  and next-ten-day availability. `unit/explore.test.ts` and
+  `e2e/explore.spec.ts` prove hard boundaries and no ineligible padding.
+- I-04, P20 and DEC-036: `lockedExplorePair`, `withMemberPair`, migrations
+  0010/0011 and `ExploreStore` enforce locked retrieval/reservation/delivery/
+  acceptance. `integration/explore.test.ts` tests both block orderings at all
+  three transitions, bilateral grant removal, restriction and queued-mail denial.
+  `unit/explore-architecture.test.ts` and the expanded M2 architecture inventory
+  classify all new HTTP and worker entries and reject removed guard paths.
+- I-05/I-06/I-09, P5/P6/P16: permanent pair history, versioned capacity ledgers,
+  weekly delivered/pending counters and slot-held closure. Real Postgres tests
+  cover racing batches, lower personal limits, weekly limits after passes,
+  accept/expiry, repeat closure and edited concierge additions/removals.
+- I-07/I-08, P6/P13: per-member decision versions and distinct expiry/closure
+  states. Database and browser tests prove unchanged counterpart DTOs after the
+  first accept, mutual acceptance at capacity, private pass, EXPIRED without a
+  PASS label, and unavailable profile reads after closure.
+- I-15, P13/P15/P16: immutable allocation snapshots and learning exposure/decision
+  records; policy/feature versions, retrieval source, feasible-set ID/size, seed,
+  step and conditional q. Property tests verify feasibility, no duplicate pair,
+  capacity, deterministic replay and q normalization. Operator exposures have
+  null q. `scripts/benchmark-explore.ts` compares small synthetic graphs exactly.
+- I-11/I-12/I-17/I-20: card/past-opportunity concern links, existing independent
+  safety routes, generic SMTP, no member geometry or case narrative in learning,
+  current-role operator access and append-only batch audits. M2 isolation tests
+  continue to apply. Worker construction does not use ops/safety pools or the case
+  key; isolating process secrets beyond the shared local `.env` remains M7 work.
+- I-16, P4/P6: `/explore`, `/explore/[id]`, `/ops/explore` have truthful empty
+  and capacity states, one full-page profile and no scores/feeds. Two browser
+  workflows run axe and real Postgres/MinIO/Mailpit. A real pg-boss integration
+  exercises batch, delivery, notification and opt-in reminder maintenance.
+
+Full totals and CI links are recorded in `testing/m3-review.md` and the M3 PR.
+Synthetic venue feasibility is not real venue approval; chat/plan block races
+belong to M4, and post-meeting/erasure/retention gates belong to M5.
+
+DEC-044 copy follow-up (P4/P20, I-11): `config/accounts` supplies typed labels to
+the profile editor and `/app` preview; `components/shell` names the existing
+report-status link "My reports". Existing accounts and safety browser workflows
+cover these surfaces and their accessibility; stored values and routes are unchanged.

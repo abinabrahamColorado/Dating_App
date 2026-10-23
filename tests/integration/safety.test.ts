@@ -386,7 +386,9 @@ it('I-04 I-20 precaution/lift and appeal are versioned, independent of account e
     { version: 0, decision: 'LIFTED' },
     randomUUID(),
   );
-  expect((await memberProfile(accounts, a, b.memberId)).id).toBe(b.memberId);
+  expect((await db.ownEnforcement(b)).restricted).toBe(false);
+  // DEC-041: lifting enforcement never recreates the former introduction grant.
+  await expect(memberProfile(accounts, a, b.memberId)).rejects.toThrow('NOT_FOUND');
   await db.enforce(staff, randomUUID(), { ...command, version: 2 }, randomUUID());
   await accounts.withSession(b, () =>
     accounts.changePolicy(b, randomUUID(), { action: 'EXIT', version: 1 }),

@@ -50,12 +50,12 @@ it('I-04 architecture: every HTTP entry and worker is inventoried; new surfaces 
   // disclosure under an old name. Review any diff before updating these baselines;
   // a new member-data path must use withMemberPair and get a negative race test.
   const reviewedSelfAndInfrastructure: Record<string, string> = {
-    // DEC-039 review: added only the release shutdown gate/error, no new disclosure.
-    'apps/web/server/api.ts': '20f42a4b3d0119923aec957c80a852b10d3b0e67fab77fdacb7818c640d0ee2c',
+    // DEC-040 review: dispatches M3 only through its inventoried guarded adapter.
+    'apps/web/server/api.ts': '745a203d6e527c52517b97f7c274e6810694357a068ace82f74c578cdc4c41a1',
     'apps/web/server/passkeys.ts':
       'b4f7600984751171bf430f0d4afe7760d26ba284fce4f5f90ccb3c1d151caa64',
-    'apps/web/server/mail.ts': '3412a014fd66e8790e27bdcd0dbf348dd564d46b7d20da2c0120e7ed2d918f2a',
-    'apps/worker/src/main.ts': 'd771388492cbf4a428cfd76ec5ef9094fbe5870119fac3f4e33c563e1240b30a',
+    'apps/web/server/mail.ts': '3b8370eec4869db1751869ff9b3a5231e46653092ccba37561fc8c2da14b9a82',
+    'apps/worker/src/main.ts': '263d1e64f6d4416d3c9d319ac4622ce4e57b4880d94dcf402b9e79204e924603',
     'apps/worker/src/worker.ts': '4ca1ef0251aed6b867a0d1c13fda3a4d62bb9e90ea22bf95c99742079daa2cf7',
   };
   for (const [path, hash] of Object.entries(reviewedSelfAndInfrastructure))
@@ -72,6 +72,7 @@ it('I-04 architecture: every HTTP entry and worker is inventoried; new surfaces 
   expect(files('apps/web/server').sort()).toEqual(
     [
       'api.ts',
+      'explore-api.ts',
       'mail.ts',
       'media.ts',
       'passkeys.ts',
@@ -84,6 +85,7 @@ it('I-04 architecture: every HTTP entry and worker is inventoried; new surfaces 
       .sort(),
   );
   expect(files('apps/worker/src').sort()).toEqual([
+    'apps/worker/src/explore.ts',
     'apps/worker/src/main.ts',
     'apps/worker/src/worker.ts',
   ]);
@@ -97,7 +99,14 @@ it('I-04 architecture: every HTTP entry and worker is inventoried; new surfaces 
         .map((n) => n.arguments[0]?.getText(f));
     })
     .sort();
-  expect(jobs).toEqual(["'auth.deliver'", 'HEALTH_QUEUE']); // Both deliver infrastructure/auth data only, never another member's data.
+  expect(jobs).toEqual([
+    "'auth.deliver'",
+    "'explore.batch'",
+    "'explore.deliver'",
+    "'explore.mail'",
+    "'explore.maintain'",
+    'HEALTH_QUEUE',
+  ]);
   const entry = parse('apps/web/app/api/v1/[...path]/route.ts');
   expect(calls(entry).filter((c) => c.expression.getText(entry) === 'handle')).toHaveLength(2);
 });
@@ -107,8 +116,8 @@ it('I-04 architecture: every current member-data route calls the guarded store; 
   expect(() =>
     requiresPairGuard(
       source.replace(
-        'return withMemberPair(store, auth, subject, async (db) => {',
-        'return unguarded(store, auth, subject, async (db) => {',
+        'return withMemberPair(store, auth, subject, async (db) =>',
+        'return unguarded(store, auth, subject, async (db) =>',
       ),
     ),
   ).toThrow('Missing pair guard');

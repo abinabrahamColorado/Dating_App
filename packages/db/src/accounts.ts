@@ -109,6 +109,12 @@ export class AccountStore {
   lookup(value: string) {
     return lookupToken(this.lookupKey, value);
   }
+  /** Internal repositories reuse the checked identity transaction. Borrowing a
+   * second pool slot while all slots hold sessions can deadlock guarded reads.
+   * Object/pair authorization remains the caller's responsibility. */
+  get identityConnection(): Pool | PoolClient {
+    return this.sessionScope.getStore()?.client ?? this.identity;
+  }
   /** I-19/I-20: serialize a member's authenticated operations and revocations.
    * Row locks also interlock with administrative SQL revocation. A stale Authority
    * is never sufficient. Nested safety calls reuse the checked transaction.
