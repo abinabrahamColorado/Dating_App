@@ -62,7 +62,14 @@ were visually inspected; controls and text wrap without overlap or horizontal ov
 Initial browser runs found two harness issues (axe context setup and an ambiguous
 text selector), then a real midnight-hours filtering defect. The hours filter now
 checks every occupied civil minute across day/DST boundaries; its regression and
-the full browser workflow pass. No timeout was raised to hide a failure.
+the full browser workflow pass.
+
+The first Linux CI run exposed a browser assertion whose five-second deadline
+matched the five-second chat poll timer. The test now proves HTTP acceptance and
+database delivery separately, then checks a stationary recipient through normal
+polling within two configured poll intervals. Connection closure uses the same
+poll-aware assertion. Delivery keeps its original five-second assertion; no
+production timer or delivery rule changed.
 
 ## Decisions and limits
 

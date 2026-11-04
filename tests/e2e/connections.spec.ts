@@ -8,6 +8,7 @@ import { ExploreStore } from '../../packages/db/src/explore';
 import { VenueStore } from '../../packages/db/src/venues';
 import { hashToken } from '../../packages/db/src/encryption';
 import { accountConfig } from '../../packages/config/src/accounts';
+import { pilot } from '../../packages/config/src/pilot';
 import { syntheticProfile, syntheticPreferences } from '../fixtures/accounts';
 import { syntheticVenue } from '../fixtures/venues';
 import { putPhoto } from '../../apps/web/server/media';
@@ -132,6 +133,25 @@ async function post(page: Page, path: string, data: unknown) {
     data,
   });
 }
+async function sendAndAwaitDelivery(page: Page, connectionId: string, button: string) {
+  const response = page.waitForResponse(
+    (r) =>
+      r.request().method() === 'POST' &&
+      new URL(r.url()).pathname === `/api/v1/connections/${connectionId}/messages`,
+  );
+  await page.getByRole('button', { name: button, exact: true }).click();
+  const sent = await response;
+  expect(sent.status()).toBe(200);
+  const message = (await sent.json()) as { id: string };
+  // Prove the production after-response delivery ran, independently of UI polling.
+  await expect
+    .poll(
+      async () =>
+        (await admin.query('SELECT state FROM app.messages WHERE id=$1', [message.id])).rows[0]
+          ?.state,
+    )
+    .toBe('DELIVERED');
+}
 function tomorrow() {
   const p = zonedParts(new Date(), 'America/New_York');
   return `${new Date(Date.UTC(p.year, p.month - 1, p.day + 1)).toISOString().slice(0, 10)}T11:00`;
@@ -244,17 +264,22 @@ test('I-09 I-11 I-20 reviewed public venue and mutual connection reach a confirm
     expect(copied).toContain('Synthetic');
     expect(copied).not.toContain(id);
     expect(copied).not.toContain('chelsea');
-    await page.getByRole('button', { name: "I'm here", exact: true }).click();
+    await sendAndAwaitDelivery(page, id, "I'm here");
     await other.reload();
     await expect(
       other.getByRole('list', { name: 'Messages' }).getByText("I'm here", { exact: true }),
     ).toBeVisible();
+    await page.getByRole('link', { name: 'Back to chat and planning', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Conversation', exact: true })).toBeVisible();
     await other
       .getByLabel('Your message', { exact: true })
       .fill('Synthetic question before travel');
-    await other.getByRole('button', { name: 'Send message', exact: true }).click();
-    await page.getByRole('link', { name: 'Back to chat and planning', exact: true }).click();
-    await expect(page.getByText('Synthetic question before travel', { exact: true })).toBeVisible();
+    await sendAndAwaitDelivery(other, id, 'Send message');
+    // A stationary recipient must see the delivered message through normal polling.
+    // Allow a complete poll cycle plus its response, not a deadline equal to the timer.
+    await expect(page.getByText('Synthetic question before travel', { exact: true })).toBeVisible({
+      timeout: pilot.CHAT_POLL_MILLISECONDS * 2,
+    });
     await axe(page);
     await page.setViewportSize({ width: 390, height: 844 });
     await page.screenshot({ path: testInfo.outputPath('mobile-conversation.png'), fullPage: true });
@@ -262,7 +287,9 @@ test('I-09 I-11 I-20 reviewed public venue and mutual connection reach a confirm
       true,
     );
     await other.getByRole('button', { name: 'Close connection privately', exact: true }).click();
-    await expect(page.getByText('This connection has ended.', { exact: true })).toBeVisible();
+    await expect(page.getByText('This connection has ended.', { exact: true })).toBeVisible({
+      timeout: pilot.CHAT_POLL_MILLISECONDS * 2,
+    });
     await expect(page.getByRole('link', { name: 'Something felt off', exact: true })).toBeVisible();
   } finally {
     await otherContext.close();
