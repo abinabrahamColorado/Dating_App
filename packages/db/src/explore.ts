@@ -239,7 +239,10 @@ export class ExploreStore {
       ? [...new Set(selected)].sort()
       : (
           await db.query<{ id: string }>(
-            "SELECT id FROM app.members WHERE state<>'EXITED' AND deletion_requested_at IS NULL ORDER BY id",
+            // Coarse retrieval only; the locked authoritative gate still runs for
+            // every candidate pair. Inactive accounts must not make batch cost
+            // quadratic in the lifetime membership of the service.
+            "SELECT id FROM app.members WHERE state='ACTIVE' AND intent='EXPLORE' AND deletion_requested_at IS NULL ORDER BY id",
           )
         ).rows.map((r) => r.id);
     if (creator) ids = ids.filter((id) => id !== creator); // Staff cannot curate their own introductions.

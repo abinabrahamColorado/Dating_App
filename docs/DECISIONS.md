@@ -510,3 +510,9 @@ without inventing a permanent refusal. New operator removals have an explicit
 OPERATOR_REMOVED reason. No exposure, decision or original opportunity is erased.
 An already-closed attempt cannot revoke a later attempt's grants or release its
 capacity. Current state, denial, weekly budget and live-pair checks still apply.
+
+CI's expanded historical fixtures exposed a full-batch performance defect: the
+initial candidate query included every paused account and then evaluated all of
+their pairs. Scheduled retrieval now selects active Explore accounts only, before
+the unchanged authoritative locked pair gates. This bounds candidate work to the
+current cohort; it does not cache eligibility or weaken any reservation gate.

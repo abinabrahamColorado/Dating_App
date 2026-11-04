@@ -40,6 +40,12 @@ fixture proves existing attempts/exposures survive and only qualifying closure
 history remains. Six invalidation cases re-enter with fresh grants; an old closed
 attempt cannot revoke them. Generated pass/block sequences never re-enter.
 
+The first correction CI run exposed a worker batch timeout on both Linux and
+Windows: paused historical accounts were entering the quadratic candidate loop.
+The candidate query now excludes paused and Focus accounts before the unchanged
+locked pair gates. A scheduled-batch regression checks that exclusion, and the
+expanded real-worker test retains its original timeout.
+
 Targeted pure/architecture checks passed: 32 unit tests. Twelve new real-Postgres
 tests passed, including both lock orderings for block versus reservation, delivery
 and acceptance, racing batches, accept versus expiry, private DTOs, exact-once slot

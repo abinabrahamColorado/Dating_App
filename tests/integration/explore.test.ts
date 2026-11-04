@@ -135,10 +135,16 @@ it('I-02 I-06 I-15 scheduled allocation, approval and delivery persist condition
   const a = await member(),
     b = await member(),
     staff = await member(true);
+  const paused = await member(),
+    focused = await member();
+  await admin.query("UPDATE app.members SET state='PAUSED' WHERE id=$1", [paused.memberId]);
+  await admin.query("UPDATE app.members SET intent='FOCUS' WHERE id=$1", [focused.memberId]);
   const batch = await db.generateScheduled();
   expect(await db.generateScheduled()).toEqual(batch);
   const review = await db.review(staff, batch.id, randomUUID());
   expect(review.pairs).toHaveLength(1);
+  expect(review.unserved.map((r) => r.memberId)).not.toContain(paused.memberId);
+  expect(review.unserved.map((r) => r.memberId)).not.toContain(focused.memberId);
   expect(await grantCount(a, b)).toBe(0);
   expect(await counts(a, b)).toEqual([1, 1]);
   await db.edit(staff, batch.id, randomUUID(), { version: 0, action: 'APPROVE' }, randomUUID());
