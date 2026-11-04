@@ -1,6 +1,6 @@
 # Meetwell — Human Connection Platform
 
-M2 safety core for a Manhattan, NYC pilot, ages 18–30. Meetwell is a working name. **This is a loopback-only development build using synthetic data.** Accounts, private photo review, blocking, independent reporting/help, case status, safety review, appeals and shutdown controls work. Matching, chat, plans and complete erasure arrive in later milestones. M1 is merged; the M2 PR requires founder review and must remain unmerged.
+M3 Explore engine for a Manhattan, NYC pilot, ages 18–30. Meetwell is a working name. **This is a loopback-only development build using synthetic data.** Accounts, safety review, bilateral eligibility, finite introductions, private decisions and connection closure work. Chat and plans belong to M4; complete erasure belongs to M5. M2 is merged with founder approval; the M3 PR must remain unmerged for review.
 
 Start with [AGENTS.md](AGENTS.md), then read the authoritative [architecture PDF](docs/architecture-v0.2.pdf) and its [extracted text](docs/architecture-v0.2.txt). [CODEX_PROMPTS.md](CODEX_PROMPTS.md) defines M0–M7. Run one milestone at a time and review/merge its PR before the next.
 
@@ -53,6 +53,14 @@ revoke with `corepack pnpm staff:revoke <member-id-or-synthetic-email> safety_re
 See [M2 safety operations](docs/operations/safety.md) for boundaries and review steps.
 The [Windows guide](docs/DEVELOPMENT_WINDOWS.md) documents ports, data, and diagnostics.
 
+For M3, rerun `corepack pnpm setup:accounts`. Use `corepack pnpm seed:explore-venue`
+only for a clearly synthetic development feasibility fixture. Open `/ops/explore`
+with an operator account to prepare, review and approve a batch; the running worker
+delivers eligible introductions to `/explore`. `corepack pnpm benchmark:explore`
+compares the allocator with an exact solver on small synthetic graphs.
+See [Explore operations](docs/operations/explore.md) for review, expiry, concurrency
+and uncertain-mail handling. No real venue is approved by the fixture command.
+
 ## Repository map
 
 ```text
@@ -61,6 +69,7 @@ apps/worker/        Durable background processing
 packages/core/     Pure domain rules
 packages/db/       PostgreSQL schema, migrations, repositories
 packages/config/   Launch settings, pilot numbers, feature flags
+packages/runtime/  Shared server/worker account construction and mail adapters
 tests/             Unit/property, integration, and browser tests
 docs/              Specification, architecture, decisions, trace, roadmap
 scripts/           Reproducible setup and development commands

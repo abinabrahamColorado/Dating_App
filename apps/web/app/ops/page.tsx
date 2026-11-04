@@ -34,6 +34,8 @@ export default function Page() {
         <Notice error={loadError || error} />
         <p>
           <Link href="/ops/safety">Open safety console</Link>
+          {' · '}
+          <Link href="/ops/explore">Review introductions</Link>
         </p>
         {!me ? (
           <p role="status">Checking access…</p>

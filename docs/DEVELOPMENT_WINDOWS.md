@@ -126,3 +126,12 @@ read cases. An appeal must be decided by a different reviewer than the challenge
 decision maker. Revoke a local role with
 `corepack pnpm staff:revoke reviewer@synthetic.invalid safety_reviewer`.
 See [safety operations](operations/safety.md) for M2 paths and limits.
+
+## Explore development preview
+
+After pulling M3, rerun `corepack pnpm setup:accounts`. For synthetic feasibility
+only, run `corepack pnpm seed:explore-venue`; it does not approve a real location.
+Keep `corepack pnpm worker` running. An independent operator prepares and approves
+batches at `/ops/explore`; members review delivered cards at `/explore`.
+`corepack pnpm benchmark:explore` runs the exact small-graph comparison.
+See [Explore operations](operations/explore.md) for gates and uncertain email review.

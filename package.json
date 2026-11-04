@@ -18,6 +18,8 @@
     "test:unit": "vitest run --config vitest.unit.config.ts",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "test:e2e": "playwright test",
+    "benchmark:explore": "tsx scripts/benchmark-explore.ts",
+    "seed:explore-venue": "tsx scripts/seed-explore-venue.ts",
     "db:migrate": "tsx scripts/migrate.ts",
     "setup:accounts": "tsx scripts/setup-accounts.ts",
     "staff:grant": "tsx scripts/grant-staff.ts",

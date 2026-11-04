@@ -33,6 +33,16 @@ export const accountConfig = {
 export const genders = ['woman', 'man', 'nonbinary'] as const;
 export const intentions = ['long-term', 'exploring', 'casual'] as const;
 export const structures = ['monogamous', 'non-monogamous', 'exploring'] as const;
+export const intentionLabels = {
+  'long-term': 'A long-term relationship',
+  exploring: 'Open to exploring',
+  casual: 'Casual dating',
+} as const satisfies Record<(typeof intentions)[number], string>;
+export const structureLabels = {
+  monogamous: 'Monogamous',
+  'non-monogamous': 'Consensually non-monogamous',
+  exploring: 'Open to exploring',
+} as const satisfies Record<(typeof structures)[number], string>;
 export const transportModes = ['walk', 'transit', 'bike', 'drive'] as const;
 export const smokingValues = ['no', 'sometimes', 'yes', 'not-stated'] as const;
 export const interests = [

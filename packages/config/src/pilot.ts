@@ -41,6 +41,17 @@ export const pilot = {
   STRONG_PREFERENCE_WEIGHT: 2, // M3 definition; Spec P11, P15.
   SOFT_PREFERENCE_WEIGHT: 1, // M3 definition; Spec P11, P15.
   WAIT_PRIORITY_BUCKET_DAYS: 7, // M3 weekly wait-time buckets; Spec P16.
+  EXPLORE_RESERVATION_HOURS: 24, // M3/P6 soft hold before human approval; pilot hypothesis.
+  EXPLORE_REMINDER_HOURS: 12, // M3/P6 one quiet reminder only after explicit opt-in.
+  EXPLORE_WORK_BATCH_SIZE: 20, // M3 bounded worker sweep, P22.
+  EXPLORE_MAX_REVIEW_MEMBERS: 200, // M3 exhaustive pilot graph; refuse larger snapshots, never silently truncate.
+  EXPLORE_REQUESTS_PER_MINUTE: 30, // M3 discovery/decision abuse budget, P21.
+  EXPLORE_MAIL_RETRY_SECONDS: 60, // M3 retry only when transport proves it did not send.
+  EXPLORE_MAIL_MAX_ATTEMPTS: 5, // P22 durable bounded delivery; uncertain SMTP is held for review.
+  EXPLORE_MAIL_UNCERTAIN_MINUTES: 5, // M3/P22 process loss after claiming a send requires review.
+  TRAVEL_ESTIMATE_KMH: { walk: 4.5, bike: 12, transit: 15, drive: 12 }, // M3/P6 centroid estimates, not routing.
+  TRAVEL_ESTIMATE_DETOUR_FACTOR: 1.3, // M3/P6 conservative pilot estimate; never member coordinates.
+  EXACT_BENCHMARK_MAX_EDGES: 20, // P16 offline exhaustive solver bound.
   ONBOARDING_TARGET_SECONDS: 180, // M1 stricter target within Spec P4's 2–5 minutes.
   PROFILE_MIN_PHOTOS: 2,
   PROFILE_MAX_PHOTOS: 3, // Spec P4.
