@@ -36,6 +36,8 @@ export default function Page() {
           <Link href="/ops/safety">Open safety console</Link>
           {' · '}
           <Link href="/ops/explore">Review introductions</Link>
+          {' · '}
+          <Link href="/ops/venues">Manage approved public meeting places</Link>
         </p>
         {!me ? (
           <p role="status">Checking access…</p>

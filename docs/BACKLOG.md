@@ -3,8 +3,10 @@
 M0 was reviewed and merged in PR #2. M1 was merged with explicit founder approval
 in PR #3 at `a4dee472951f4d11968de6613e6d416f0e227df8`; main CI is green.
 M2 merged in PR #5 at `5711fe60dfdec9e9ffa6a2f50b2ea38dea2ecb0f`; main CI
-39723068853 passed. M3 is on `codex/m3-explore-engine` for review. Do not merge
-its PR or start M4. The earlier hosted preview remains an independent design reference.
+39723068853 passed. M3 PR #6 merged with founder approval at
+`010a80bc40a96cc0576a0370e6238f9b988e487c`; main CI 41772404412 passed.
+M4 is on `codex/m4-connections-plans`. Do not merge its PR or start M5.
+The earlier hosted preview remains an independent design reference.
 
 Latest review: [execution roadmap](product/roadmap.md),
 [architecture gaps](architecture/review-2026-10-20.md),
@@ -41,7 +43,7 @@ research is complete for now (DEC-033). DEC-035 authorizes this M2 build only.
   provenance and remain explicitly marked LEGACY_CANCELLED; no real-user migration
   is authorized by the local synthetic repair.
 
-- Completed in the open M3 PR #6: founder-requested human-readable profile preview
+- Completed in merged M3 PR #6: founder-requested human-readable profile preview
   labels and "My reports" member navigation (DEC-044). M2 PR #5 had already merged
   when this follow-up arrived. No remaining work or milestone change for this copy.
 
@@ -85,8 +87,16 @@ Pricing/payments; demographic research; pooled models/embeddings; broad neighbor
   block-vs-reservation/delivery/acceptance are tested on Postgres. Queued product
   mail is checked again under the pair lock. SMTP already accepted by a transport
   cannot be recalled; see DEC-042.
-- M4: enforce denial in chat and plans; add block-vs-message/delivery/confirmation
-  races and concern links on these surfaces. Enforce stored venue shutdowns.
+- M4 implemented: locked denial for chat send/delivery, plan proposal/change/
+  confirmation; both orderings of block versus delivery/confirmation; concern
+  links on chat/plan screens; venue shutdown exclusion and plan invalidation.
+- M5: enforce D11 encrypted-chat and D12 plan retention after closure, plus active
+  account deletion. Immutable plan versions/confirmations need a narrowly scoped
+  erasure path; safety-held evidence stays isolated. Do not preserve content in
+  command receipts or backups beyond its authorized retention window.
+- M7: pagination/load budgets beyond the pilot, manual screen-reader review,
+  interrupted browser command recovery after reload, and generic opted-in plan
+  reminder delivery. M4 adds no automatic alerts or new outbound message emails.
 - M5/M6: add post-meeting concern links and enforce stored event/Go shutdowns;
   retain report/help access during every shutdown. M5 retains erasure/restore work.
 - M3 implemented: bilateral preference/block/capacity/travel/availability gates,
