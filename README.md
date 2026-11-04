@@ -1,6 +1,6 @@
 # Meetwell — Human Connection Platform
 
-M3 Explore engine for a Manhattan, NYC pilot, ages 18–30. Meetwell is a working name. **This is a loopback-only development build using synthetic data.** Accounts, safety review, bilateral eligibility, finite introductions, private decisions and connection closure work. Chat and plans belong to M4; complete erasure belongs to M5. M2 is merged with founder approval; the M3 PR must remain unmerged for review.
+M4 connections and plans for a Manhattan, NYC pilot, ages 18–30. Meetwell is a working name. **This is a loopback-only development build using synthetic data.** Accounts, safety review, finite introductions, private decisions, encrypted chat, operator venue review and bilateral meeting plans work. M3 merged with founder approval and green main CI. The M4 PR must remain unmerged for review; complete erasure remains M5.
 
 Start with [AGENTS.md](AGENTS.md), then read the authoritative [architecture PDF](docs/architecture-v0.2.pdf) and its [extracted text](docs/architecture-v0.2.txt). [CODEX_PROMPTS.md](CODEX_PROMPTS.md) defines M0–M7. Run one milestone at a time and review/merge its PR before the next.
 
@@ -58,6 +58,11 @@ only for a clearly synthetic development feasibility fixture. Open `/ops/explore
 with an operator account to prepare, review and approve a batch; the running worker
 delivers eligible introductions to `/explore`. `corepack pnpm benchmark:explore`
 compares the allocator with an exact solver on small synthetic graphs.
+
+For M4, rerun `corepack pnpm setup:accounts` and keep the worker running. Operators
+review full venue details at `/ops/venues`; the M3 minimal synthetic fixture alone
+does not qualify as a reviewed M4 place. A mutual card links to chat and planning.
+See [connection and venue operations](docs/operations/connections-plans.md).
 See [Explore operations](docs/operations/explore.md) for review, expiry, concurrency
 and uncertain-mail handling. No real venue is approved by the fixture command.
 

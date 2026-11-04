@@ -50,12 +50,14 @@ it('I-04 architecture: every HTTP entry and worker is inventoried; new surfaces 
   // disclosure under an old name. Review any diff before updating these baselines;
   // a new member-data path must use withMemberPair and get a negative race test.
   const reviewedSelfAndInfrastructure: Record<string, string> = {
-    // DEC-040 review: dispatches M3 only through its inventoried guarded adapter.
-    'apps/web/server/api.ts': '745a203d6e527c52517b97f7c274e6810694357a068ace82f74c578cdc4c41a1',
+    // M4 review: dispatches connections/venues only after current session,
+    // registration, client-version, CSRF and body checks; adapter inventory below.
+    'apps/web/server/api.ts': '606c4b446cf2d91c306448ae29c69ae02f2be63466acb0f1dae691e613d6add5',
     'apps/web/server/passkeys.ts':
       'b4f7600984751171bf430f0d4afe7760d26ba284fce4f5f90ccb3c1d151caa64',
     'apps/web/server/mail.ts': '3b8370eec4869db1751869ff9b3a5231e46653092ccba37561fc8c2da14b9a82',
-    'apps/worker/src/main.ts': '263d1e64f6d4416d3c9d319ac4622ce4e57b4880d94dcf402b9e79204e924603',
+    // M4 registers only the inventoried delivery and revocation maintenance jobs.
+    'apps/worker/src/main.ts': '320f8a70d51b628087a30bb319369ae69a0b6e90572b5e3e204b8d9f6c775d4e',
     'apps/worker/src/worker.ts': '4ca1ef0251aed6b867a0d1c13fda3a4d62bb9e90ea22bf95c99742079daa2cf7',
   };
   for (const [path, hash] of Object.entries(reviewedSelfAndInfrastructure))
@@ -72,6 +74,7 @@ it('I-04 architecture: every HTTP entry and worker is inventoried; new surfaces 
   expect(files('apps/web/server').sort()).toEqual(
     [
       'api.ts',
+      'connections-api.ts',
       'explore-api.ts',
       'mail.ts',
       'media.ts',
@@ -85,6 +88,7 @@ it('I-04 architecture: every HTTP entry and worker is inventoried; new surfaces 
       .sort(),
   );
   expect(files('apps/worker/src').sort()).toEqual([
+    'apps/worker/src/connections.ts',
     'apps/worker/src/explore.ts',
     'apps/worker/src/main.ts',
     'apps/worker/src/worker.ts',
@@ -101,6 +105,8 @@ it('I-04 architecture: every HTTP entry and worker is inventoried; new surfaces 
     .sort();
   expect(jobs).toEqual([
     "'auth.deliver'",
+    "'connections.deliver'",
+    "'connections.maintain'",
     "'explore.batch'",
     "'explore.deliver'",
     "'explore.mail'",

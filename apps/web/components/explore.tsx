@@ -276,6 +276,11 @@ export function Introduction({ id }: { id: string }) {
                   You both chose to connect. Your profile access stays open while this connection is
                   active.
                 </p>
+                <p>
+                  <Link className="button" href={`/connections/${id}`}>
+                    Open chat and make a plan
+                  </Link>
+                </p>
                 <button
                   className="secondary"
                   disabled={busy}
