@@ -1,6 +1,8 @@
 import { beforeAll, afterAll, beforeEach, it, expect } from 'vitest';
 import { Pool } from 'pg';
 import { randomUUID, randomBytes } from 'node:crypto';
+import fc from 'fast-check';
+import { permanentlyClosesPair, type OpportunityState } from '../../packages/core/src/explore';
 import { migrate } from '../../packages/db/src/migrate';
 import { AccountStore, type Authority } from '../../packages/db/src/accounts';
 import { ExploreStore } from '../../packages/db/src/explore';
@@ -274,8 +276,174 @@ it('I-05 I-08 pass and expiry are distinct, revoke grants and never reset exposu
       )
     ).rowCount,
   ).toBe(0);
+  expect((await reservePair(a, b, staff)).id).toBeUndefined();
+  expect((await reservePair(c, d, staff)).id).toBeUndefined();
 });
-it('I-04 restriction and profile revocation remove grants and pending capacity without exposing safety reasons', async () => {
+it.each(['profile', 'preferences', 'epoch', 'pause', 'focus', 'photo'] as const)(
+  'I-05 %s invalidation retains the attempt and exposure while allowing the next batch',
+  async (change) => {
+    const a = await member(),
+      b = await member(),
+      staff = await member(true);
+    const first = await delivered(a, b, staff);
+    if (change === 'profile')
+      await accounts.saveProfile(a.memberId, randomUUID(), 1, {
+        ...syntheticProfile,
+        prompt: 'A different synthetic prompt.',
+      });
+    else if (change === 'preferences')
+      await accounts.savePreferences(a.memberId, randomUUID(), 1, syntheticPreferences);
+    else if (change === 'photo')
+      await admin.query("UPDATE app.media SET status='REJECTED' WHERE member_id=$1", [a.memberId]);
+    else if (change === 'pause')
+      await accounts.changePolicy(a, randomUUID(), {
+        action: 'PAUSE',
+        version: (await accounts.policy(a.memberId)).version,
+      });
+    else if (change === 'focus')
+      await accounts.changePolicy(a, randomUUID(), {
+        action: 'FOCUS',
+        version: (await accounts.policy(a.memberId)).version,
+      });
+    else await admin.query('UPDATE app.members SET epoch=epoch+1 WHERE id=$1', [a.memberId]);
+    expect(
+      (await admin.query('SELECT state,slot_held FROM app.opportunities WHERE id=$1', [first.id]))
+        .rows[0],
+    ).toEqual({ state: 'CANCELLED', slot_held: false });
+    expect(
+      (
+        await admin.query(
+          'SELECT reason,delivered FROM app.opportunity_closures WHERE opportunity_id=$1',
+          [first.id],
+        )
+      ).rows[0],
+    ).toEqual({ reason: 'CANCELLED', delivered: true });
+    expect(
+      (
+        await learning.query(
+          'SELECT 1 FROM learning.introduction_exposure WHERE opportunity_id=$1',
+          [first.id],
+        )
+      ).rowCount,
+    ).toBe(1);
+    expect(await grantCount(a, b)).toBe(0);
+    expect(await counts(a, b)).toEqual([0, 0]);
+    // Synthetic restoration of the invalidated gate; history alone must not deny.
+    await admin.query("UPDATE app.members SET state='ACTIVE',intent='EXPLORE' WHERE id=$1", [
+      a.memberId,
+    ]);
+    await admin.query("UPDATE app.media SET status='APPROVED' WHERE member_id=$1", [a.memberId]);
+    const next = await delivered(a, b, staff);
+    expect(next.id).not.toBe(first.id);
+    expect(await grantCount(a, b)).toBe(2);
+    expect(
+      (
+        await admin.query('SELECT 1 FROM app.opportunities WHERE id=ANY($1::uuid[])', [
+          [first.id, next.id],
+        ])
+      ).rowCount,
+    ).toBe(2);
+    expect(
+      (
+        await learning.query(
+          'SELECT 1 FROM learning.introduction_exposure WHERE opportunity_id=ANY($1::uuid[])',
+          [[first.id, next.id]],
+        )
+      ).rowCount,
+    ).toBe(2);
+    // Retrying old maintenance/closure cannot revoke the new attempt's grants.
+    await db.expireOne(first.id);
+    await db.close(a, first.id, randomUUID());
+    expect(await grantCount(a, b)).toBe(2);
+  },
+);
+it('I-05 an undelivered expired reservation releases once and can be reserved again', async () => {
+  const a = await member(),
+    b = await member(),
+    staff = await member(true);
+  const first = await reservePair(a, b, staff);
+  expect(first.id).toBeTruthy();
+  await admin.query(
+    "UPDATE app.opportunities SET reserve_expires_at=now()-interval '1 second' WHERE id=$1",
+    [first.id],
+  );
+  await db.expireOne(first.id!);
+  await db.expireOne(first.id!);
+  expect(await counts(a, b)).toEqual([0, 0]);
+  expect(
+    (
+      await admin.query(
+        'SELECT reason,delivered FROM app.opportunity_closures WHERE opportunity_id=$1',
+        [first.id],
+      )
+    ).rows[0],
+  ).toEqual({ reason: 'EXPIRED', delivered: false });
+  const next = await reservePair(a, b, staff);
+  expect(next.id).toBeTruthy();
+  expect(next.id).not.toBe(first.id);
+});
+it('I-05 permanent closure predicate agrees at the domain and PostgreSQL boundaries', async () => {
+  const reasons = [
+    'PASSED',
+    'BLOCKED',
+    'RESTRICTED',
+    'EXPIRED',
+    'CLOSED',
+    'CANCELLED',
+    'OPERATOR_REMOVED',
+  ] as const;
+  for (const state of ['RESERVED', 'PROPOSED', 'MUTUAL'] as OpportunityState[])
+    for (const reason of reasons)
+      for (const delivered of [false, true])
+        expect(
+          (
+            await app.query('SELECT app.permanent_pair_closure($1,$2,$3) AS result', [
+              reason,
+              state,
+              delivered,
+            ])
+          ).rows[0].result,
+        ).toBe(permanentlyClosesPair(reason, state, delivered));
+});
+it('I-05 property: neither member can ever be proposed a pair they passed or blocked, even after later edits', async () => {
+  await fc.assert(
+    fc.asyncProperty(
+      fc.boolean(),
+      fc.boolean(),
+      fc.array(fc.uuid(), { minLength: 1, maxLength: 3 }),
+      async (block, reverse, seeds) => {
+        const a = await member(),
+          b = await member(),
+          staff = await member(true),
+          first = await delivered(a, b, staff);
+        const actor = reverse ? b : a,
+          other = reverse ? a : b;
+        if (block) await blockMember(accounts, actor, other.memberId, randomUUID());
+        else await db.decide(actor, first.id, randomUUID(), { version: 0, decision: 'PASS' });
+        // Even future removal of a directional block cannot erase the refusal history.
+        await admin.query(
+          'DELETE FROM app.blocks WHERE low_id=least($1::uuid,$2::uuid) AND high_id=greatest($1::uuid,$2::uuid)',
+          [a.memberId, b.memberId],
+        );
+        await accounts.saveProfile(a.memberId, randomUUID(), 1, {
+          ...syntheticProfile,
+          prompt: 'Another synthetic revision.',
+        });
+        for (const seed of seeds) {
+          const batch = await db.generate(
+            staff,
+            randomUUID(),
+            { seed, members: [a.memberId, b.memberId] },
+            randomUUID(),
+          );
+          expect((await db.review(staff, batch.id, randomUUID())).pairs).toHaveLength(0);
+        }
+      },
+    ),
+    { numRuns: 12 },
+  );
+}, 30000);
+it('I-04 I-05 restriction is permanent even after lift; profile revocation only cancels the attempt', async () => {
   const a = await member(),
     b = await member(),
     staff = await member(true);
@@ -300,6 +468,13 @@ it('I-04 restriction and profile revocation remove grants and pending capacity w
       )
     ).status,
   ).toBe('RECEIVED');
+  await safetyDb.enforce(
+    staff,
+    randomUUID(),
+    { subjectId: b.memberId, version: 1, restricted: false, caseId: null },
+    randomUUID(),
+  );
+  expect((await reservePair(a, b, staff)).id).toBeUndefined();
   const c = await member(),
     d = await member();
   await delivered(c, d, staff);

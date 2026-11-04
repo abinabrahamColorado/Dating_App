@@ -31,8 +31,13 @@ export function exploreMember(id: string, freeSlots = 3): ExploreMember {
 }
 export function allPairs(members: readonly ExploreMember[]): PairFacts[] {
   return members.flatMap((u, i) =>
-    members
-      .slice(i + 1)
-      .map((v) => ({ u: u.id, v: v.id, blockedBy: [], legacyDenied: false, hasHistory: false })),
+    members.slice(i + 1).map((v) => ({
+      u: u.id,
+      v: v.id,
+      blockedBy: [],
+      legacyDenied: false,
+      hasHistory: false,
+      hasLive: false,
+    })),
   );
 }

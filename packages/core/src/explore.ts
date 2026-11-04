@@ -31,6 +31,7 @@ export type PairFacts = {
   blockedBy: string[];
   legacyDenied: boolean;
   hasHistory: boolean;
+  hasLive: boolean;
 };
 export type EligibilityStage = 'RETRIEVAL' | 'RESERVATION' | 'DELIVERY' | 'ACCEPTANCE';
 export function pairKey(u: string, v: string) {
@@ -109,7 +110,9 @@ export function eligible(
   const newReservation = stage === 'RETRIEVAL' || stage === 'RESERVATION';
   if (
     newReservation &&
-    (facts.hasHistory || [a, b].some((m) => m.freeSlots <= 0 || m.remainingWeekly <= 0))
+    (facts.hasHistory ||
+      facts.hasLive ||
+      [a, b].some((m) => m.freeSlots <= 0 || m.remainingWeekly <= 0))
   )
     return false;
   if (!boundariesAllow(a, b) || !availabilityFeasible(a.profile, b.profile, now)) return false;
@@ -326,6 +329,19 @@ export type OpportunityState =
   | 'CLOSED'
   | 'CANCELLED';
 export type Decision = 'UNDECIDED' | 'ACCEPT' | 'PASS';
+/** I-05, DEC-045: attempts are retained, but only these closures exclude a pair.
+ * Migration 0012 enforces this same predicate at the database boundary. */
+export function permanentlyClosesPair(
+  reason: OpportunityState | 'OPERATOR_REMOVED',
+  priorState: OpportunityState,
+  delivered: boolean,
+) {
+  return (
+    ['PASSED', 'BLOCKED', 'RESTRICTED', 'OPERATOR_REMOVED'].includes(reason) ||
+    (reason === 'EXPIRED' && delivered) ||
+    (reason === 'CLOSED' && priorState === 'MUTUAL')
+  );
+}
 export function decisionOutcome(
   state: OpportunityState,
   expiresAt: Date,

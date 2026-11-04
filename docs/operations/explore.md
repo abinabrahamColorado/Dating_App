@@ -1,7 +1,7 @@
 # Explore operations (M3)
 
 This is a synthetic loopback preview, not a live introduction service. Read
-DEC-040–043 and the M3 review evidence before changing allocation or delivery.
+DEC-040–045 and the M3 review evidence before changing allocation or delivery.
 
 ## Run locally
 
@@ -31,8 +31,11 @@ reservation, delivery and acceptance. Card/photo reads use `withMemberPair` and
 live grants. Neither helper returns a reusable authorization token.
 
 Every delivered pair gets two profile grants. Pass, expiry, block, restriction and
-close remove them and release held capacity once. The pair history remains closed
-forever. A delivered exposure remains counted even if passed. A lower personal
+close remove them and release held capacity once. Permanent history covers pass,
+block, restriction, operator removal after review, delivered expiry and closed mutual
+connections. System cancellations and undelivered expiry may retry in a later batch
+after every gate passes; previous attempts and exposures remain recorded. A delivered
+exposure remains counted even if passed or system-cancelled. A lower personal
 cap only stops new holds. Blind per-member versions avoid revealing the other's
 first acceptance. Operator-curated exposures always have null propensity.
 

@@ -428,10 +428,13 @@ Each member has a separate decision version. The other's first acceptance change
 neither that version nor their card DTO, preventing a response-version side channel.
 Pass is neutral unavailability to the other member; expiry is EXPIRED without a
 negative learning label; a closed connection has its own CLOSED presentation.
-Permanent pair history prevents resurfacing, including after operator removal or
-reservation expiry. Profile/preference/epoch edits or removal of approved media
-cancel pending introductions rather than deliver stale snapshots. This is a
-protective pilot choice; retained mutual connections still obey the shared deny gate.
+Amended 2026-11-03 by the founder (DEC-045): permanent pair history is written on
+PASS, BLOCK, RESTRICTED, operator removal after review, a closed MUTUAL connection,
+or expiry after delivery to both members. Profile/preference/epoch edits, pause,
+Focus and withdrawn photo approval cancel pending introductions without permanent
+exclusion. Undelivered reservation expiry also permits a later attempt after all
+gates pass. Attempt, exposure and audit records remain separate from exclusion.
+Retained mutual connections still obey the shared deny gate.
 Operator views and edits require current roles and append an audit with batch ID.
 Operators cannot review or curate their own introductions.
 
@@ -486,3 +489,24 @@ and structure labels as the profile editor, for example "A long-term relationshi
 · Monogamous". The member navigation label is "My reports". Stored values and
 report routing are unchanged. This founder-requested copy follow-up is included
 in M3 PR #6 because M2 PR #5 had already merged; PR #6 remains unmerged.
+
+## Pair exclusion follows closure, not reservation (DEC-045)
+
+2026-11-03, Spec P5/P10, I-05. The founder corrected DEC-041's overly broad
+reservation-time exclusion. Migration 0012 removes insertion-time history and
+replaces the lifetime pair uniqueness constraint with one live opportunity per
+pair. `opportunities` retains each attempt; append-only `opportunity_closures`
+records the prior state, reason and delivery status. Only the approved permanent
+closure reasons enter `pair_history`. Block records still prevent re-entry even
+when no opportunity existed. Delivery means the atomic publication of both cards
+and both profile grants, independently of optional email transport.
+
+Applied migrations 0010/0011 remain unchanged. The forward repair preserves
+existing passes, blocks, restrictions, delivered expiries and closed mutual
+connections, while removing premature reservation history. The old CANCELLED
+state did not distinguish operator removal from system invalidation; those
+synthetic pre-release records remain marked LEGACY_CANCELLED in the audit ledger,
+without inventing a permanent refusal. New operator removals have an explicit
+OPERATOR_REMOVED reason. No exposure, decision or original opportunity is erased.
+An already-closed attempt cannot revoke a later attempt's grants or release its
+capacity. Current state, denial, weekly budget and live-pair checks still apply.

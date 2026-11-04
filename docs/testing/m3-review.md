@@ -1,8 +1,9 @@
 # M3 review evidence
 
 Scope: Spec P5/P6/P10/P13/P15/P16, plus DEC-036 grant lifecycle and I-04 block
-races carried from M2. The branch is `codex/m3-explore-engine`; do not merge its
-PR or start M4. All data used for verification is synthetic.
+races carried from M2. The branch is `codex/m3-explore-engine`. On 2026-11-03 the
+founder authorized merging after the DEC-045 pair-history fix and green CI, followed
+by M4 after main CI passes. All data used for verification is synthetic.
 
 ## Merge prerequisite
 
@@ -31,6 +32,13 @@ passed all three jobs before branching M3.
   workflows, with concern/help links and no M4 chat/plan placeholders.
 
 ## Validation record
+
+2026-11-03 DEC-045 correction: full `pnpm check` passed typecheck, lint,
+formatting, 32 unit/property/architecture tests, 56 real PostgreSQL tests,
+production build and 13 Chromium/axe workflows (101 total). The migration upgrade
+fixture proves existing attempts/exposures survive and only qualifying closure
+history remains. Six invalidation cases re-enter with fresh grants; an old closed
+attempt cannot revoke them. Generated pass/block sequences never re-enter.
 
 Targeted pure/architecture checks passed: 32 unit tests. Twelve new real-Postgres
 tests passed, including both lock orderings for block versus reservation, delivery
@@ -70,6 +78,8 @@ DEC-040: exhaustive pilot cap, operator policy provenance, heuristic input limit
 DEC-041: reservation lease, private decision versions, grants and closure semantics.
 DEC-042: generic durable delivery and uncertain-send handling.
 DEC-043: finite experience, synthetic venue scope and later release gates.
+DEC-045: closure-based exclusion and separately retained attempts; system
+cancellations and undelivered expiry can re-enter after every gate passes.
 
 M2's required reserve/deliver/accept block races are now implemented. M4 must add
 message delivery and plan confirmation races and enforce venue switches. M5 retains

@@ -38,7 +38,7 @@ implemented portions; it does not mark future behavior complete.
 | REQ-002     | I-02      | P11, P12      | Bilateral who-to-meet, age, intention and exclusions gate every introduction; no learned override.                | M1, M3         | `core/eligibility`                          | `I-02 bilateral hard-boundary property`                   |
 | REQ-003     | I-03      | P11, P12      | Three-way preference setting preserves user statements and USER-sourced history.                                  | M1             | `core/preferences; db/preferences`          | `I-03 preference history cannot be overwritten`           |
 | REQ-004     | I-04      | P5, P20       | Immediate bilateral blocks are rechecked at retrieval, reserve, delivery, accept and confirmation.                | M2, M3, M4, M6 | `core/policy; db/authorization`             | `I-04 block racing every consequential transition`        |
-| REQ-005     | I-05      | P5, P10       | One unordered pair key; passed, blocked, expired or ended pairs never re-enter another route.                     | M3, M6         | `core/pairs; db/opportunities`              | `I-05 permanent pair exclusion across modes`              |
+| REQ-005     | I-05      | P5, P10       | Closure-based exclusion; system cancellation and undelivered expiry may retry after all gates pass.               | M3, M6         | `core/explore; db/opportunities`            | `I-05 permanent pair exclusion across modes`              |
 | REQ-006     | I-06      | P5, P6, P16   | Atomically reserve both capacity ledgers in ID order; release once; last held slot remains acceptable.            | M3, M4         | `core/capacity; db/reservations`            | `I-06 concurrent reserve and exactly-once release`        |
 | REQ-007     | I-07      | P4, P6        | Decisions remain blind until both accept; never reveal a unilateral choice or like count.                         | M3             | `core/opportunities; web/introductions`     | `I-07 two-client private decision disclosure`             |
 | REQ-008     | I-08      | P6, P13       | Timeout is distinct from pass and archive from rejection in storage and outcomes.                                 | M3, M5         | `core/opportunities; learning/selection`    | `I-08 expiry remains unknown`                             |
@@ -377,3 +377,10 @@ DEC-044 copy follow-up (P4/P20, I-11): `config/accounts` supplies typed labels t
 the profile editor and `/app` preview; `components/shell` names the existing
 report-status link "My reports". Existing accounts and safety browser workflows
 cover these surfaces and their accessibility; stored values and routes are unchanged.
+
+DEC-045 updates I-05: migration 0012 records permanent history on qualifying
+closure and retains all opportunities plus an append-only closure ledger.
+`integration/explore.test.ts` covers six invalidation paths with later delivery,
+undelivered expiry, permanent closure parity, and generated pass/block histories
+that cannot be proposed again. Existing delivered-expiry, restriction, operator
+removal and mutual-close tests continue to apply.

@@ -35,6 +35,12 @@ research is complete for now (DEC-033). DEC-035 authorizes this M2 build only.
 
 ## Dependency refinements
 
+- M3 review correction completed in DEC-045: temporary system cancellations and
+  undelivered reservation expiry permit later re-entry; permanent refusals and
+  delivered expiry remain excluded. Pre-fix CANCELLED records lack operator-removal
+  provenance and remain explicitly marked LEGACY_CANCELLED; no real-user migration
+  is authorized by the local synthetic repair.
+
 - Completed in the open M3 PR #6: founder-requested human-readable profile preview
   labels and "My reports" member navigation (DEC-044). M2 PR #5 had already merged
   when this follow-up arrived. No remaining work or milestone change for this copy.

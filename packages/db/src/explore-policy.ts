@@ -113,10 +113,11 @@ export async function loadPairFacts(db: PoolClient, u: string, v: string): Promi
     )
   ).rows;
   const r = (
-    await db.query<{ legacy: boolean; history: boolean }>(
+    await db.query<{ legacy: boolean; history: boolean; live: boolean }>(
       `SELECT
   EXISTS(SELECT 1 FROM app.legacy_pair_denials WHERE low_id=least($1::uuid,$2::uuid) AND high_id=greatest($1::uuid,$2::uuid)) AS legacy,
-  EXISTS(SELECT 1 FROM app.pair_history WHERE low_id=least($1::uuid,$2::uuid) AND high_id=greatest($1::uuid,$2::uuid)) AS history`,
+  EXISTS(SELECT 1 FROM app.pair_history WHERE low_id=least($1::uuid,$2::uuid) AND high_id=greatest($1::uuid,$2::uuid)) AS history,
+  EXISTS(SELECT 1 FROM app.opportunities WHERE low_id=least($1::uuid,$2::uuid) AND high_id=greatest($1::uuid,$2::uuid) AND slot_held) AS live`,
       [u, v],
     )
   ).rows[0]!;
@@ -126,6 +127,7 @@ export async function loadPairFacts(db: PoolClient, u: string, v: string): Promi
     blockedBy: blocks.map((b) => b.blocker_id),
     legacyDenied: r.legacy,
     hasHistory: r.history,
+    hasLive: r.live,
   };
 }
 /** I-04: authoritative shared gate for every M3 retrieval/reserve/deliver/accept.

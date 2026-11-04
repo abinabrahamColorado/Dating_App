@@ -409,7 +409,7 @@ export class ExploreStore {
             const target = rows.find((o) => o.id === input.opportunityId);
             if (!target) throw new StoreError('NOT_FOUND');
             await db.query('SELECT app.lock_pair($1,$2)', [target.low_id, target.high_id]);
-            await db.query("SELECT app.close_opportunity($1,'CANCELLED')", [target.id]);
+            await db.query("SELECT app.close_opportunity($1,'OPERATOR_REMOVED')", [target.id]);
           } else {
             for (const o of rows.filter((o) => o.state === 'RESERVED')) {
               const gate = await lockedExplorePair(

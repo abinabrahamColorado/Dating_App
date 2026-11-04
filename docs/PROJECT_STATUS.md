@@ -1,11 +1,12 @@
 # Project status
 
-Updated 2026-10-22 (America/Chicago). Working name: **Meetwell**.
+Updated 2026-11-03 (America/Chicago). Working name: **Meetwell**.
 Pilot proposal: Manhattan, New York City; ages 18–30.
 
 Permanent checkout: `E:\Buisness\Dating_App`.
 Remote: `https://github.com/abinabrahamColorado/Dating_App`.
-Current review branch: `codex/m3-explore-engine`. M3 will remain unmerged for review.
+Current review branch: `codex/m3-explore-engine`. The founder authorized merging
+after the DEC-045 closure-history correction and green CI, then M4 after main CI.
 PR #3 merged with explicit founder
 approval at `a4dee472951f4d11968de6613e6d416f0e227df8`. Main CI
 [39547453037](https://github.com/abinabrahamColorado/Dating_App/actions/runs/39547453037)
@@ -59,6 +60,11 @@ and 20 invariant mappings remain tracked. This audit adds a source-backed
 [test strategy](testing/strategy.md).
 
 ## Verification and GitHub review
+
+DEC-045 correction passed full `pnpm check`: 32 unit/property/architecture,
+56 real PostgreSQL and 13 Chromium/axe tests (101 total), plus typecheck, lint,
+formatting and build. Migrations 0010/0011 remain unchanged; 0012 repairs history
+and retains attempts, exposures and an append-only closure ledger.
 
 M3 full `corepack pnpm check` passed: typecheck, lint, formatting, 32 unit/property
 tests, 46 real PostgreSQL integration tests, production build and 13 Chromium tests
