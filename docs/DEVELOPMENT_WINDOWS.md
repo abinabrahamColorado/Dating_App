@@ -6,7 +6,9 @@ The scripts also work when the repository is cloned elsewhere.
 
 ## First setup
 
-Install Node 24, Git for Windows, and Corepack. From the repository root:
+Install Node 24.19.0 (see `.node-version`), Git for Windows, and Corepack 0.35.0.
+Use `corepack pnpm` consistently; a different plain `pnpm` is on this PC's PATH.
+From the repository root:
 
 ```powershell
 corepack pnpm install --frozen-lockfile
@@ -14,10 +16,11 @@ corepack pnpm setup:windows
 corepack pnpm db:migrate
 corepack pnpm db:grant-local-worker
 corepack pnpm setup:accounts
+corepack pnpm exec playwright install chromium
 corepack pnpm check
 ```
 
-Install the browser once before the first full check:
+Reinstall the pinned browser after Playwright changes or its cache is removed:
 
 ```powershell
 corepack pnpm exec playwright install chromium
@@ -95,7 +98,7 @@ Do not copy `.local`, `.env`, or `node_modules` to GitHub.
 
 ## Accounts and a synthetic photo reviewer
 
-Run `corepack pnpm setup:accounts` with services running after pulling M2.
+Run `corepack pnpm setup:accounts` with services running after pulling schema changes.
 It migrates dev/test, provisions separate identity/app/ops/safety logins, generates
 encryption keys, and creates private buckets. Keys/passwords remain in ignored
 `.env`; never replace them casually or encrypted local data becomes unreadable.

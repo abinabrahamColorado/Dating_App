@@ -22,19 +22,25 @@ jobs:
           version: 12.11.2
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version-file: .node-version
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      # Disposable runner: replace preinstalled Yarn/Corepack shims consistently.
+      - run: npm install --global corepack@0.35.0 --force
+      - run: corepack pnpm check:toolchain
+      - run: corepack pnpm install --frozen-lockfile
       - name: Set up project-local Windows services
-        run: pnpm setup:windows
-      - run: pnpm db:migrate
-      - run: pnpm db:grant-local-worker
-      - run: pnpm setup:accounts
-      - run: pnpm exec playwright install chromium
-      - run: pnpm check
+        run: corepack pnpm setup:windows
+      - run: corepack pnpm db:migrate
+      - run: corepack pnpm db:grant-local-worker
+      - run: corepack pnpm setup:accounts
+      - run: corepack pnpm exec playwright install chromium
+      - run: corepack pnpm check
       - name: Stop services and preserve local data
         if: always()
-        run: pnpm services:windows:stop
+        run: |
+          if (Test-Path .local/tools/pgsql/bin/pg_ctl.exe) {
+            corepack pnpm services:windows:stop
+          }
   dev-services:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -74,20 +80,22 @@ jobs:
           version: 12.11.2
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version-file: .node-version
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - run: npm install --global corepack@0.35.0 --force
+      - run: corepack pnpm check:toolchain
+      - run: corepack pnpm install --frozen-lockfile
       - name: Start private object storage and development mailbox
         run: docker compose up --build -d --wait --wait-timeout 120 minio mailpit
-      - run: pnpm setup:accounts
-      - run: pnpm typecheck
-      - run: pnpm lint
-      - run: pnpm format:check
-      - run: pnpm test:unit
-      - run: pnpm test:integration
-      - run: pnpm build
-      - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:e2e
+      - run: corepack pnpm setup:accounts
+      - run: corepack pnpm typecheck
+      - run: corepack pnpm lint
+      - run: corepack pnpm format:check
+      - run: corepack pnpm test:unit
+      - run: corepack pnpm test:integration
+      - run: corepack pnpm build
+      - run: corepack pnpm exec playwright install --with-deps chromium
+      - run: corepack pnpm test:e2e
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
