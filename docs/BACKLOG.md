@@ -5,7 +5,9 @@ in PR #3 at `a4dee472951f4d11968de6613e6d416f0e227df8`; main CI is green.
 M2 merged in PR #5 at `5711fe60dfdec9e9ffa6a2f50b2ea38dea2ecb0f`; main CI
 39723068853 passed. M3 PR #6 merged with founder approval at
 `010a80bc40a96cc0576a0370e6238f9b988e487c`; main CI 41772404412 passed.
-M4 is on `codex/m4-connections-plans`. Do not merge its PR or start M5.
+M4 PR #8 merged with founder approval at `cc6ecf1b3c3461c807ea12b8ea96cfa631079cf1`;
+main CI 42974176138 passed. Setup PR #10 and the separate security-hardening PR
+remain for review. Do not merge them or start M5 without further approval.
 The earlier hosted preview remains an independent design reference.
 
 Latest review: [execution roadmap](product/roadmap.md),
@@ -36,6 +38,14 @@ research is complete for now (DEC-033). DEC-035 authorizes this M2 build only.
 | M7        | Route/role/object matrix, security/rate budgets, accessibility/mobile audit, runbooks, privacy/release review                           | All20 invariant suites green; P23 gates and documented human operations/legal/venue review                          |
 
 ## Dependency refinements
+
+- DEC-050/051 security follow-up: [the 49-item register](security/checklist.md)
+  names remaining release owners. Before hosting, review bucket IAM, network/TLS,
+  build/access/framework log privacy, universal route rate budgets, key custody,
+  external monitoring/alert ownership and isolated staging. No vendor is approved.
+- M5 retains deletion-tombstone replay before restored data may serve traffic,
+  D14 backup expiry, media/key recovery and retention/legal holds. The standalone
+  encrypted backup/fresh-restore drill does not complete I-18 or start M5.
 
 - M3 review correction completed in DEC-045: temporary system cancellations and
   undelivered reservation expiry permit later re-entry; permanent refusals and

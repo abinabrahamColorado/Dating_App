@@ -1,19 +1,22 @@
 import type { NextConfig } from 'next';
+import { securityHeaders } from './security-headers';
+import { assertRuntimeSecurity } from '@meetwell/config/security';
 const config: NextConfig = {
   poweredByHeader: false,
+  productionBrowserSourceMaps: false,
   transpilePackages: ['@meetwell/config', '@meetwell/core', '@meetwell/db'],
   async headers() {
     return [
       {
         source: '/:path*',
-        headers: [
-          { key: 'X-Frame-Options', value: 'DENY' },
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Referrer-Policy', value: 'no-referrer' },
-          { key: 'Permissions-Policy', value: 'geolocation=(), camera=(), microphone=()' },
-        ],
+        // Proxy supplies CSP on each request so Next's scripts receive its nonce.
+        headers: securityHeaders(process.env.APP_MODE),
       },
     ];
   },
 };
-export default config;
+export default function configure(phase: string) {
+  if (['phase-production-server', 'phase-development-server'].includes(phase))
+    assertRuntimeSecurity(process.env, 'web');
+  return config;
+}

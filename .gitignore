@@ -8,5 +8,6 @@ coverage/
 .local/
 playwright-report/
 test-results/
+*.mwbackup
 *.tsbuildinfo
 .DS_Store

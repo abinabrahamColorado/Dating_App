@@ -10,6 +10,9 @@
   "scripts": {
     "dev": "tsx scripts/web.ts dev --hostname 127.0.0.1",
     "worker": "tsx apps/worker/src/main.ts",
+    "monitor": "tsx scripts/monitor.ts",
+    "db:backup": "tsx scripts/backup.ts",
+    "db:restore": "tsx scripts/restore.ts",
     "build": "pnpm --filter @meetwell/web build",
     "typecheck": "tsc --noEmit && pnpm --filter @meetwell/web typecheck",
     "lint": "eslint . --max-warnings=0",
