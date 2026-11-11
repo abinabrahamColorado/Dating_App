@@ -384,3 +384,35 @@ closure and retains all opportunities plus an append-only closure ledger.
 undelivered expiry, permanent closure parity, and generated pass/block histories
 that cannot be proposed again. Existing delivered-expiry, restriction, operator
 removal and mutual-close tests continue to apply.
+
+## M4 implementation evidence (2026-11-03)
+
+- I-04/I-19: `db/connection-policy` calls the authoritative `isDenied` under
+  `app.lock_pair`. `db/connections` applies it to reads, sends, delivery, proposals,
+  venue/time changes and confirmations. Real PostgreSQL tests cover both orderings
+  of block versus message delivery and plan confirmation, stale sessions and
+  unrelated-member access. M2/M3 inventories extend to every M4 route/job, with
+  negative tests that remove a guard and require the architecture audit to fail.
+- I-06/I-08/I-13; REQ-035: chat/plan lifecycle retains the M3 connection slot;
+  closure releases once. Tests cover explicit paused-chat consent, Focus keeping
+  existing connections, unavailable reads and closure distinct from a pass.
+- I-09; Spec P18: `core/connections`, `db/connections`, `db/venues` and migration
+  0013 implement complete reviewed venue fields, private meeting preferences,
+  both-person filters, stable ranked options, immutable plan revisions and
+  bilateral same-revision confirmations. Tests cover revision/cancel/venue races,
+  expired reviews, venue shutdown, operator revocation, private DTOs and retries.
+- I-11/I-12/I-17/I-20: chat and plan safety links, encrypted messages and private
+  operator records, learning/app role denial, audited venue reviews, no member
+  origin in options/share and no chat content in learning/logs. Existing safety
+  tests remain authoritative for reports, help and case-role isolation.
+- P6/P18: browser workflows cover human venue review, mutual -> proposal -> two
+  confirmations -> plan page without sending a message, calendar download, copy
+  sharing, manual arrival messages, chat, private close, venue shutdown and help.
+  Axe runs on venue review, chat and plan pages; mobile overflow is checked.
+- Domain/property tests cover the prescribed travel ranking, accessibility/cost/
+  activity/alcohol/hour filters, short shared windows, DST gaps/folds, midnight
+  opening boundaries, calendar escaping and opt-in paused connection access.
+
+DEC-046–048 explain protective defaults, serialization and remaining release work.
+M5 feedback/post-meeting surfaces, D9/D11/D12 retention and deletion remain planned;
+M6 event/Go switches remain off. No research build card is implemented.

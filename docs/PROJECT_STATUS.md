@@ -5,8 +5,11 @@ Pilot proposal: Manhattan, New York City; ages 18–30.
 
 Permanent checkout: `E:\Buisness\Dating_App`.
 Remote: `https://github.com/abinabrahamColorado/Dating_App`.
-Current review branch: `codex/m3-explore-engine`. The founder authorized merging
-after the DEC-045 closure-history correction and green CI, then M4 after main CI.
+Current review branch: `codex/m4-connections-plans`. M3 PR #6 merged after the
+DEC-045 closure-history correction and all six checks passed at `d0c1aa7`.
+Merge commit: `010a80bc40a96cc0576a0370e6238f9b988e487c`. Main CI
+[41772404412](https://github.com/abinabrahamColorado/Dating_App/actions/runs/41772404412)
+passed all three jobs before the M4 branch was created. Do not merge M4 or start M5.
 PR #3 merged with explicit founder
 approval at `a4dee472951f4d11968de6613e6d416f0e227df8`. Main CI
 [39547453037](https://github.com/abinabrahamColorado/Dating_App/actions/runs/39547453037)
@@ -15,7 +18,7 @@ approved M2 after the DEC-039 corrections passed 67 local tests and green CI.
 [PR #5](https://github.com/abinabrahamColorado/Dating_App/pull/5) merged at
 `5711fe60dfdec9e9ffa6a2f50b2ea38dea2ecb0f`; main CI
 [39723068853](https://github.com/abinabrahamColorado/Dating_App/actions/runs/39723068853)
-passed before the M3 branch was created. M3's PR must remain unmerged.
+passed before the M3 branch was created.
 
 ## Implemented and reviewed state
 
@@ -43,6 +46,13 @@ connections and closure. Delivery grants both profiles; terminal transitions rev
 grants and release slots once. See [Explore operations](operations/explore.md),
 DEC-040–043 and [M3 review](testing/m3-review.md).
 
+M4 adds encrypted polling chat, queued delivery, private closure and archive
+suggestions, explicit paused-chat consent, operator venue review, stable filtered
+venue options, immutable venue/time revisions and bilateral plan confirmation.
+Venue edits, review expiry and shutdowns invalidate plans. Calendar/share/manual
+messages, chat/plan safety links and the opt-in Focus offer are implemented.
+See DEC-046–048 and [M4 operations](operations/connections-plans.md).
+
 This review branch isolates authentication email failures: each message commits
 independently, failed attempts persist with a retry delay and budget, and a corrupt
 message cannot undo earlier successful delivery markers. Migration `0004` is
@@ -61,6 +71,11 @@ and 20 invariant mappings remain tracked. This audit adds a source-backed
 
 ## Verification and GitHub review
 
+M4 full `pnpm check` passed: typecheck, lint, formatting, 42 unit/property/
+architecture tests, 70 real PostgreSQL tests, production build and 15 Chromium/axe
+workflows (127 total). See [M4 review](testing/m4-review.md) and the M4 PR for
+exact-head CI. Migration 0013 has been applied only to local development/test stores.
+
 DEC-045 correction passed full `pnpm check`: 32 unit/property/architecture,
 56 real PostgreSQL and 13 Chromium/axe tests (101 total), plus typecheck, lint,
 formatting and build. Migrations 0010/0011 remain unchanged; 0012 repairs history
@@ -69,7 +84,7 @@ and retains attempts, exposures and an append-only closure ledger.
 M3 full `corepack pnpm check` passed: typecheck, lint, formatting, 32 unit/property
 tests, 46 real PostgreSQL integration tests, production build and 13 Chromium tests
 with axe (91 total). See [M3 review](testing/m3-review.md) and the PR's exact-head
-checks for CI results. The branch remains unmerged for founder review.
+checks for the historical CI results. M3 is now merged; M4 remains for review.
 
 Full `corepack pnpm check` passed on the M2 review branch: typecheck, lint, formatting,
 22 unit/property tests, 34 real PostgreSQL integration tests, production build and

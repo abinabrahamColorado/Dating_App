@@ -516,3 +516,74 @@ initial candidate query included every paused account and then evaluated all of
 their pairs. Scheduled retrieval now selects active Explore accounts only, before
 the unchanged authoritative locked pair gates. This bounds candidate work to the
 current cohort; it does not cache eligibility or weaken any reservation gate.
+
+## M4 connection authority and consent (DEC-046)
+
+2026-11-03, Spec P5/P6/P18, I-04/I-06/I-08/I-09/I-11. The founder authorized M4
+after the corrected M3 merge and green main CI. PR #6 merged at `010a80b`; main
+run 41772404412 passed before this branch. M4 remains unmerged for review.
+
+Chat uses encrypted text and polling, with a durable delivery sweep and no read
+receipts, typing indicators or message-content learning. Send, delivery and every
+plan read/transition recheck `isDenied` under `app.lock_pair`. Existing connection
+access has an explicit purpose in the same deny function: paused members must
+have selected the existing "Keep existing chats while paused" setting; discovery
+still denies every paused member. Focus keeps existing connections. Temporary
+unavailability reveals no counterpart details and still allows private closure.
+Closure cancels pending messages/plans and releases the inherited slot once.
+
+Plan content has an immutable revision independent of the row's CAS version.
+Each person confirms the same content revision; one confirmation never invalidates
+the other person's opportunity to confirm. Changing venue/time creates a revision
+and requires both confirmations again. Confirmed plan IDs, not reconfirmations of
+one plan, count toward the optional Focus offer. Archiving is a private closure,
+distinct from PASS; inactivity is never inferred rejection or attendance.
+
+## Reviewed venues, private choices and stable suggestions (DEC-047)
+
+2026-11-03, Spec P6/P18/P20, I-09/I-12/I-17/I-20. M4 extends the M3 venue read model
+with the complete human-review fields. Partner contact/training and operational
+complaints are encrypted in `ops`, separate from public venue details and safety
+cases. Staff reads/writes require current roles and audit rows. No map vendor or
+real venue is automatically approved; the old minimal synthetic fixture cannot
+be suggested as a complete M4 venue.
+
+Meeting preferences are private per connection. Protective defaults are free,
+no-purchase venues with alcohol-free options, no required accessibility features
+unless selected, and no alcohol-primary venue without both explicit choices and
+both ages at least 21. The member can edit these choices; edits invalidate future
+plans for renewed bilateral consent. A venue review must cover the whole meeting.
+
+Candidates pass both people's availability, access, budget, activity, hours and
+travel gates, then rank by the specified maximum-travel plus imbalance formula.
+Store the ordered choices for a time/preference snapshot; area edits do not
+silently rerank or refill it. Every use revalidates current eligibility. Explicit
+"Refresh reviewed places" requests a new snapshot. Empty supply remains empty.
+Neither member sees the other's origin, travel score or private preferences.
+
+Catalog reads hold shared advisory lock (40,1); operator edits and venue switches
+hold it exclusively before writing. Catalog revocation locks plans in ID order
+and never takes member locks, preserving member -> catalog -> plan ordering.
+Venue edits/shutdowns invalidate future proposed and confirmed plans. Review
+expiry is also checked at reads/confirmation and in the durable maintenance job.
+Re-enabling a place never silently restores a plan or its old approvals.
+
+## Meeting time, sharing and release boundaries (DEC-048)
+
+2026-11-03, Spec P6/P18/P22. The pilot uses New York time for member scheduling;
+venue hours retain their own IANA timezone. Ambiguous or nonexistent local times
+are rejected. All occupied civil minutes, including midnight and DST boundaries,
+must fit permitted hours. The optional default duration is 30 minutes, with a
+5–120 minute pilot range in config; this is not a shared two-hour availability gate.
+
+Only a currently confirmed plan can produce a calendar file or be shared. The
+calendar contains the venue/time, with escaped and folded text. Share uses the
+browser's share sheet or copy fallback and only the venue, time and the sharing
+member's first name. The three arrival/late/leaving messages are explicit member
+actions. There is no contact import, automatic safety alert, live ETA or tracking.
+
+M5 retains D9/D11/D12 retention, scoped legal holds and deletion/restore. M7 retains
+production process-secret isolation, manual accessibility review and generic
+opted-in plan reminder delivery. Real venue approval, staffed safety coverage and
+launch privacy review are founder release questions. REA remains uninstalled;
+algorithm research cards remain unimplemented and need separate explicit approval.

@@ -4,6 +4,8 @@ import { deliverAuthMail, sendIntroductionMail } from '@meetwell/runtime/mail';
 import { workerStore } from '@meetwell/runtime/accounts';
 import { ExploreStore } from '@meetwell/db/explore';
 import { registerExploreJobs } from './explore';
+import { ConnectionStore } from '@meetwell/db/connections';
+import { registerConnectionJobs } from './connections';
 import { accountConfig } from '@meetwell/config/accounts';
 const url = process.env.WORKER_DATABASE_URL;
 if (!url) throw new Error('WORKER_DATABASE_URL is required');
@@ -12,6 +14,7 @@ await boss.createQueue('auth.deliver');
 await boss.work('auth.deliver', async () => deliverAuthMail(workerStore()));
 await boss.schedule('auth.deliver', accountConfig.AUTH_OUTBOX_CRON, {});
 await registerExploreJobs(boss, new ExploreStore(workerStore()), sendIntroductionMail);
+await registerConnectionJobs(boss, new ConnectionStore(workerStore()));
 writeOperationalEvent('worker.started');
 let stopping = false;
 async function stop() {
