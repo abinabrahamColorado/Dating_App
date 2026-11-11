@@ -7,7 +7,7 @@ export default defineConfig({
   use: { baseURL: 'http://localhost:3100', trace: 'retain-on-failure' },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
-    command: 'pnpm exec tsx scripts/web.ts start --port 3100 --hostname 127.0.0.1',
+    command: 'corepack pnpm exec tsx scripts/web.ts start --port 3100 --hostname 127.0.0.1',
     env: {
       APP_MODE: 'test',
       APP_ORIGIN: 'http://localhost:3100',

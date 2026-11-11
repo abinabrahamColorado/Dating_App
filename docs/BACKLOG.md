@@ -5,8 +5,14 @@ in PR #3 at `a4dee472951f4d11968de6613e6d416f0e227df8`; main CI is green.
 M2 merged in PR #5 at `5711fe60dfdec9e9ffa6a2f50b2ea38dea2ecb0f`; main CI
 39723068853 passed. M3 PR #6 merged with founder approval at
 `010a80bc40a96cc0576a0370e6238f9b988e487c`; main CI 41772404412 passed.
-M4 is on `codex/m4-connections-plans`. Do not merge its PR or start M5.
+M4 PR #8 merged with explicit founder approval on 2026-11-11 at `cc6ecf1`.
+Main CI 42974176138 passed all three jobs. Do not start M5.
 The earlier hosted preview remains an independent design reference.
+
+The separate setup audit (DEC-049) standardizes Corepack/Node and durable guidance.
+The sidebar primary folder is corrected and verified. Remaining setup work:
+activate and verify main's PR/check/force-push/deletion protections after owner sign-in, and validate
+workspace access with automatic review. See [setup evidence](DEVELOPMENT_SETUP.md).
 
 Latest review: [execution roadmap](product/roadmap.md),
 [architecture gaps](architecture/review-2026-10-20.md),

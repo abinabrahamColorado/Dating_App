@@ -1,15 +1,28 @@
 # Project status
 
-Updated 2026-11-03 (America/Chicago). Working name: **Meetwell**.
+Updated 2026-11-11 (America/Chicago). Working name: **Meetwell**.
 Pilot proposal: Manhattan, New York City; ages 18–30.
 
 Permanent checkout: `E:\Buisness\Dating_App`.
 Remote: `https://github.com/abinabrahamColorado/Dating_App`.
-Current review branch: `codex/m4-connections-plans`. M3 PR #6 merged after the
-DEC-045 closure-history correction and all six checks passed at `d0c1aa7`.
-Merge commit: `010a80bc40a96cc0576a0370e6238f9b988e487c`. Main CI
-[41772404412](https://github.com/abinabrahamColorado/Dating_App/actions/runs/41772404412)
-passed all three jobs before the M4 branch was created. Do not merge M4 or start M5.
+Current setup branch: `codex/development-setup`, based on reviewed `main`.
+PR #6 merged with merge commit `010a80bc40a96cc0576a0370e6238f9b988e487c`;
+[main CI 41772404412](https://github.com/abinabrahamColorado/Dating_App/actions/runs/41772404412)
+passed before M4 started. M4 was implemented in
+[PR #8](https://github.com/abinabrahamColorado/Dating_App/pull/8), on
+`codex/m4-connections-plans` at `85761dd`, with all six CI checks green and
+127 local tests passing (42 unit/property/architecture, 70 PostgreSQL, 15 browser/axe).
+The founder approved merging PR #8 on 2026-11-11. It merged at
+`cc6ecf1b3c3461c807ea12b8ea96cfa631079cf1`;
+[main CI 42974176138](https://github.com/abinabrahamColorado/Dating_App/actions/runs/42974176138)
+passed `verify`, `windows`, and `dev-services` after the merge.
+The setup branch is based on that M4 baseline and changes development controls only.
+
+The next authorized work is finishing setup verification and the separate scoped
+security hardening PR. Neither new PR may merge without approval. Do not start M5.
+No research build card is authorized.
+See [development setup](DEVELOPMENT_SETUP.md) and DEC-049 for settings evidence,
+remaining UI actions and permissions tradeoffs.
 PR #3 merged with explicit founder
 approval at `a4dee472951f4d11968de6613e6d416f0e227df8`. Main CI
 [39547453037](https://github.com/abinabrahamColorado/Dating_App/actions/runs/39547453037)
@@ -53,7 +66,7 @@ Venue edits, review expiry and shutdowns invalidate plans. Calendar/share/manual
 messages, chat/plan safety links and the opt-in Focus offer are implemented.
 See DEC-046–048 and [M4 operations](operations/connections-plans.md).
 
-This review branch isolates authentication email failures: each message commits
+The merged M1 repair isolates authentication email failures: each message commits
 independently, failed attempts persist with a retry delay and budget, and a corrupt
 message cannot undo earlier successful delivery markers. Migration `0004` is
 additive and has been applied only to local development/test databases. SMTP
@@ -71,6 +84,13 @@ and 20 invariant mappings remain tracked. This audit adds a source-backed
 
 ## Verification and GitHub review
 
+Setup audit on 2026-11-11: `corepack pnpm install --frozen-lockfile` and full
+`corepack pnpm check` passed with Node 24.19.0 / pnpm 12.11.2: typecheck, lint,
+formatting, 42 unit/property/architecture tests, 70 real PostgreSQL tests,
+production build and 15 Chromium/axe tests (127 total). The first run discovered
+a missing Playwright browser cache; installing the pinned Chromium restored it.
+Services were stopped with local data preserved. Setup PR CI remains to be checked.
+
 M4 full `pnpm check` passed: typecheck, lint, formatting, 42 unit/property/
 architecture tests, 70 real PostgreSQL tests, production build and 15 Chromium/axe
 workflows (127 total). See [M4 review](testing/m4-review.md) and the M4 PR for
@@ -84,7 +104,7 @@ and retains attempts, exposures and an append-only closure ledger.
 M3 full `corepack pnpm check` passed: typecheck, lint, formatting, 32 unit/property
 tests, 46 real PostgreSQL integration tests, production build and 13 Chromium tests
 with axe (91 total). See [M3 review](testing/m3-review.md) and the PR's exact-head
-checks for the historical CI results. M3 is now merged; M4 remains for review.
+checks for the historical CI results. M3 and M4 are now merged.
 
 Full `corepack pnpm check` passed on the M2 review branch: typecheck, lint, formatting,
 22 unit/property tests, 34 real PostgreSQL integration tests, production build and
@@ -113,8 +133,8 @@ branch. Its initial run 39541603202 exposed a Compose initialization race:
 `postgis_version()` was unavailable after the socket health check passed. DEC-032
 changes readiness to TCP and retains the SQL assertions. Inspect the final PR head
 and live checks before merging; publication and final CI results are recorded in
-that PR and the task handoff. The older open M0 PR #1 is a conflicting historical proposal and must
-not be mistaken for additional work to merge.
+that PR and the task handoff. The older M0 PR #1 was subsequently closed as
+superseded without merging and is not additional work to merge.
 
 PR #4 subsequently merged into M1 with explicit approval. The current M1 merge
 review records DEC-033/034, the complete Markdown-rewrite audit, a four-fail/four-pass
@@ -127,14 +147,16 @@ founder's explicit M1 merge and M2 authorization in DEC-035.
 
 Account APIs require local/test mode and a loopback origin. Use synthetic accounts.
 Birth-date entry is not identity verification. Deletion currently disables access;
-it does not erase data. Chat, joint plans,
+it does not erase data. Chat and joint plans were merged in PR #8;
 feedback, erasure/restore and event Go remain unbuilt. No serving model, member
 GPS collection, real provider integration or live pilot is enabled.
 
-Next: review the M3 PR; do not merge it or start M4 without further authorization.
+Next: finish the authorized setup audit and separate scoped security hardening PR.
+Leave both new PRs unmerged and do not start M5 without further founder authorization.
 M1 client retry recovery and ambiguous media-write compensation (G08/G09) remain
 release gates. M2 fixes G02/G03 for current request/case boundaries; M3 now tests
-reservation/delivery/acceptance races. Chat and plan races remain M4 work.
+reservation/delivery/acceptance races. M4 PR #8 proves the chat-delivery and
+plan-confirmation block races in both lock orderings.
 Deletion/restore must pass before real enrollment; Go also requires staffed
 operations and explicit activation approval. The founder rejected the crosswalk;
 CODEX_PROMPTS numbering and order govern. M5 deletion already precedes M6 Go.
