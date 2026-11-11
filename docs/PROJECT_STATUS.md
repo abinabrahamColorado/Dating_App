@@ -187,4 +187,5 @@ retrieve the link in `http://127.0.0.1:8025` and open it in the same browser.
 Run `corepack pnpm worker` in a second terminal for retries.
 See DEVELOPMENT_WINDOWS.md for a synthetic moderator and shutdown instructions.
 Ignored `.env` holds generated keys; `.local/` holds services/data.
-Local services are running for the current synthetic verification; data is preserved.
+Verification finished and local services were stopped with data preserved. Check
+current service state with `corepack pnpm services:windows:status` before resuming.
