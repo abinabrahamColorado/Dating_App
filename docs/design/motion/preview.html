@@ -25,6 +25,8 @@
         --app-ink: #243f37;
         --app-soft: #5f6e68;
         --app-line: #ddd8c8;
+        --app-map: #e6e4d6;
+        --app-park: #cfd6bd;
         --app-cream: #e8d2b5;
         --app-burgundy: #590907;
         --app-sage: #a5a79b;
@@ -233,6 +235,7 @@
       }
       .pre {
         opacity: 0;
+        pointer-events: none;
       }
       .abtn {
         border: 0;
@@ -575,6 +578,101 @@
         align-items: center;
       }
 
+      .onwrap {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .slot > .onwrap {
+        pointer-events: none;
+      }
+      .slot > .onwrap > :not(.pre) {
+        pointer-events: auto;
+      }
+      .go-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+      .go-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        font-size: 12.5px;
+        background: var(--app-card);
+        border: 1px solid var(--app-line);
+        border-radius: 999px;
+        padding: 8px 12px;
+      }
+      .stopbtn {
+        width: auto;
+        padding: 8px 18px;
+      }
+      .map {
+        position: relative;
+        height: 205px;
+        border-radius: 18px;
+        background: var(--app-map);
+        overflow: hidden;
+        border: 1px solid var(--app-line);
+      }
+      .map i {
+        position: absolute;
+        background: var(--app-paper);
+      }
+      .map .s1 {
+        left: 0;
+        right: 0;
+        top: 38%;
+        height: 10px;
+      }
+      .map .s2 {
+        top: 0;
+        bottom: 0;
+        left: 30%;
+        width: 10px;
+      }
+      .map .s3 {
+        left: 0;
+        right: 0;
+        top: 74%;
+        height: 8px;
+      }
+      .map .s4 {
+        top: 0;
+        bottom: 0;
+        left: 72%;
+        width: 8px;
+      }
+      .map .park {
+        left: 36%;
+        top: 44%;
+        width: 33%;
+        height: 27%;
+        background: var(--app-park);
+        border-radius: 6px;
+      }
+      .pin {
+        position: absolute;
+        background: var(--app-ink);
+        color: var(--app-paper);
+        font-size: 11px;
+        font-weight: 600;
+        padding: 5px 9px;
+        border-radius: 999px 999px 999px 4px;
+      }
+      .offer {
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+      }
+      .offer .actions {
+        flex-direction: row;
+      }
+
       /* ---------- spec ---------- */
       .spec {
         display: flex;
@@ -729,7 +827,7 @@
       <header>
         <h1>Meetwell motion</h1>
         <p class="lede">
-          Seven moments in the app, each playing with the exact values listed beside it. Pick a
+          Ten moments in the app, each playing with the exact values listed beside it. Pick a
           moment, tap inside the phone where it asks, and use slow motion to study it. The table is
           generated from the same numbers the phone plays.
         </p>
@@ -782,6 +880,10 @@
               Motion only follows a real change of state: something arrived, you decided, a plan was
               confirmed. Nothing animates to invite another tap.
             </li>
+            <li>
+              The Go map shows public places, never people. No dots for members, no distance or
+              proximity meter, no radar sweep, no arrow toward a person, no rewards for moving.
+            </li>
             <li>Nothing takes longer than 600ms, and no animation blocks a tap while it plays.</li>
             <li>
               With reduced motion on, positions jump and only opacity fades, in 150ms or less.
@@ -823,6 +925,27 @@
             '<div class="center-note status-no pre"><b>Okay.</b><span class="tiny">Maya isn\'t told. You won\'t be introduced again.</span></div>'
           );
         }
+
+        function goOn(pre, stopRun) {
+          var c = pre ? ' pre' : '';
+          return (
+            '<div class="onwrap"><div class="go-row' +
+            c +
+            '"><div class="go-pill"><span class="dot"></span>Open · 30 min left</div>' +
+            '<button class="abtn ghost stopbtn"' +
+            (stopRun ? ' data-run="stop"' : '') +
+            ' type="button">Stop</button></div>' +
+            '<div class="map' +
+            c +
+            '"><i class="s1"></i><i class="s2"></i><i class="s3"></i><i class="s4"></i><i class="park"></i>' +
+            '<span class="pin" style="left:7%;top:13%">Coffee</span><span class="pin" style="left:42%;top:50%">Market</span><span class="pin" style="left:56%;top:83%">Bookshop</span></div>' +
+            '<p class="tiny go-note' +
+            c +
+            '">Pins are public places. Nobody\'s location is ever shown.</p></div>'
+          );
+        }
+        var GOBAR =
+          '<div class="bar"><span class="brand">Meetwell</span><span class="tiny">Tompkins Square market</span></div>';
 
         var MOMENTS = [
           {
@@ -1242,6 +1365,179 @@
                     p: { opacity: OUT },
                     d: 'fade',
                     e: 'standard',
+                  },
+                ],
+              },
+            },
+          },
+          {
+            id: 'go-on',
+            name: 'Go: open to meet',
+            hint: 'Tap "Open to meet for 30 minutes" in the phone.',
+            sum: 'Turning Go on swaps the off card for a calm status line and a map of public places. Pins are venues and they settle once. There are no people dots, no counts, no radar sweep and no countdown animation.',
+            trigger: 'Confirming Go at a supported public event or zone.',
+            plays: 'Once per Go session. The time left updates as plain text, without animation.',
+            reduced: 'Status line and map fade in. Pins appear in place.',
+            html: function () {
+              return (
+                GOBAR +
+                '<div class="slot"><div class="card off-card" style="align-self:start"><b style="font-family:var(--display);font-size:19px;font-weight:500">Nearby is off</b>' +
+                '<span class="tiny">You cannot see or be discovered in nearby introductions.</span>' +
+                '<button class="abtn" data-run="open" type="button">Open to meet for 30 minutes</button></div>' +
+                goOn(true, false) +
+                '</div>'
+              );
+            },
+            seqs: {
+              open: {
+                label: 'Turn Go on',
+                steps: [
+                  {
+                    t: '.off-card',
+                    n: 'Nearby-off card',
+                    p: { opacity: OUT },
+                    d: 'exit',
+                    e: 'exit',
+                  },
+                  {
+                    t: '.go-row',
+                    n: 'Status line and Stop button',
+                    p: { opacity: FADE, transform: up(8) },
+                    d: 'fade',
+                    w: 160,
+                    e: 'settle',
+                  },
+                  {
+                    t: '.map',
+                    n: 'Map of public places',
+                    p: { opacity: FADE },
+                    d: 'move',
+                    w: 240,
+                    e: 'standard',
+                  },
+                  {
+                    t: '.pin',
+                    n: 'Each venue pin',
+                    p: { opacity: FADE, transform: ['translateY(-8px)', 'none'] },
+                    d: 'fade',
+                    w: 400,
+                    s: 60,
+                    e: 'settle',
+                  },
+                  {
+                    t: '.go-note',
+                    n: 'Privacy note',
+                    p: { opacity: FADE },
+                    d: 'fade',
+                    w: 640,
+                    e: 'standard',
+                  },
+                ],
+                hooks: [
+                  {
+                    w: 0,
+                    fn: function (s) {
+                      s.querySelector('.off-card').style.pointerEvents = 'none';
+                    },
+                  },
+                ],
+              },
+            },
+          },
+          {
+            id: 'go-offer',
+            name: 'Go: someone is available',
+            hint: 'Plays when the screen opens.',
+            sum: 'One real introduction arrives while Go is on. The map steps back and a normal identity card settles in, with one short haptic tick as it starts. The card never points toward the person or shows distance.',
+            trigger: 'The server has reserved both people for this one introduction.',
+            plays: 'Once per offer. One haptic tick, no sound, no repeat.',
+            reduced: 'Card fades in. The map dims without movement. The haptic still fires once.',
+            html: function () {
+              return (
+                GOBAR +
+                goOn(false, false) +
+                '<div class="card offer pre"><div class="who"><div class="face">M</div><div><b>Maya, 26</b>' +
+                '<span class="tiny where">Available to meet in this public area</span></div></div>' +
+                '<div class="actions"><button class="abtn" type="button">Interested</button><button class="abtn ghost" type="button">Pass</button></div></div>'
+              );
+            },
+            auto: 'offer',
+            seqs: {
+              offer: {
+                label: 'Offer arrives',
+                steps: [
+                  {
+                    t: '.map',
+                    n: 'Map steps back',
+                    p: { opacity: [1, 0.35] },
+                    d: 'fade',
+                    e: 'standard',
+                  },
+                  {
+                    t: '.offer',
+                    n: 'Introduction card',
+                    p: { opacity: FADE, transform: up(12) },
+                    d: 'settle',
+                    w: 120,
+                    e: 'settle',
+                  },
+                  {
+                    t: '.offer .actions',
+                    n: 'Both buttons together',
+                    p: { opacity: FADE },
+                    d: 'fade',
+                    w: 420,
+                    e: 'standard',
+                  },
+                ],
+              },
+            },
+          },
+          {
+            id: 'ghost',
+            name: 'Nearby off (Ghost)',
+            hint: 'Tap "Stop" in the phone.',
+            sum: 'The fastest transition in the app. The map and status clear in 80ms, before the server answers, because stopping must feel immediate and certain. Then one plain sentence says what is and is not still on.',
+            trigger: 'Tapping Stop, or the Go session expiring.',
+            plays:
+              'Every time, never queued behind another animation. It never turns itself back on.',
+            reduced: 'Identical. This is already an instant cut and a short fade.',
+            html: function () {
+              return (
+                GOBAR +
+                '<div class="slot">' +
+                goOn(false, true) +
+                '<div class="card off-state pre" style="align-self:start"><b style="font-family:var(--display);font-size:19px;font-weight:500">Nearby is off</b>' +
+                '<span>You cannot see or be discovered in nearby introductions. Explore and existing chats still work.</span>' +
+                '<span class="tiny">It stays off until you turn it on again.</span></div></div>'
+              );
+            },
+            seqs: {
+              stop: {
+                label: 'Stop',
+                steps: [
+                  {
+                    t: '.onwrap',
+                    n: 'Map, status and any nearby card',
+                    p: { opacity: OUT },
+                    d: 'press',
+                    e: 'exit',
+                  },
+                  {
+                    t: '.off-state',
+                    n: 'Nearby-off confirmation',
+                    p: { opacity: FADE },
+                    d: 'fade',
+                    w: 80,
+                    e: 'standard',
+                  },
+                ],
+                hooks: [
+                  {
+                    w: 0,
+                    fn: function (s) {
+                      s.querySelector('.onwrap').style.pointerEvents = 'none';
+                    },
                   },
                 ],
               },

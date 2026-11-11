@@ -28,15 +28,18 @@ Sequence values (element, property change, duration, delay, easing) are in the
 table shown for each moment in `preview.html`, and in the `MOMENTS` array in
 its script.
 
-| Moment                         | Trigger                                      | Plays                                        |
-| ------------------------------ | -------------------------------------------- | -------------------------------------------- |
-| Introduction arrives           | First time an introduction is shown          | Once per introduction                        |
-| Private answer (accept / pass) | Tapping either decision button               | Once; the decision is final                  |
-| Mutual match                   | First open after both answers are yes        | Once per pair                                |
-| Plan confirmed                 | Second person confirms the same plan version | Once per confirmed plan version              |
-| Onboarding step change         | Continue / Back with a valid answer          | Every step; Back mirrors the direction       |
-| Loading and empty week         | Introductions loading, then none left        | Pulse only while loading                     |
-| "Something felt off" sheet     | Tapping the entry point anywhere             | Every time, never queued behind other motion |
+| Moment                         | Trigger                                              | Plays                                               |
+| ------------------------------ | ---------------------------------------------------- | --------------------------------------------------- |
+| Introduction arrives           | First time an introduction is shown                  | Once per introduction                               |
+| Private answer (accept / pass) | Tapping either decision button                       | Once; the decision is final                         |
+| Mutual match                   | First open after both answers are yes                | Once per pair                                       |
+| Plan confirmed                 | Second person confirms the same plan version         | Once per confirmed plan version                     |
+| Onboarding step change         | Continue / Back with a valid answer                  | Every step; Back mirrors the direction              |
+| Loading and empty week         | Introductions loading, then none left                | Pulse only while loading                            |
+| "Something felt off" sheet     | Tapping the entry point anywhere                     | Every time, never queued behind other motion        |
+| Go: open to meet               | Confirming Go at a supported public event or zone    | Once per Go session                                 |
+| Go: someone is available       | Server has reserved both people for one introduction | Once per offer, with one haptic tick                |
+| Nearby off (Ghost)             | Tapping Stop, or the Go session expiring             | Every time; clears the UI before the server answers |
 
 ## Rules (these are requirements, not suggestions)
 
@@ -57,12 +60,28 @@ its script.
 9. Keep WCAG 2.2 AA and 44px touch targets. Motion must not move focus
    unexpectedly; the sheet traps focus while open and returns it on close.
 
+## Go mode and Nearby off (spec Parts 7 and 8)
+
+The last three moments belong to Go mode, which is M6. Do not build them
+before M6; the Explore moments can be integrated on their own first.
+
+10. The Go map shows public places only. Never draw a member as a dot, never
+    show a count of compatible people, distance, a proximity meter, a radar
+    sweep or an arrow toward a person, and never reward movement.
+11. Time left in a Go session updates as plain text. No animated countdown.
+12. Nearby off is the fastest transition in the app (`--mw-dur-press`). Clear
+    the map, status and any unaccepted nearby card locally at once, without
+    waiting for the server, then show the confirmation sentence. If the device
+    is offline, show the pending state the spec describes; do not animate it.
+13. Nearby never turns itself back on, so there is no "returning" animation.
+14. Use "Nearby off" as the control label; "Ghost" is optional brand language.
+
 ## Suggested integration steps
 
 1. Copy the declarations from `motion-tokens.css` into
    `apps/web/app/globals.css`. Check the global `button` rule does not fight
    existing button styles; scope it if it does.
-2. Apply the sequences to the real components for the seven moments above,
+2. Apply the sequences to the real components for the ten moments above,
    preferring CSS transitions/animations over a JS animation library.
 3. Add a Playwright run with `reducedMotion: 'reduce'` covering onboarding,
    decision, plan confirmation and the safety sheet, asserting the flows
