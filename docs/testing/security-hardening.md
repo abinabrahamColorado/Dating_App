@@ -56,7 +56,8 @@ Full required `corepack pnpm check` passed on 2026-11-11: typecheck, lint,
 formatting, **46 unit/property/architecture + 74 real PostgreSQL integration +
 18 Chromium/axe tests = 138**, plus the production build. All existing M0–M4
 workflows pass under the CSP. The production dependency audit found no advisories.
-Final published-head CI is recorded on the PR before handoff. Setup PR #10 is
+Final published-head CI is recorded on
+[PR #11](https://github.com/abinabrahamColorado/Dating_App/pull/11) before handoff. Setup PR #10 is
 separate and is not included in this branch.
 
 DEC-050/051 record the scope and protective choices. Existing enrollment remains

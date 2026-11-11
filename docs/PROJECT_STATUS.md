@@ -11,20 +11,24 @@ Main CI [42974176138](https://github.com/abinabrahamColorado/Dating_App/actions/
 passed `verify`, `windows` and `dev-services`. No M5 is authorized.
 
 Setup [PR #10](https://github.com/abinabrahamColorado/Dating_App/pull/10) is separate,
-unmerged and green at `21f3f9caa3fea0cb913336f39d2a1f5d7042f442`. It records the
+unmerged; all checks passed at `21f3f9caa3fea0cb913336f39d2a1f5d7042f442` and its
+documentation follow-up is recorded on that PR. It records the
 authoritative E: project folder, Astra/Extra High project defaults, pinned Node/
 Corepack/pnpm and the prepared main ruleset. Browser authentication is still needed
 to activate the ruleset. Full Access remains unchanged pending the permissions
 tradeoff decision. The current chat's historical starting directory is not the
 repository; every development command explicitly uses the permanent checkout.
 
-`codex/security-hardening` starts from merged main independently of PR #10. It adds
+`codex/security-hardening` is published as
+[PR #11](https://github.com/abinabrahamColorado/Dating_App/pull/11), from merged
+main independently of PR #10. It adds
 nonce CSP/HSTS, strict nonlocal startup/SMTP checks, secret/dependency CI, local
 privacy-limited monitoring and encrypted backup/fresh-restore tools. See DEC-050/051,
 [checklist](security/checklist.md) and [verification](testing/security-hardening.md).
 Full `corepack pnpm check` passes: 46 unit/property/architecture, 74 real PostgreSQL
 integration and 18 Chromium/axe tests (138 total), plus typecheck/lint/format/build.
-The production dependency audit is clean; publication/CI verification is next. External alerting,
+The production dependency audit and full-history secret scan are clean. Final
+published-head CI and its run links are recorded on PR #11 before handoff. External alerting,
 hosting controls and M5 deletion replay remain open. Do not merge this work yet.
 
 M3 PR #6 merged after the
