@@ -24,7 +24,8 @@ jobs:
         with:
           node-version-file: .node-version
           cache: pnpm
-      - run: npm install --global corepack@0.35.0
+      # Disposable runner: replace preinstalled Yarn/Corepack shims consistently.
+      - run: npm install --global corepack@0.35.0 --force
       - run: corepack pnpm check:toolchain
       - run: corepack pnpm install --frozen-lockfile
       - name: Set up project-local Windows services
@@ -36,7 +37,10 @@ jobs:
       - run: corepack pnpm check
       - name: Stop services and preserve local data
         if: always()
-        run: corepack pnpm services:windows:stop
+        run: |
+          if (Test-Path .local/tools/pgsql/bin/pg_ctl.exe) {
+            corepack pnpm services:windows:stop
+          }
   dev-services:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -78,7 +82,7 @@ jobs:
         with:
           node-version-file: .node-version
           cache: pnpm
-      - run: npm install --global corepack@0.35.0
+      - run: npm install --global corepack@0.35.0 --force
       - run: corepack pnpm check:toolchain
       - run: corepack pnpm install --frozen-lockfile
       - name: Start private object storage and development mailbox
