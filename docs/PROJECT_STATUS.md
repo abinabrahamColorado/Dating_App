@@ -18,8 +18,17 @@ The founder approved merging PR #8 on 2026-11-11. It merged at
 passed `verify`, `windows`, and `dev-services` after the merge.
 The setup branch is based on that M4 baseline and changes development controls only.
 
-The next authorized work is finishing setup verification and the separate scoped
-security hardening PR. Neither new PR may merge without approval. Do not start M5.
+Setup [PR #10](https://github.com/abinabrahamColorado/Dating_App/pull/10) passed all
+six CI checks at `21f3f9c`; final documentation-follow-up CI is linked on the PR.
+The separate scoped security hardening is published as
+[PR #11](https://github.com/abinabrahamColorado/Dating_App/pull/11), with 138 local
+tests passing; its final published-head CI is linked there. Neither PR may merge
+without approval. Do not start M5.
+Main rules remain inactive pending GitHub sign-in in the in-app tab. Workspace
+access with Approve for me remains a recommendation, not a verified permission
+profile: the current chat still has Full Access/never. The app controls could not
+be re-inspected while the native windows were minimized; follow the documented
+composer steps after this run, then verify a full check under the chosen profile.
 No research build card is authorized.
 See [development setup](DEVELOPMENT_SETUP.md) and DEC-049 for settings evidence,
 remaining UI actions and permissions tradeoffs.

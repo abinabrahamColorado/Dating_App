@@ -60,7 +60,7 @@ contents safe to print or upload. Keep all development records synthetic.
 
 ## GitHub workflow and evidence
 
-The repository is **public**, unchanged. `main` was verified at `010a80b`, with
+The repository is **public**, unchanged. `main` was rechecked at `cc6ecf1`, with
 `protected: false` and no repository rulesets. The connector can work with PRs but
 cannot administer branch protections. Its successful CI check contexts are exactly
 **verify**, **windows**, and **dev-services**, all produced by **GitHub Actions**
@@ -69,6 +69,9 @@ cannot administer branch protections. Its successful CI check contexts are exact
 The authorized target configuration is prepared in
 `docs/operations/main-ruleset.json`; this file alone does not activate protection.
 The browser session was signed out, so activation requires repository-owner sign-in.
+On 2026-11-11 the founder offered to sign in; the open in-app tab still showed
+GitHub's login page and the API still returned no rulesets. No protection is
+claimed active. The connector has no repository-settings write capability.
 
 After sign-in, use repository **Settings → Rules → Rulesets → New branch ruleset**:
 
@@ -121,6 +124,14 @@ reinstalled after its cache was missing. Local services were stopped afterwards.
 
 Finish setup verification and the separate authorized security hardening PR.
 Neither new PR may merge without founder approval. M5 is not authorized.
+Setup [PR #10](https://github.com/abinabrahamColorado/Dating_App/pull/10) passed all
+six checks at `21f3f9c` in runs
+[42975378791](https://github.com/abinabrahamColorado/Dating_App/actions/runs/42975378791)
+and [42975372656](https://github.com/abinabrahamColorado/Dating_App/actions/runs/42975372656).
+This documentation follow-up records the remaining sign-in/permissions limitations;
+inspect PR #10 for its final head and check results. Separate security hardening is
+[PR #11](https://github.com/abinabrahamColorado/Dating_App/pull/11), based on main;
+its code is not included here.
 M5 retention/deletion/tombstone replay, staffed safety operations,
 real venue review and release privacy/accessibility gates remain outstanding.
 No real users, Go, deployment or algorithm research build card is authorized here.
