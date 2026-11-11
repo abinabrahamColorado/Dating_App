@@ -9,10 +9,10 @@ Integrator: Codex, in a separate PR, when the founder asks for it.
 
 ## What is here
 
-| File | Purpose |
-| --- | --- |
-| `preview.html` | Open in a browser. A phone mock-up that plays each animation, with slow-motion and reduced-motion switches. The table beside the phone is generated from the same numbers the phone plays, so it is the source of truth for per-element values. |
-| `motion-tokens.css` | The only durations, easing curves and distances the app may use. |
+| File                | Purpose                                                                                                                                                                                                                                         |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `preview.html`      | Open in a browser. A phone mock-up that plays each animation, with slow-motion and reduced-motion switches. The table beside the phone is generated from the same numbers the phone plays, so it is the source of truth for per-element values. |
+| `motion-tokens.css` | The only durations, easing curves and distances the app may use.                                                                                                                                                                                |
 
 The mock-up inside `preview.html` is illustrative. Its names, venue, copy and
 markup are placeholders: **do not copy its HTML or copy text into the app.**
@@ -28,15 +28,15 @@ Sequence values (element, property change, duration, delay, easing) are in the
 table shown for each moment in `preview.html`, and in the `MOMENTS` array in
 its script.
 
-| Moment | Trigger | Plays |
-| --- | --- | --- |
-| Introduction arrives | First time an introduction is shown | Once per introduction |
-| Private answer (accept / pass) | Tapping either decision button | Once; the decision is final |
-| Mutual match | First open after both answers are yes | Once per pair |
-| Plan confirmed | Second person confirms the same plan version | Once per confirmed plan version |
-| Onboarding step change | Continue / Back with a valid answer | Every step; Back mirrors the direction |
-| Loading and empty week | Introductions loading, then none left | Pulse only while loading |
-| "Something felt off" sheet | Tapping the entry point anywhere | Every time, never queued behind other motion |
+| Moment                         | Trigger                                      | Plays                                        |
+| ------------------------------ | -------------------------------------------- | -------------------------------------------- |
+| Introduction arrives           | First time an introduction is shown          | Once per introduction                        |
+| Private answer (accept / pass) | Tapping either decision button               | Once; the decision is final                  |
+| Mutual match                   | First open after both answers are yes        | Once per pair                                |
+| Plan confirmed                 | Second person confirms the same plan version | Once per confirmed plan version              |
+| Onboarding step change         | Continue / Back with a valid answer          | Every step; Back mirrors the direction       |
+| Loading and empty week         | Introductions loading, then none left        | Pulse only while loading                     |
+| "Something felt off" sheet     | Tapping the entry point anywhere             | Every time, never queued behind other motion |
 
 ## Rules (these are requirements, not suggestions)
 

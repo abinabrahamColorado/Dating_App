@@ -1,479 +1,1465 @@
 <!doctype html>
 <!-- Design reference only. Not part of the app build. See README.md in this folder. -->
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Meetwell Motion Preview</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<style>
-/* Layout: moment list | phone you can tap | the exact values that just played. Stacks to one column on a phone. */
-:root {
-  --bg: #ece9df; --surface: #f7f5ee; --fg: #1f2f2a; --muted: #5d6a64; --line: #cfcabb;
-  --accent: #590907; --accent-fg: #f7f5ee; --code-bg: #e3dfd2;
-  /* the app inside the phone keeps its own fixed look in both themes */
-  --app-paper: #f7f5ee; --app-ink: #243f37; --app-soft: #5f6e68; --app-line: #ddd8c8;
-  --app-cream: #e8d2b5; --app-burgundy: #590907; --app-sage: #a5a79b; --app-card: #fffdf7;
-  --display: "Newsreader", Georgia, "Times New Roman", serif;
-  --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
-}
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #151a18; --surface: #1d2421; --fg: #e9e6dc; --muted: #a2aaa4; --line: #343d39;
-  --accent: #e0a09b; --accent-fg: #1d1211; --code-bg: #232b28; color-scheme: dark } }
-:root[data-theme="dark"] {
-  --bg: #151a18; --surface: #1d2421; --fg: #e9e6dc; --muted: #a2aaa4; --line: #343d39;
-  --accent: #e0a09b; --accent-fg: #1d1211; --code-bg: #232b28; color-scheme: dark }
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Meetwell Motion Preview</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    />
+    <style>
+      /* Layout: moment list | phone you can tap | the exact values that just played. Stacks to one column on a phone. */
+      :root {
+        --bg: #ece9df;
+        --surface: #f7f5ee;
+        --fg: #1f2f2a;
+        --muted: #5d6a64;
+        --line: #cfcabb;
+        --accent: #590907;
+        --accent-fg: #f7f5ee;
+        --code-bg: #e3dfd2;
+        /* the app inside the phone keeps its own fixed look in both themes */
+        --app-paper: #f7f5ee;
+        --app-ink: #243f37;
+        --app-soft: #5f6e68;
+        --app-line: #ddd8c8;
+        --app-cream: #e8d2b5;
+        --app-burgundy: #590907;
+        --app-sage: #a5a79b;
+        --app-card: #fffdf7;
+        --display: 'Newsreader', Georgia, 'Times New Roman', serif;
+        --body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+        --mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) {
+          --bg: #151a18;
+          --surface: #1d2421;
+          --fg: #e9e6dc;
+          --muted: #a2aaa4;
+          --line: #343d39;
+          --accent: #e0a09b;
+          --accent-fg: #1d1211;
+          --code-bg: #232b28;
+          color-scheme: dark;
+        }
+      }
+      :root[data-theme='dark'] {
+        --bg: #151a18;
+        --surface: #1d2421;
+        --fg: #e9e6dc;
+        --muted: #a2aaa4;
+        --line: #343d39;
+        --accent: #e0a09b;
+        --accent-fg: #1d1211;
+        --code-bg: #232b28;
+        color-scheme: dark;
+      }
 
-* { box-sizing: border-box }
-body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.5 }
-.page { max-width: 1180px; margin: 0 auto; padding-block: 28px 56px;
-  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  display: flex; flex-direction: column; gap: 28px }
-h1, h2, h3 { font-family: var(--display); font-weight: 500; margin: 0; text-wrap: balance; letter-spacing: -0.01em }
-h1 { font-size: 34px; line-height: 1.1 }
-h2 { font-size: 24px; line-height: 1.2 }
-h3 { font-size: 17px }
-p { margin: 0 }
-.lede { color: var(--muted); max-width: 62ch; margin-top: 8px }
-button { font: inherit; color: inherit; cursor: pointer }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.5;
+      }
+      .page {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding-block: 28px 56px;
+        padding-left: max(16px, env(safe-area-inset-left, 0px));
+        padding-right: max(16px, env(safe-area-inset-right, 0px));
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: var(--display);
+        font-weight: 500;
+        margin: 0;
+        text-wrap: balance;
+        letter-spacing: -0.01em;
+      }
+      h1 {
+        font-size: 34px;
+        line-height: 1.1;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.2;
+      }
+      h3 {
+        font-size: 17px;
+      }
+      p {
+        margin: 0;
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 62ch;
+        margin-top: 8px;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+        cursor: pointer;
+      }
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
 
-.work { display: grid; grid-template-columns: 210px 320px minmax(0, 1fr); gap: 32px; align-items: start }
-.moments { display: flex; flex-direction: column; gap: 4px }
-.moments button { text-align: left; background: none; border: 0; border-left: 2px solid var(--line); padding: 9px 12px; min-height: 44px; color: var(--muted) }
-.moments button[aria-pressed="true"] { border-left-color: var(--accent); color: var(--fg); font-weight: 600 }
-.moments button:hover { color: var(--fg) }
+      .work {
+        display: grid;
+        grid-template-columns: 210px 320px minmax(0, 1fr);
+        gap: 32px;
+        align-items: start;
+      }
+      .moments {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .moments button {
+        text-align: left;
+        background: none;
+        border: 0;
+        border-left: 2px solid var(--line);
+        padding: 9px 12px;
+        min-height: 44px;
+        color: var(--muted);
+      }
+      .moments button[aria-pressed='true'] {
+        border-left-color: var(--accent);
+        color: var(--fg);
+        font-weight: 600;
+      }
+      .moments button:hover {
+        color: var(--fg);
+      }
 
-.stagecol { display: flex; flex-direction: column; gap: 14px; align-items: center }
-.controls { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center }
-.controls button { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 14px; min-height: 40px; font-size: 13px }
-.controls button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg) }
-.controls .replay { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); font-weight: 600 }
-.hint { font-size: 13px; color: var(--muted); text-align: center; min-height: 20px }
+      .stagecol {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        align-items: center;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+      }
+      .controls button {
+        border: 1px solid var(--line);
+        background: var(--surface);
+        border-radius: 999px;
+        padding: 8px 14px;
+        min-height: 40px;
+        font-size: 13px;
+      }
+      .controls button[aria-pressed='true'] {
+        background: var(--fg);
+        color: var(--bg);
+        border-color: var(--fg);
+      }
+      .controls .replay {
+        background: var(--accent);
+        color: var(--accent-fg);
+        border-color: var(--accent);
+        font-weight: 600;
+      }
+      .hint {
+        font-size: 13px;
+        color: var(--muted);
+        text-align: center;
+        min-height: 20px;
+      }
 
-/* ---------- phone ---------- */
-.phone { width: 300px; max-width: 100%; height: 590px; border: 9px solid #1a2421; border-radius: 40px; background: var(--app-paper); overflow: hidden; position: relative; box-shadow: 0 18px 40px -22px rgba(0,0,0,.55) }
-.screen { position: absolute; inset: 0; color: var(--app-ink); font-size: 13.5px; line-height: 1.4; display: flex; flex-direction: column; padding: 18px 16px 16px; gap: 14px; overflow: hidden }
-.screen .bar { display: flex; justify-content: space-between; align-items: baseline; position: relative; z-index: 1 }
-.screen .brand { font-family: var(--display); font-size: 18px; font-weight: 600 }
-.screen .tiny { font-size: 11.5px; color: var(--app-soft) }
-.screen h4 { font-family: var(--display); font-weight: 500; font-size: 23px; line-height: 1.15; margin: 0; letter-spacing: -0.01em }
-.pre { opacity: 0 }
-.abtn { border: 0; border-radius: 12px; min-height: 44px; padding: 10px 14px; font-weight: 600; font-size: 13.5px; width: 100%; background: var(--app-ink); color: var(--app-paper); transition: transform 80ms cubic-bezier(.4,0,.2,1) }
-.abtn:active { transform: scale(.98) }
-.abtn.ghost { background: transparent; color: var(--app-ink); border: 1px solid var(--app-sage) }
-.abtn.warm { background: var(--app-burgundy); color: var(--app-paper) }
-.abtn.link { background: none; color: var(--app-soft); font-weight: 500; text-decoration: underline; min-height: 44px }
+      /* ---------- phone ---------- */
+      .phone {
+        width: 300px;
+        max-width: 100%;
+        height: 590px;
+        border: 9px solid #1a2421;
+        border-radius: 40px;
+        background: var(--app-paper);
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.55);
+      }
+      .screen {
+        position: absolute;
+        inset: 0;
+        color: var(--app-ink);
+        font-size: 13.5px;
+        line-height: 1.4;
+        display: flex;
+        flex-direction: column;
+        padding: 18px 16px 16px;
+        gap: 14px;
+        overflow: hidden;
+      }
+      .screen .bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        position: relative;
+        z-index: 1;
+      }
+      .screen .brand {
+        font-family: var(--display);
+        font-size: 18px;
+        font-weight: 600;
+      }
+      .screen .tiny {
+        font-size: 11.5px;
+        color: var(--app-soft);
+      }
+      .screen h4 {
+        font-family: var(--display);
+        font-weight: 500;
+        font-size: 23px;
+        line-height: 1.15;
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+      .pre {
+        opacity: 0;
+      }
+      .abtn {
+        border: 0;
+        border-radius: 12px;
+        min-height: 44px;
+        padding: 10px 14px;
+        font-weight: 600;
+        font-size: 13.5px;
+        width: 100%;
+        background: var(--app-ink);
+        color: var(--app-paper);
+        transition: transform 80ms cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .abtn:active {
+        transform: scale(0.98);
+      }
+      .abtn.ghost {
+        background: transparent;
+        color: var(--app-ink);
+        border: 1px solid var(--app-sage);
+      }
+      .abtn.warm {
+        background: var(--app-burgundy);
+        color: var(--app-paper);
+      }
+      .abtn.link {
+        background: none;
+        color: var(--app-soft);
+        font-weight: 500;
+        text-decoration: underline;
+        min-height: 44px;
+      }
 
-.card { background: var(--app-card); border: 1px solid var(--app-line); border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 12px }
-.who { display: flex; gap: 12px; align-items: center }
-.face { width: 54px; height: 54px; border-radius: 16px; background: var(--app-cream); color: var(--app-burgundy); display: grid; place-items: center; font-family: var(--display); font-size: 26px; flex: none }
-.who b { font-family: var(--display); font-size: 19px; font-weight: 500; display: block }
-.why { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px }
-.why li { background: var(--app-paper); border-radius: 10px; padding: 8px 10px; font-size: 12.5px }
-.slot { display: grid }
-.slot > * { grid-area: 1 / 1 }
-.actions { display: flex; flex-direction: column; gap: 8px }
-.status { align-self: center; text-align: center; font-size: 13px; padding: 10px }
-.status b { font-family: var(--display); font-size: 17px; font-weight: 500; display: block; margin-bottom: 2px }
-.center-note { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; padding: 28px; gap: 6px; pointer-events: none }
-.center-note b { font-family: var(--display); font-size: 21px; font-weight: 500 }
+      .card {
+        background: var(--app-card);
+        border: 1px solid var(--app-line);
+        border-radius: 18px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .who {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .face {
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
+        background: var(--app-cream);
+        color: var(--app-burgundy);
+        display: grid;
+        place-items: center;
+        font-family: var(--display);
+        font-size: 26px;
+        flex: none;
+      }
+      .who b {
+        font-family: var(--display);
+        font-size: 19px;
+        font-weight: 500;
+        display: block;
+      }
+      .why {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .why li {
+        background: var(--app-paper);
+        border-radius: 10px;
+        padding: 8px 10px;
+        font-size: 12.5px;
+      }
+      .slot {
+        display: grid;
+      }
+      .slot > * {
+        grid-area: 1 / 1;
+      }
+      .actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .status {
+        align-self: center;
+        text-align: center;
+        font-size: 13px;
+        padding: 10px;
+      }
+      .status b {
+        font-family: var(--display);
+        font-size: 17px;
+        font-weight: 500;
+        display: block;
+        margin-bottom: 2px;
+      }
+      .center-note {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-content: center;
+        text-align: center;
+        padding: 28px;
+        gap: 6px;
+        pointer-events: none;
+      }
+      .center-note b {
+        font-family: var(--display);
+        font-size: 21px;
+        font-weight: 500;
+      }
 
-.warm-wash { position: absolute; inset: 0; background: var(--app-cream) }
-.mutual { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; color: var(--app-burgundy) }
-.pair { display: flex }
-.pair .av { width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; font-family: var(--display); font-size: 32px; border: 3px solid var(--app-cream) }
-.pair .av-a { background: var(--app-burgundy); color: var(--app-cream) }
-.pair .av-b { background: var(--app-paper); color: var(--app-burgundy); margin-left: -14px }
-.mutual h4 { font-size: 28px }
-.mutual p { color: #4a2a22; max-width: 22ch }
-.mutual .abtn { margin-top: 10px }
+      .warm-wash {
+        position: absolute;
+        inset: 0;
+        background: var(--app-cream);
+      }
+      .mutual {
+        position: relative;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        text-align: center;
+        color: var(--app-burgundy);
+      }
+      .pair {
+        display: flex;
+      }
+      .pair .av {
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-family: var(--display);
+        font-size: 32px;
+        border: 3px solid var(--app-cream);
+      }
+      .pair .av-a {
+        background: var(--app-burgundy);
+        color: var(--app-cream);
+      }
+      .pair .av-b {
+        background: var(--app-paper);
+        color: var(--app-burgundy);
+        margin-left: -14px;
+      }
+      .mutual h4 {
+        font-size: 28px;
+      }
+      .mutual p {
+        color: #4a2a22;
+        max-width: 22ch;
+      }
+      .mutual .abtn {
+        margin-top: 10px;
+      }
 
-.stage2 { position: relative; height: 170px }
-.rows { display: flex; flex-direction: column; gap: 10px; padding-top: 26px }
-.chip { border: 1px solid var(--app-line); background: var(--app-card); border-radius: 999px; padding: 10px 14px; display: flex; gap: 8px; align-items: center; font-weight: 500 }
-.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--app-ink); flex: none }
-.plan-card { position: absolute; inset: 0; background: var(--app-ink); color: var(--app-paper); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 4px; justify-content: center }
-.plan-card .top { display: flex; align-items: center; gap: 8px; font-family: var(--display); font-size: 21px }
-.plan-card svg { width: 22px; height: 22px; flex: none }
-.plan-card path { fill: none; stroke: var(--app-cream); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 24; stroke-dashoffset: 0 }
-.plan-card .when { font-weight: 600; margin-top: 6px }
-.plan-card .where { color: #c9d2cc; font-size: 12.5px }
+      .stage2 {
+        position: relative;
+        height: 170px;
+      }
+      .rows {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding-top: 26px;
+      }
+      .chip {
+        border: 1px solid var(--app-line);
+        background: var(--app-card);
+        border-radius: 999px;
+        padding: 10px 14px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-weight: 500;
+      }
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--app-ink);
+        flex: none;
+      }
+      .plan-card {
+        position: absolute;
+        inset: 0;
+        background: var(--app-ink);
+        color: var(--app-paper);
+        border-radius: 18px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        justify-content: center;
+      }
+      .plan-card .top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--display);
+        font-size: 21px;
+      }
+      .plan-card svg {
+        width: 22px;
+        height: 22px;
+        flex: none;
+      }
+      .plan-card path {
+        fill: none;
+        stroke: var(--app-cream);
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-dasharray: 24;
+        stroke-dashoffset: 0;
+      }
+      .plan-card .when {
+        font-weight: 600;
+        margin-top: 6px;
+      }
+      .plan-card .where {
+        color: #c9d2cc;
+        font-size: 12.5px;
+      }
 
-.track { height: 5px; background: var(--app-line); border-radius: 3px; overflow: hidden }
-.fill { height: 100%; width: 100%; background: var(--app-ink); transform-origin: left center; transform: scaleX(.333) }
-.steps { display: grid; flex: 1 }
-.steps > div { grid-area: 1 / 1; display: flex; flex-direction: column; gap: 12px }
-.opts { display: flex; flex-wrap: wrap; gap: 7px }
-.opts span { border: 1px solid var(--app-sage); border-radius: 999px; padding: 7px 11px; font-size: 12.5px }
-.opts span.on { background: var(--app-ink); color: var(--app-paper); border-color: var(--app-ink) }
-.push { margin-top: auto }
+      .track {
+        height: 5px;
+        background: var(--app-line);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .fill {
+        height: 100%;
+        width: 100%;
+        background: var(--app-ink);
+        transform-origin: left center;
+        transform: scaleX(0.333);
+      }
+      .steps {
+        display: grid;
+        flex: 1;
+      }
+      .steps > div {
+        grid-area: 1 / 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .opts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+      }
+      .opts span {
+        border: 1px solid var(--app-sage);
+        border-radius: 999px;
+        padding: 7px 11px;
+        font-size: 12.5px;
+      }
+      .opts span.on {
+        background: var(--app-ink);
+        color: var(--app-paper);
+        border-color: var(--app-ink);
+      }
+      .push {
+        margin-top: auto;
+      }
 
-.skel-wrap { display: flex; flex-direction: column; gap: 10px; position: absolute; left: 16px; right: 16px; top: 96px }
-.skel { background: var(--app-line); border-radius: 12px; height: 16px }
-.skel.big { height: 130px; border-radius: 18px }
-.skel.w60 { width: 60% } .skel.w40 { width: 40% }
+      .skel-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        top: 96px;
+      }
+      .skel {
+        background: var(--app-line);
+        border-radius: 12px;
+        height: 16px;
+      }
+      .skel.big {
+        height: 130px;
+        border-radius: 18px;
+      }
+      .skel.w60 {
+        width: 60%;
+      }
+      .skel.w40 {
+        width: 40%;
+      }
 
-.scrim { position: absolute; inset: 0; background: rgba(26,36,33,.45); pointer-events: none }
-.sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--app-paper); border-radius: 22px 22px 0 0; padding: 10px 16px 16px; display: flex; flex-direction: column; gap: 8px; transform: translateY(100%) }
-.sheet .grab { width: 36px; height: 4px; border-radius: 2px; background: var(--app-sage); align-self: center; margin-bottom: 6px }
-.sheet .opt { border: 1px solid var(--app-line); background: var(--app-card); border-radius: 12px; padding: 11px 12px; min-height: 44px; display: flex; align-items: center }
+      .scrim {
+        position: absolute;
+        inset: 0;
+        background: rgba(26, 36, 33, 0.45);
+        pointer-events: none;
+      }
+      .sheet {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--app-paper);
+        border-radius: 22px 22px 0 0;
+        padding: 10px 16px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        transform: translateY(100%);
+      }
+      .sheet .grab {
+        width: 36px;
+        height: 4px;
+        border-radius: 2px;
+        background: var(--app-sage);
+        align-self: center;
+        margin-bottom: 6px;
+      }
+      .sheet .opt {
+        border: 1px solid var(--app-line);
+        background: var(--app-card);
+        border-radius: 12px;
+        padding: 11px 12px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+      }
 
-/* ---------- spec ---------- */
-.spec { display: flex; flex-direction: column; gap: 18px; min-width: 0 }
-.spec .sum { color: var(--muted); max-width: 60ch; margin-top: 6px }
-.meta { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 0; font-size: 14px }
-.meta dt { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; padding-top: 2px }
-.meta dd { margin: 0 }
-.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface) }
-table { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 520px }
-th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top }
-tr:last-child td { border-bottom: 0 }
-th { font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted) }
-td.v, .mono { font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums }
-th, td { padding-inline: 10px }
-caption { text-align: left; padding: 10px 12px 2px; font-weight: 600; caption-side: top }
+      /* ---------- spec ---------- */
+      .spec {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        min-width: 0;
+      }
+      .spec .sum {
+        color: var(--muted);
+        max-width: 60ch;
+        margin-top: 6px;
+      }
+      .meta {
+        display: grid;
+        grid-template-columns: max-content minmax(0, 1fr);
+        gap: 6px 16px;
+        margin: 0;
+        font-size: 14px;
+      }
+      .meta dt {
+        color: var(--muted);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding-top: 2px;
+      }
+      .meta dd {
+        margin: 0;
+      }
+      .tablewrap {
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--surface);
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 13px;
+        min-width: 520px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      th {
+        font-weight: 600;
+        font-size: 11.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+      }
+      td.v,
+      .mono {
+        font-family: var(--mono);
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+      }
+      th,
+      td {
+        padding-inline: 10px;
+      }
+      caption {
+        text-align: left;
+        padding: 10px 12px 2px;
+        font-weight: 600;
+        caption-side: top;
+      }
 
-.lower { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 32px; border-top: 1px solid var(--line); padding-top: 28px }
-.lower > section { display: flex; flex-direction: column; gap: 12px; min-width: 0 }
-.codehead { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap }
-.copy { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 12px; min-height: 36px; font-size: 13px }
-pre { margin: 0; background: var(--code-bg); border-radius: 10px; padding: 14px; overflow-x: auto; font-family: var(--mono); font-size: 12px; line-height: 1.55; user-select: all }
-.rules { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 8px; max-width: 60ch }
+      .lower {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+        gap: 32px;
+        border-top: 1px solid var(--line);
+        padding-top: 28px;
+      }
+      .lower > section {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 0;
+      }
+      .codehead {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .copy {
+        border: 1px solid var(--line);
+        background: var(--surface);
+        border-radius: 8px;
+        padding: 7px 12px;
+        min-height: 36px;
+        font-size: 13px;
+      }
+      pre {
+        margin: 0;
+        background: var(--code-bg);
+        border-radius: 10px;
+        padding: 14px;
+        overflow-x: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        line-height: 1.55;
+        user-select: all;
+      }
+      .rules {
+        margin: 0;
+        padding-left: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-width: 60ch;
+      }
 
-@media (max-width: 980px) {
-  .work { grid-template-columns: minmax(0, 1fr) }
-  .moments { flex-direction: row; flex-wrap: wrap; gap: 6px }
-  .moments button { border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px }
-  .moments button[aria-pressed="true"] { border-color: var(--accent) }
-  .lower { grid-template-columns: minmax(0, 1fr) }
-  h1 { font-size: 28px }
-}
-</style>
-</head>
-<body style="margin:0">
+      @media (max-width: 980px) {
+        .work {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .moments {
+          flex-direction: row;
+          flex-wrap: wrap;
+          gap: 6px;
+        }
+        .moments button {
+          border: 1px solid var(--line);
+          border-radius: 999px;
+          padding: 8px 14px;
+        }
+        .moments button[aria-pressed='true'] {
+          border-color: var(--accent);
+        }
+        .lower {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        h1 {
+          font-size: 28px;
+        }
+      }
+    </style>
+  </head>
+  <body style="margin: 0">
+    <div class="page">
+      <header>
+        <h1>Meetwell motion</h1>
+        <p class="lede">
+          Seven moments in the app, each playing with the exact values listed beside it. Pick a
+          moment, tap inside the phone where it asks, and use slow motion to study it. The table is
+          generated from the same numbers the phone plays.
+        </p>
+      </header>
 
-<div class="page">
-  <header>
-    <h1>Meetwell motion</h1>
-    <p class="lede">Seven moments in the app, each playing with the exact values listed beside it. Pick a moment, tap inside the phone where it asks, and use slow motion to study it. The table is generated from the same numbers the phone plays.</p>
-  </header>
+      <div class="work">
+        <nav class="moments" id="moments" aria-label="Moments"></nav>
 
-  <div class="work">
-    <nav class="moments" id="moments" aria-label="Moments"></nav>
+        <div class="stagecol">
+          <div class="phone"><div class="screen" id="screen"></div></div>
+          <p class="hint" id="hint"></p>
+          <div class="controls">
+            <button class="replay" id="replay" type="button">Replay</button>
+            <button id="slow" type="button" aria-pressed="false">Slow motion ¼×</button>
+            <button id="reduced" type="button" aria-pressed="false">Reduced motion</button>
+          </div>
+        </div>
 
-    <div class="stagecol">
-      <div class="phone"><div class="screen" id="screen"></div></div>
-      <p class="hint" id="hint"></p>
-      <div class="controls">
-        <button class="replay" id="replay" type="button">Replay</button>
-        <button id="slow" type="button" aria-pressed="false">Slow motion ¼×</button>
-        <button id="reduced" type="button" aria-pressed="false">Reduced motion</button>
+        <section class="spec" id="spec" aria-live="polite"></section>
+      </div>
+
+      <div class="lower">
+        <section>
+          <div class="codehead">
+            <h2>Tokens for the app</h2>
+            <button class="copy" id="copy" type="button">Copy tokens</button>
+          </div>
+          <p class="lede" style="margin: 0">
+            Every animation above uses only these durations, curves and distances. Put them in
+            <span class="mono">globals.css</span> and reference them by name.
+          </p>
+          <pre id="tokens"></pre>
+        </section>
+        <section>
+          <h2>What motion never does here</h2>
+          <ul class="rules">
+            <li>
+              Nothing moves sideways on a decision. Yes and no leave the same quiet way, so neither
+              feels like a swipe.
+            </li>
+            <li>
+              No confetti, hearts, bounces, shakes, counters ticking up, or sound. The mutual screen
+              is the only warm moment and it plays once.
+            </li>
+            <li>
+              Nothing loops to hold attention. The loading pulse is the only repeating motion and it
+              stops the moment content arrives.
+            </li>
+            <li>
+              Motion only follows a real change of state: something arrived, you decided, a plan was
+              confirmed. Nothing animates to invite another tap.
+            </li>
+            <li>Nothing takes longer than 600ms, and no animation blocks a tap while it plays.</li>
+            <li>
+              With reduced motion on, positions jump and only opacity fades, in 150ms or less.
+            </li>
+          </ul>
+        </section>
       </div>
     </div>
 
-    <section class="spec" id="spec" aria-live="polite"></section>
-  </div>
-
-  <div class="lower">
-    <section>
-      <div class="codehead">
-        <h2>Tokens for the app</h2>
-        <button class="copy" id="copy" type="button">Copy tokens</button>
-      </div>
-      <p class="lede" style="margin:0">Every animation above uses only these durations, curves and distances. Put them in <span class="mono">globals.css</span> and reference them by name.</p>
-      <pre id="tokens"></pre>
-    </section>
-    <section>
-      <h2>What motion never does here</h2>
-      <ul class="rules">
-        <li>Nothing moves sideways on a decision. Yes and no leave the same quiet way, so neither feels like a swipe.</li>
-        <li>No confetti, hearts, bounces, shakes, counters ticking up, or sound. The mutual screen is the only warm moment and it plays once.</li>
-        <li>Nothing loops to hold attention. The loading pulse is the only repeating motion and it stops the moment content arrives.</li>
-        <li>Motion only follows a real change of state: something arrived, you decided, a plan was confirmed. Nothing animates to invite another tap.</li>
-        <li>Nothing takes longer than 600ms, and no animation blocks a tap while it plays.</li>
-        <li>With reduced motion on, positions jump and only opacity fades, in 150ms or less.</li>
-      </ul>
-    </section>
-  </div>
-</div>
-
-<script>
-(function () {
-  var DUR = { press: 80, exit: 160, fade: 240, move: 320, settle: 420, warm: 600, pulse: 1400 };
-  var EASE = {
-    settle: 'cubic-bezier(0.22, 1, 0.36, 1)',
-    standard: 'cubic-bezier(0.4, 0, 0.2, 1)',
-    exit: 'cubic-bezier(0.4, 0, 1, 1)'
-  };
-  var FADE = [0, 1], OUT = [1, 0];
-  function up(px) { return ['translateY(' + px + 'px)', 'none']; }
-
-  function introCard() {
-    return '<div class="bar"><span class="brand">Meetwell</span><span class="tiny">1 of 3 this week</span></div>' +
-      '<div class="card"><div class="who"><div class="face">M</div><div><b>Maya, 26</b><span class="tiny">Lower East Side</span></div></div>' +
-      '<ul class="why"><li>You both climb at the same gym in Long Island City</li><li>You both like slow Sunday mornings</li><li>You are both free Thursday evenings</li></ul>' +
-      '<div class="slot"><div class="actions"><button class="abtn" data-run="accept" type="button">I\'d like to meet</button><button class="abtn ghost" data-run="pass" type="button">Not this time</button></div>' +
-      '<div class="status status-yes pre"><b>Answer saved</b>Maya can\'t see it. You\'ll both hear by Wednesday 6:00 pm.</div></div></div>' +
-      '<div class="center-note status-no pre"><b>Okay.</b><span class="tiny">Maya isn\'t told. You won\'t be introduced again.</span></div>';
-  }
-
-  var MOMENTS = [
-    {
-      id: 'intro', name: 'Introduction arrives', hint: 'Plays when the screen opens.',
-      sum: 'The week\'s introduction settles into place like a card set down on a table. The reasons you might get on appear one after another so they are read, not scanned.',
-      trigger: 'First time this introduction is shown.',
-      plays: 'Once per introduction. Returning to the screen shows it already at rest.',
-      reduced: 'Card and contents fade in together. No movement.',
-      html: introCard, auto: 'arrive',
-      seqs: { arrive: { label: 'Arrive', steps: [
-        { t: '.card', n: 'Introduction card', p: { opacity: FADE, transform: up(12) }, d: 'settle', e: 'settle' },
-        { t: '.who', n: 'Name and neighbourhood', p: { opacity: FADE }, d: 'fade', w: 120, e: 'standard' },
-        { t: '.why li', n: 'Each shared reason', p: { opacity: FADE, transform: up(8) }, d: 'fade', w: 180, s: 60, e: 'settle' },
-        { t: '.actions', n: 'Both buttons together', p: { opacity: FADE }, d: 'fade', w: 420, e: 'standard' }
-      ] } }
-    },
-    {
-      id: 'decide', name: 'Your private answer', hint: 'Tap either button in the phone. Replay to try the other.',
-      sum: 'Yes and no are treated the same. The buttons step aside and a plain line confirms what happened. Nothing flies off, nothing celebrates.',
-      trigger: 'Tapping "I\'d like to meet" or "Not this time".',
-      plays: 'Once. The answer is final, so there is no undo animation.',
-      reduced: 'Same sequence, opacity only.',
-      html: introCard,
-      seqs: {
-        accept: { label: 'I\'d like to meet', steps: [
-          { t: '.actions', n: 'Buttons', p: { opacity: OUT }, d: 'exit', e: 'exit' },
-          { t: '.status-yes', n: 'Confirmation line', p: { opacity: FADE, transform: up(8) }, d: 'fade', w: 160, e: 'settle' }
-        ], hooks: [{ w: 0, fn: function (s) { s.querySelector('.actions').style.pointerEvents = 'none'; } }] },
-        pass: { label: 'Not this time', steps: [
-          { t: '.card', n: 'Whole card, in place', p: { opacity: OUT }, d: 'fade', e: 'exit' },
-          { t: '.status-no', n: 'Quiet note', p: { opacity: FADE }, d: 'fade', w: 240, e: 'standard' }
-        ], hooks: [{ w: 0, fn: function (s) { s.querySelector('.card').style.pointerEvents = 'none'; } }] }
-      }
-    },
-    {
-      id: 'mutual', name: 'You both said yes', hint: 'Plays when the screen opens.',
-      sum: 'The one warm moment in the app. The screen warms from paper to cream and the two of you come together. It is slower than everything else on purpose.',
-      trigger: 'Opening the app after both answers are yes.',
-      plays: 'Once, ever, for this pair.',
-      reduced: 'Cream background and text fade in. The circles do not travel.',
-      html: function () {
-        return '<div class="warm-wash"></div><div class="bar"><span class="brand" style="color:var(--app-burgundy)">Meetwell</span></div>' +
-          '<div class="mutual"><div class="pair"><div class="av av-a">A</div><div class="av av-b">M</div></div>' +
-          '<h4 class="m-title">You both said yes</h4><p class="m-sub">Maya would like to meet you too.</p>' +
-          '<button class="abtn warm m-cta" type="button">Plan when to meet</button></div>';
-      }, auto: 'reveal',
-      seqs: { reveal: { label: 'Reveal', steps: [
-        { t: '.warm-wash', n: 'Background, paper to cream', p: { opacity: FADE }, d: 'warm', e: 'standard' },
-        { t: '.av-a', n: 'Your circle', p: { opacity: FADE, transform: ['translateX(-28px)', 'none'] }, d: 'warm', e: 'settle' },
-        { t: '.av-b', n: 'Their circle', p: { opacity: FADE, transform: ['translateX(28px)', 'none'] }, d: 'warm', e: 'settle' },
-        { t: '.m-title', n: 'Headline', p: { opacity: FADE, transform: up(8) }, d: 'move', w: 280, e: 'settle' },
-        { t: '.m-sub', n: 'Supporting line', p: { opacity: FADE }, d: 'fade', w: 400, e: 'standard' },
-        { t: '.m-cta', n: 'Plan button', p: { opacity: FADE }, d: 'fade', w: 600, e: 'standard' }
-      ] } }
-    },
-    {
-      id: 'plan', name: 'Plan confirmed', hint: 'Tap "Confirm Thursday 7:00 pm" in the phone.',
-      sum: 'Two separate confirmations become one plan. Your chip appears beside Maya\'s, the two close together, and a single plan card takes their place.',
-      trigger: 'The second person confirms the same version of the plan.',
-      plays: 'Once per confirmed plan. A changed plan has to be confirmed again and plays again.',
-      reduced: 'Chips fade out, plan card fades in. The tick appears already drawn.',
-      html: function () {
-        return '<div class="bar"><span class="brand">Meetwell</span><span class="tiny">Maya</span></div>' +
-          '<h4>Maya suggested Thursday</h4><p class="tiny">7:00 pm · Daybreak Coffee, E 7th St</p>' +
-          '<div class="stage2"><div class="rows"><div class="row-maya"><div class="chip"><span class="dot"></span>Maya confirmed</div></div>' +
-          '<div class="row-you"><div class="chip chip-you pre"><span class="dot"></span>You confirmed</div></div></div>' +
-          '<div class="plan-card pre"><div class="top"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="tick" d="M4 12.5l5 5L20 6.5"/></svg>It\'s a plan</div>' +
-          '<div class="when">Thursday 12 November · 7:00 pm</div><div class="where">Daybreak Coffee, E 7th St</div></div></div>' +
-          '<button class="abtn confirm push" data-run="confirm" type="button">Confirm Thursday 7:00 pm</button>';
-      },
-      seqs: { confirm: { label: 'Confirm', steps: [
-        { t: '.confirm', n: 'Confirm button', p: { opacity: OUT }, d: 'exit', e: 'exit' },
-        { t: '.chip-you', n: 'Your chip appears', p: { opacity: FADE }, d: 'fade', w: 160, e: 'standard' },
-        { t: '.row-maya', n: 'Maya\'s chip moves down', p: { opacity: OUT, transform: ['none', 'translateY(12px)'] }, d: 'move', w: 560, e: 'standard' },
-        { t: '.row-you', n: 'Your chip moves up', p: { opacity: OUT, transform: ['none', 'translateY(-12px)'] }, d: 'move', w: 560, e: 'standard' },
-        { t: '.plan-card', n: 'Plan card', p: { opacity: FADE, transform: ['scale(0.97)', 'none'] }, d: 'settle', w: 720, e: 'settle' },
-        { t: '.tick', n: 'Tick draws itself', p: { strokeDashoffset: [24, 0] }, d: 'move', w: 960, e: 'standard' }
-      ], hooks: [{ w: 0, fn: function (s) { s.querySelector('.confirm').style.pointerEvents = 'none'; } }] } }
-    },
-    {
-      id: 'onboard', name: 'Onboarding step', hint: 'Tap "Continue" in the phone.',
-      sum: 'The old question leaves quickly, the next one eases in from the direction you are heading, and the progress line grows by exactly one ninth.',
-      trigger: 'Tapping Continue with a valid answer.',
-      plays: 'Every step forward. Going back mirrors it: the incoming step starts 12px to the left.',
-      reduced: 'Questions cross-fade. The progress line jumps to its new length.',
-      html: function () {
-        return '<div class="bar"><span class="brand">Meetwell</span><span class="tiny" id="stepno">Step 3 of 9</span></div>' +
-          '<div class="track"><div class="fill"></div></div>' +
-          '<div class="steps"><div class="step-a"><h4>What do you do with a free Saturday?</h4><div class="opts"><span class="on">Climbing</span><span>Live music</span><span class="on">Long walks</span><span>Cooking</span><span>Museums</span><span class="on">Coffee</span><span>Running</span></div></div>' +
-          '<div class="step-b pre"><h4>Who would you like to meet?</h4><div class="opts"><span>Women</span><span>Men</span><span>Everyone</span></div><p class="tiny">You can mark each as a must, a preference, or no preference.</p></div></div>' +
-          '<button class="abtn" data-run="next" type="button">Continue</button>';
-      },
-      seqs: { next: { label: 'Continue', steps: [
-        { t: '.fill', n: 'Progress line', p: { transform: ['scaleX(0.333)', 'scaleX(0.444)'] }, d: 'move', e: 'standard' },
-        { t: '.step-a', n: 'Current question', p: { opacity: OUT }, d: 'exit', e: 'exit' },
-        { t: '.step-b', n: 'Next question', p: { opacity: FADE, transform: ['translateX(12px)', 'none'] }, d: 'fade', w: 160, e: 'settle' }
-      ], hooks: [{ w: 160, fn: function (s) { s.querySelector('#stepno').textContent = 'Step 4 of 9'; } }] } }
-    },
-    {
-      id: 'quiet', name: 'Loading and a finished week', hint: 'Plays when the screen opens. The preview shows two loading pulses.',
-      sum: 'Loading is a soft pulse, not a moving shimmer. When there is nobody left this week the app says so and stays still. An empty week is a finished week, not a prompt to keep looking.',
-      trigger: 'Opening Introductions while data loads, then finding none left.',
-      plays: 'Pulse repeats only while loading. The finished-week message fades in once.',
-      reduced: 'Placeholder shapes stay still. The message fades in.',
-      html: function () {
-        return '<div class="bar"><span class="brand">Meetwell</span><span class="tiny">This week</span></div>' +
-          '<div class="skel-wrap"><div class="skel big"></div><div class="skel w60"></div><div class="skel w40"></div></div>' +
-          '<div class="center-note empty pre"><b>That\'s everyone for this week</b><span class="tiny">New introductions arrive Monday morning. Go enjoy your Thursday.</span></div>';
-      }, auto: 'load',
-      seqs: { load: { label: 'Load, then finished', steps: [
-        { t: '.skel', n: 'Placeholder shapes', p: { opacity: [1, 0.45] }, d: 'pulse', e: 'standard', it: 2 },
-        { t: '.skel-wrap', n: 'Placeholders leave', p: { opacity: OUT }, d: 'exit', w: 2800, e: 'exit' },
-        { t: '.empty', n: 'Finished-week message', p: { opacity: FADE }, d: 'move', w: 2960, e: 'standard' }
-      ] } }
-    },
-    {
-      id: 'sheet', name: 'Something felt off', hint: 'Tap "Something felt off", then "Not now" to close.',
-      sum: 'The safety sheet rises quickly and steadily. It must feel dependable, so it is one of the fastest things in the app and closes faster than it opens.',
-      trigger: 'Tapping "Something felt off" anywhere it appears.',
-      plays: 'Every time. Never delayed behind another animation.',
-      reduced: 'Sheet and dimmed background appear with a 150ms fade. No slide.',
-      html: function () {
-        return '<div class="bar"><span class="brand">Meetwell</span><span class="tiny">Maya</span></div>' +
-          '<h4>Thursday with Maya</h4><div class="card"><b>7:00 pm · Daybreak Coffee</b><span class="tiny">E 7th St, East Village</span></div>' +
-          '<button class="abtn link push" data-run="open" type="button">Something felt off</button>' +
-          '<div class="scrim pre"></div><div class="sheet" role="dialog" aria-label="Something felt off"><div class="grab"></div><h4 style="font-size:20px">What happened?</h4>' +
-          '<div class="opt">Made me uncomfortable</div><div class="opt">Not who their profile showed</div><div class="opt">I felt unsafe</div>' +
-          '<button class="abtn ghost" data-run="close" type="button">Not now</button></div>';
-      },
-      seqs: {
-        open: { label: 'Open', steps: [
-          { t: '.scrim', n: 'Dimmed background', p: { opacity: FADE }, d: 'fade', e: 'standard' },
-          { t: '.sheet', n: 'Sheet', p: { transform: ['translateY(100%)', 'none'] }, d: 'move', e: 'settle' }
-        ] },
-        close: { label: 'Close', steps: [
-          { t: '.sheet', n: 'Sheet', p: { transform: ['none', 'translateY(100%)'] }, d: 'fade', e: 'exit' },
-          { t: '.scrim', n: 'Dimmed background', p: { opacity: OUT }, d: 'fade', e: 'standard' }
-        ] }
-      }
-    }
-  ];
-
-  var screen = document.getElementById('screen'), nav = document.getElementById('moments'),
-      spec = document.getElementById('spec'), hint = document.getElementById('hint'),
-      slowBtn = document.getElementById('slow'), redBtn = document.getElementById('reduced');
-  var current = MOMENTS[0], slow = false, timers = [];
-  var reduced = false;
-  try { reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
-  redBtn.setAttribute('aria-pressed', String(reduced));
-
-  function run(seq) {
-    var k = slow ? 4 : 1;
-    seq.steps.forEach(function (st) {
-      var els = screen.querySelectorAll(st.t);
-      Array.prototype.forEach.call(els, function (el, i) {
-        var delay = ((st.w || 0) + (st.s || 0) * i) * k, dur = DUR[st.d] * k;
-        if (!reduced) {
-          el.animate(st.p, { duration: dur, delay: delay, easing: EASE[st.e], fill: 'both',
-            iterations: st.it || 1, direction: st.it ? 'alternate' : 'normal' });
-          return;
+    <script>
+      (function () {
+        var DUR = {
+          press: 80,
+          exit: 160,
+          fade: 240,
+          move: 320,
+          settle: 420,
+          warm: 600,
+          pulse: 1400,
+        };
+        var EASE = {
+          settle: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          standard: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          exit: 'cubic-bezier(0.4, 0, 1, 1)',
+        };
+        var FADE = [0, 1],
+          OUT = [1, 0];
+        function up(px) {
+          return ['translateY(' + px + 'px)', 'none'];
         }
-        if (st.it) return; // loading pulse stays still
-        Object.keys(st.p).forEach(function (prop) {
-          var kf = {}; kf[prop] = st.p[prop];
-          el.animate(kf, { duration: prop === 'opacity' ? Math.min(DUR[st.d], 150) : 0, delay: delay, easing: 'linear', fill: 'both' });
+
+        function introCard() {
+          return (
+            '<div class="bar"><span class="brand">Meetwell</span><span class="tiny">1 of 3 this week</span></div>' +
+            '<div class="card"><div class="who"><div class="face">M</div><div><b>Maya, 26</b><span class="tiny">Lower East Side</span></div></div>' +
+            '<ul class="why"><li>You both climb at the same gym in Long Island City</li><li>You both like slow Sunday mornings</li><li>You are both free Thursday evenings</li></ul>' +
+            '<div class="slot"><div class="actions"><button class="abtn" data-run="accept" type="button">I\'d like to meet</button><button class="abtn ghost" data-run="pass" type="button">Not this time</button></div>' +
+            '<div class="status status-yes pre"><b>Answer saved</b>Maya can\'t see it. You\'ll both hear by Wednesday 6:00 pm.</div></div></div>' +
+            '<div class="center-note status-no pre"><b>Okay.</b><span class="tiny">Maya isn\'t told. You won\'t be introduced again.</span></div>'
+          );
+        }
+
+        var MOMENTS = [
+          {
+            id: 'intro',
+            name: 'Introduction arrives',
+            hint: 'Plays when the screen opens.',
+            sum: "The week's introduction settles into place like a card set down on a table. The reasons you might get on appear one after another so they are read, not scanned.",
+            trigger: 'First time this introduction is shown.',
+            plays: 'Once per introduction. Returning to the screen shows it already at rest.',
+            reduced: 'Card and contents fade in together. No movement.',
+            html: introCard,
+            auto: 'arrive',
+            seqs: {
+              arrive: {
+                label: 'Arrive',
+                steps: [
+                  {
+                    t: '.card',
+                    n: 'Introduction card',
+                    p: { opacity: FADE, transform: up(12) },
+                    d: 'settle',
+                    e: 'settle',
+                  },
+                  {
+                    t: '.who',
+                    n: 'Name and neighbourhood',
+                    p: { opacity: FADE },
+                    d: 'fade',
+                    w: 120,
+                    e: 'standard',
+                  },
+                  {
+                    t: '.why li',
+                    n: 'Each shared reason',
+                    p: { opacity: FADE, transform: up(8) },
+                    d: 'fade',
+                    w: 180,
+                    s: 60,
+                    e: 'settle',
+                  },
+                  {
+                    t: '.actions',
+                    n: 'Both buttons together',
+                    p: { opacity: FADE },
+                    d: 'fade',
+                    w: 420,
+                    e: 'standard',
+                  },
+                ],
+              },
+            },
+          },
+          {
+            id: 'decide',
+            name: 'Your private answer',
+            hint: 'Tap either button in the phone. Replay to try the other.',
+            sum: 'Yes and no are treated the same. The buttons step aside and a plain line confirms what happened. Nothing flies off, nothing celebrates.',
+            trigger: 'Tapping "I\'d like to meet" or "Not this time".',
+            plays: 'Once. The answer is final, so there is no undo animation.',
+            reduced: 'Same sequence, opacity only.',
+            html: introCard,
+            seqs: {
+              accept: {
+                label: "I'd like to meet",
+                steps: [
+                  { t: '.actions', n: 'Buttons', p: { opacity: OUT }, d: 'exit', e: 'exit' },
+                  {
+                    t: '.status-yes',
+                    n: 'Confirmation line',
+                    p: { opacity: FADE, transform: up(8) },
+                    d: 'fade',
+                    w: 160,
+                    e: 'settle',
+                  },
+                ],
+                hooks: [
+                  {
+                    w: 0,
+                    fn: function (s) {
+                      s.querySelector('.actions').style.pointerEvents = 'none';
+                    },
+                  },
+                ],
+              },
+              pass: {
+                label: 'Not this time',
+                steps: [
+                  {
+                    t: '.card',
+                    n: 'Whole card, in place',
+                    p: { opacity: OUT },
+                    d: 'fade',
+                    e: 'exit',
+                  },
+                  {
+                    t: '.status-no',
+                    n: 'Quiet note',
+                    p: { opacity: FADE },
+                    d: 'fade',
+                    w: 240,
+                    e: 'standard',
+                  },
+                ],
+                hooks: [
+                  {
+                    w: 0,
+                    fn: function (s) {
+                      s.querySelector('.card').style.pointerEvents = 'none';
+                    },
+                  },
+                ],
+              },
+            },
+          },
+          {
+            id: 'mutual',
+            name: 'You both said yes',
+            hint: 'Plays when the screen opens.',
+            sum: 'The one warm moment in the app. The screen warms from paper to cream and the two of you come together. It is slower than everything else on purpose.',
+            trigger: 'Opening the app after both answers are yes.',
+            plays: 'Once, ever, for this pair.',
+            reduced: 'Cream background and text fade in. The circles do not travel.',
+            html: function () {
+              return (
+                '<div class="warm-wash"></div><div class="bar"><span class="brand" style="color:var(--app-burgundy)">Meetwell</span></div>' +
+                '<div class="mutual"><div class="pair"><div class="av av-a">A</div><div class="av av-b">M</div></div>' +
+                '<h4 class="m-title">You both said yes</h4><p class="m-sub">Maya would like to meet you too.</p>' +
+                '<button class="abtn warm m-cta" type="button">Plan when to meet</button></div>'
+              );
+            },
+            auto: 'reveal',
+            seqs: {
+              reveal: {
+                label: 'Reveal',
+                steps: [
+                  {
+                    t: '.warm-wash',
+                    n: 'Background, paper to cream',
+                    p: { opacity: FADE },
+                    d: 'warm',
+                    e: 'standard',
+                  },
+                  {
+                    t: '.av-a',
+                    n: 'Your circle',
+                    p: { opacity: FADE, transform: ['translateX(-28px)', 'none'] },
+                    d: 'warm',
+                    e: 'settle',
+                  },
+                  {
+                    t: '.av-b',
+                    n: 'Their circle',
+                    p: { opacity: FADE, transform: ['translateX(28px)', 'none'] },
+                    d: 'warm',
+                    e: 'settle',
+                  },
+                  {
+                    t: '.m-title',
+                    n: 'Headline',
+                    p: { opacity: FADE, transform: up(8) },
+                    d: 'move',
+                    w: 280,
+                    e: 'settle',
+                  },
+                  {
+                    t: '.m-sub',
+                    n: 'Supporting line',
+                    p: { opacity: FADE },
+                    d: 'fade',
+                    w: 400,
+                    e: 'standard',
+                  },
+                  {
+                    t: '.m-cta',
+                    n: 'Plan button',
+                    p: { opacity: FADE },
+                    d: 'fade',
+                    w: 600,
+                    e: 'standard',
+                  },
+                ],
+              },
+            },
+          },
+          {
+            id: 'plan',
+            name: 'Plan confirmed',
+            hint: 'Tap "Confirm Thursday 7:00 pm" in the phone.',
+            sum: "Two separate confirmations become one plan. Your chip appears beside Maya's, the two close together, and a single plan card takes their place.",
+            trigger: 'The second person confirms the same version of the plan.',
+            plays:
+              'Once per confirmed plan. A changed plan has to be confirmed again and plays again.',
+            reduced: 'Chips fade out, plan card fades in. The tick appears already drawn.',
+            html: function () {
+              return (
+                '<div class="bar"><span class="brand">Meetwell</span><span class="tiny">Maya</span></div>' +
+                '<h4>Maya suggested Thursday</h4><p class="tiny">7:00 pm · Daybreak Coffee, E 7th St</p>' +
+                '<div class="stage2"><div class="rows"><div class="row-maya"><div class="chip"><span class="dot"></span>Maya confirmed</div></div>' +
+                '<div class="row-you"><div class="chip chip-you pre"><span class="dot"></span>You confirmed</div></div></div>' +
+                '<div class="plan-card pre"><div class="top"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="tick" d="M4 12.5l5 5L20 6.5"/></svg>It\'s a plan</div>' +
+                '<div class="when">Thursday 12 November · 7:00 pm</div><div class="where">Daybreak Coffee, E 7th St</div></div></div>' +
+                '<button class="abtn confirm push" data-run="confirm" type="button">Confirm Thursday 7:00 pm</button>'
+              );
+            },
+            seqs: {
+              confirm: {
+                label: 'Confirm',
+                steps: [
+                  { t: '.confirm', n: 'Confirm button', p: { opacity: OUT }, d: 'exit', e: 'exit' },
+                  {
+                    t: '.chip-you',
+                    n: 'Your chip appears',
+                    p: { opacity: FADE },
+                    d: 'fade',
+                    w: 160,
+                    e: 'standard',
+                  },
+                  {
+                    t: '.row-maya',
+                    n: "Maya's chip moves down",
+                    p: { opacity: OUT, transform: ['none', 'translateY(12px)'] },
+                    d: 'move',
+                    w: 560,
+                    e: 'standard',
+                  },
+                  {
+                    t: '.row-you',
+                    n: 'Your chip moves up',
+                    p: { opacity: OUT, transform: ['none', 'translateY(-12px)'] },
+                    d: 'move',
+                    w: 560,
+                    e: 'standard',
+                  },
+                  {
+                    t: '.plan-card',
+                    n: 'Plan card',
+                    p: { opacity: FADE, transform: ['scale(0.97)', 'none'] },
+                    d: 'settle',
+                    w: 720,
+                    e: 'settle',
+                  },
+                  {
+                    t: '.tick',
+                    n: 'Tick draws itself',
+                    p: { strokeDashoffset: [24, 0] },
+                    d: 'move',
+                    w: 960,
+                    e: 'standard',
+                  },
+                ],
+                hooks: [
+                  {
+                    w: 0,
+                    fn: function (s) {
+                      s.querySelector('.confirm').style.pointerEvents = 'none';
+                    },
+                  },
+                ],
+              },
+            },
+          },
+          {
+            id: 'onboard',
+            name: 'Onboarding step',
+            hint: 'Tap "Continue" in the phone.',
+            sum: 'The old question leaves quickly, the next one eases in from the direction you are heading, and the progress line grows by exactly one ninth.',
+            trigger: 'Tapping Continue with a valid answer.',
+            plays:
+              'Every step forward. Going back mirrors it: the incoming step starts 12px to the left.',
+            reduced: 'Questions cross-fade. The progress line jumps to its new length.',
+            html: function () {
+              return (
+                '<div class="bar"><span class="brand">Meetwell</span><span class="tiny" id="stepno">Step 3 of 9</span></div>' +
+                '<div class="track"><div class="fill"></div></div>' +
+                '<div class="steps"><div class="step-a"><h4>What do you do with a free Saturday?</h4><div class="opts"><span class="on">Climbing</span><span>Live music</span><span class="on">Long walks</span><span>Cooking</span><span>Museums</span><span class="on">Coffee</span><span>Running</span></div></div>' +
+                '<div class="step-b pre"><h4>Who would you like to meet?</h4><div class="opts"><span>Women</span><span>Men</span><span>Everyone</span></div><p class="tiny">You can mark each as a must, a preference, or no preference.</p></div></div>' +
+                '<button class="abtn" data-run="next" type="button">Continue</button>'
+              );
+            },
+            seqs: {
+              next: {
+                label: 'Continue',
+                steps: [
+                  {
+                    t: '.fill',
+                    n: 'Progress line',
+                    p: { transform: ['scaleX(0.333)', 'scaleX(0.444)'] },
+                    d: 'move',
+                    e: 'standard',
+                  },
+                  {
+                    t: '.step-a',
+                    n: 'Current question',
+                    p: { opacity: OUT },
+                    d: 'exit',
+                    e: 'exit',
+                  },
+                  {
+                    t: '.step-b',
+                    n: 'Next question',
+                    p: { opacity: FADE, transform: ['translateX(12px)', 'none'] },
+                    d: 'fade',
+                    w: 160,
+                    e: 'settle',
+                  },
+                ],
+                hooks: [
+                  {
+                    w: 160,
+                    fn: function (s) {
+                      s.querySelector('#stepno').textContent = 'Step 4 of 9';
+                    },
+                  },
+                ],
+              },
+            },
+          },
+          {
+            id: 'quiet',
+            name: 'Loading and a finished week',
+            hint: 'Plays when the screen opens. The preview shows two loading pulses.',
+            sum: 'Loading is a soft pulse, not a moving shimmer. When there is nobody left this week the app says so and stays still. An empty week is a finished week, not a prompt to keep looking.',
+            trigger: 'Opening Introductions while data loads, then finding none left.',
+            plays: 'Pulse repeats only while loading. The finished-week message fades in once.',
+            reduced: 'Placeholder shapes stay still. The message fades in.',
+            html: function () {
+              return (
+                '<div class="bar"><span class="brand">Meetwell</span><span class="tiny">This week</span></div>' +
+                '<div class="skel-wrap"><div class="skel big"></div><div class="skel w60"></div><div class="skel w40"></div></div>' +
+                '<div class="center-note empty pre"><b>That\'s everyone for this week</b><span class="tiny">New introductions arrive Monday morning. Go enjoy your Thursday.</span></div>'
+              );
+            },
+            auto: 'load',
+            seqs: {
+              load: {
+                label: 'Load, then finished',
+                steps: [
+                  {
+                    t: '.skel',
+                    n: 'Placeholder shapes',
+                    p: { opacity: [1, 0.45] },
+                    d: 'pulse',
+                    e: 'standard',
+                    it: 2,
+                  },
+                  {
+                    t: '.skel-wrap',
+                    n: 'Placeholders leave',
+                    p: { opacity: OUT },
+                    d: 'exit',
+                    w: 2800,
+                    e: 'exit',
+                  },
+                  {
+                    t: '.empty',
+                    n: 'Finished-week message',
+                    p: { opacity: FADE },
+                    d: 'move',
+                    w: 2960,
+                    e: 'standard',
+                  },
+                ],
+              },
+            },
+          },
+          {
+            id: 'sheet',
+            name: 'Something felt off',
+            hint: 'Tap "Something felt off", then "Not now" to close.',
+            sum: 'The safety sheet rises quickly and steadily. It must feel dependable, so it is one of the fastest things in the app and closes faster than it opens.',
+            trigger: 'Tapping "Something felt off" anywhere it appears.',
+            plays: 'Every time. Never delayed behind another animation.',
+            reduced: 'Sheet and dimmed background appear with a 150ms fade. No slide.',
+            html: function () {
+              return (
+                '<div class="bar"><span class="brand">Meetwell</span><span class="tiny">Maya</span></div>' +
+                '<h4>Thursday with Maya</h4><div class="card"><b>7:00 pm · Daybreak Coffee</b><span class="tiny">E 7th St, East Village</span></div>' +
+                '<button class="abtn link push" data-run="open" type="button">Something felt off</button>' +
+                '<div class="scrim pre"></div><div class="sheet" role="dialog" aria-label="Something felt off"><div class="grab"></div><h4 style="font-size:20px">What happened?</h4>' +
+                '<div class="opt">Made me uncomfortable</div><div class="opt">Not who their profile showed</div><div class="opt">I felt unsafe</div>' +
+                '<button class="abtn ghost" data-run="close" type="button">Not now</button></div>'
+              );
+            },
+            seqs: {
+              open: {
+                label: 'Open',
+                steps: [
+                  {
+                    t: '.scrim',
+                    n: 'Dimmed background',
+                    p: { opacity: FADE },
+                    d: 'fade',
+                    e: 'standard',
+                  },
+                  {
+                    t: '.sheet',
+                    n: 'Sheet',
+                    p: { transform: ['translateY(100%)', 'none'] },
+                    d: 'move',
+                    e: 'settle',
+                  },
+                ],
+              },
+              close: {
+                label: 'Close',
+                steps: [
+                  {
+                    t: '.sheet',
+                    n: 'Sheet',
+                    p: { transform: ['none', 'translateY(100%)'] },
+                    d: 'fade',
+                    e: 'exit',
+                  },
+                  {
+                    t: '.scrim',
+                    n: 'Dimmed background',
+                    p: { opacity: OUT },
+                    d: 'fade',
+                    e: 'standard',
+                  },
+                ],
+              },
+            },
+          },
+        ];
+
+        var screen = document.getElementById('screen'),
+          nav = document.getElementById('moments'),
+          spec = document.getElementById('spec'),
+          hint = document.getElementById('hint'),
+          slowBtn = document.getElementById('slow'),
+          redBtn = document.getElementById('reduced');
+        var current = MOMENTS[0],
+          slow = false,
+          timers = [];
+        var reduced = false;
+        try {
+          reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        } catch (e) {}
+        redBtn.setAttribute('aria-pressed', String(reduced));
+
+        function run(seq) {
+          var k = slow ? 4 : 1;
+          seq.steps.forEach(function (st) {
+            var els = screen.querySelectorAll(st.t);
+            Array.prototype.forEach.call(els, function (el, i) {
+              var delay = ((st.w || 0) + (st.s || 0) * i) * k,
+                dur = DUR[st.d] * k;
+              if (!reduced) {
+                el.animate(st.p, {
+                  duration: dur,
+                  delay: delay,
+                  easing: EASE[st.e],
+                  fill: 'both',
+                  iterations: st.it || 1,
+                  direction: st.it ? 'alternate' : 'normal',
+                });
+                return;
+              }
+              if (st.it) return; // loading pulse stays still
+              Object.keys(st.p).forEach(function (prop) {
+                var kf = {};
+                kf[prop] = st.p[prop];
+                el.animate(kf, {
+                  duration: prop === 'opacity' ? Math.min(DUR[st.d], 150) : 0,
+                  delay: delay,
+                  easing: 'linear',
+                  fill: 'both',
+                });
+              });
+              if (st.t === '.sheet') {
+                // reduced: fade the sheet instead of sliding it
+                var opening = st.p.transform[1] === 'none';
+                el.animate(
+                  { opacity: opening ? [0, 1] : [1, 0] },
+                  { duration: 150, delay: delay, fill: 'both' },
+                );
+              }
+            });
+          });
+          (seq.hooks || []).forEach(function (h) {
+            timers.push(
+              setTimeout(function () {
+                h.fn(screen);
+              }, h.w * k),
+            );
+          });
+        }
+
+        function show(m, quiet) {
+          current = m;
+          timers.forEach(clearTimeout);
+          timers = [];
+          screen.innerHTML = m.html();
+          hint.textContent = m.hint;
+          Array.prototype.forEach.call(nav.children, function (b) {
+            b.setAttribute('aria-pressed', String(b.dataset.id === m.id));
+          });
+          if (m.auto) run(m.seqs[m.auto]);
+          if (!quiet) renderSpec(m);
+        }
+
+        function esc(s) {
+          return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+        }
+        function change(p) {
+          return Object.keys(p)
+            .map(function (k) {
+              var name = k === 'strokeDashoffset' ? 'stroke-dashoffset' : k;
+              return name + ' ' + p[k][0] + ' → ' + p[k][1];
+            })
+            .join('<br>');
+        }
+        function renderSpec(m) {
+          var h =
+            '<div><h2>' +
+            esc(m.name) +
+            '</h2><p class="sum">' +
+            esc(m.sum) +
+            '</p></div>' +
+            '<dl class="meta"><dt>Trigger</dt><dd>' +
+            esc(m.trigger) +
+            '</dd><dt>Plays</dt><dd>' +
+            esc(m.plays) +
+            '</dd><dt>Reduced motion</dt><dd>' +
+            esc(m.reduced) +
+            '</dd></dl>';
+          Object.keys(m.seqs).forEach(function (key) {
+            var sq = m.seqs[key];
+            h +=
+              '<div class="tablewrap"><table><caption>' +
+              esc(sq.label) +
+              '</caption><thead><tr><th>Element</th><th>Change</th><th>Duration</th><th>Delay</th><th>Easing</th></tr></thead><tbody>';
+            sq.steps.forEach(function (st) {
+              var delay = (st.w || 0) + 'ms' + (st.s ? ' + ' + st.s + 'ms each' : '');
+              var dur = DUR[st.d] + 'ms' + (st.it ? ' × ' + st.it + ', alternating' : '');
+              h +=
+                '<tr><td>' +
+                esc(st.n) +
+                '</td><td class="mono">' +
+                change(st.p) +
+                '</td><td class="v">' +
+                dur +
+                '<br>--mw-dur-' +
+                st.d +
+                '</td><td class="v">' +
+                delay +
+                '</td><td class="v">--mw-ease-' +
+                st.e +
+                '</td></tr>';
+            });
+            h += '</tbody></table></div>';
+          });
+          spec.innerHTML = h;
+        }
+
+        MOMENTS.forEach(function (m) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = m.name;
+          b.dataset.id = m.id;
+          b.addEventListener('click', function () {
+            show(m);
+          });
+          nav.appendChild(b);
         });
-        if (st.t === '.sheet') { // reduced: fade the sheet instead of sliding it
-          var opening = st.p.transform[1] === 'none';
-          el.animate({ opacity: opening ? [0, 1] : [1, 0] }, { duration: 150, delay: delay, fill: 'both' });
-        }
-      });
-    });
-    (seq.hooks || []).forEach(function (h) {
-      timers.push(setTimeout(function () { h.fn(screen); }, h.w * k));
-    });
-  }
+        screen.addEventListener('click', function (e) {
+          var b = e.target.closest('[data-run]');
+          if (b && current.seqs[b.dataset.run]) run(current.seqs[b.dataset.run]);
+        });
+        document.getElementById('replay').addEventListener('click', function () {
+          show(current, true);
+        });
+        slowBtn.addEventListener('click', function () {
+          slow = !slow;
+          slowBtn.setAttribute('aria-pressed', String(slow));
+          show(current, true);
+        });
+        redBtn.addEventListener('click', function () {
+          reduced = !reduced;
+          redBtn.setAttribute('aria-pressed', String(reduced));
+          show(current, true);
+        });
 
-  function show(m, quiet) {
-    current = m;
-    timers.forEach(clearTimeout); timers = [];
-    screen.innerHTML = m.html();
-    hint.textContent = m.hint;
-    Array.prototype.forEach.call(nav.children, function (b) { b.setAttribute('aria-pressed', String(b.dataset.id === m.id)); });
-    if (m.auto) run(m.seqs[m.auto]);
-    if (!quiet) renderSpec(m);
-  }
+        var TOKENS =
+          ':root {\n' +
+          '  /* durations */\n' +
+          Object.keys(DUR)
+            .map(function (k) {
+              return '  --mw-dur-' + k + ': ' + DUR[k] + 'ms;';
+            })
+            .join('\n') +
+          '\n' +
+          '  --mw-stagger: 60ms;\n\n  /* easing */\n' +
+          Object.keys(EASE)
+            .map(function (k) {
+              return '  --mw-ease-' + k + ': ' + EASE[k] + ';';
+            })
+            .join('\n') +
+          '\n\n' +
+          '  /* travel distances */\n  --mw-move-s: 8px;\n  --mw-move-m: 12px;\n  --mw-move-l: 28px;\n}\n\n' +
+          '@media (prefers-reduced-motion: reduce) {\n  :root {\n' +
+          '    --mw-dur-fade: 150ms; --mw-dur-move: 150ms; --mw-dur-settle: 150ms; --mw-dur-warm: 150ms;\n' +
+          '    --mw-dur-pulse: 0ms; --mw-stagger: 0ms;\n' +
+          '    --mw-move-s: 0px; --mw-move-m: 0px; --mw-move-l: 0px;\n  }\n}\n\n' +
+          '/* buttons: the only press feedback */\n' +
+          'button { transition: transform var(--mw-dur-press) var(--mw-ease-standard); }\n' +
+          'button:active { transform: scale(0.98); }';
+        var pre = document.getElementById('tokens');
+        pre.textContent = TOKENS;
+        var copy = document.getElementById('copy');
+        copy.addEventListener('click', function () {
+          function done(t) {
+            copy.textContent = t;
+            setTimeout(function () {
+              copy.textContent = 'Copy tokens';
+            }, 1800);
+          }
+          function select() {
+            var r = document.createRange();
+            r.selectNodeContents(pre);
+            var s = window.getSelection();
+            s.removeAllRanges();
+            s.addRange(r);
+            done('Selected. Press Ctrl+C');
+          }
+          try {
+            navigator.clipboard.writeText(TOKENS).then(function () {
+              done('Copied');
+            }, select);
+          } catch (e) {
+            select();
+          }
+        });
 
-  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
-  function change(p) {
-    return Object.keys(p).map(function (k) {
-      var name = k === 'strokeDashoffset' ? 'stroke-dashoffset' : k;
-      return name + ' ' + p[k][0] + ' → ' + p[k][1];
-    }).join('<br>');
-  }
-  function renderSpec(m) {
-    var h = '<div><h2>' + esc(m.name) + '</h2><p class="sum">' + esc(m.sum) + '</p></div>' +
-      '<dl class="meta"><dt>Trigger</dt><dd>' + esc(m.trigger) + '</dd><dt>Plays</dt><dd>' + esc(m.plays) +
-      '</dd><dt>Reduced motion</dt><dd>' + esc(m.reduced) + '</dd></dl>';
-    Object.keys(m.seqs).forEach(function (key) {
-      var sq = m.seqs[key];
-      h += '<div class="tablewrap"><table><caption>' + esc(sq.label) + '</caption><thead><tr><th>Element</th><th>Change</th><th>Duration</th><th>Delay</th><th>Easing</th></tr></thead><tbody>';
-      sq.steps.forEach(function (st) {
-        var delay = (st.w || 0) + 'ms' + (st.s ? ' + ' + st.s + 'ms each' : '');
-        var dur = DUR[st.d] + 'ms' + (st.it ? ' × ' + st.it + ', alternating' : '');
-        h += '<tr><td>' + esc(st.n) + '</td><td class="mono">' + change(st.p) + '</td><td class="v">' + dur +
-          '<br>--mw-dur-' + st.d + '</td><td class="v">' + delay + '</td><td class="v">--mw-ease-' + st.e + '</td></tr>';
-      });
-      h += '</tbody></table></div>';
-    });
-    spec.innerHTML = h;
-  }
-
-  MOMENTS.forEach(function (m) {
-    var b = document.createElement('button');
-    b.type = 'button'; b.textContent = m.name; b.dataset.id = m.id;
-    b.addEventListener('click', function () { show(m); });
-    nav.appendChild(b);
-  });
-  screen.addEventListener('click', function (e) {
-    var b = e.target.closest('[data-run]');
-    if (b && current.seqs[b.dataset.run]) run(current.seqs[b.dataset.run]);
-  });
-  document.getElementById('replay').addEventListener('click', function () { show(current, true); });
-  slowBtn.addEventListener('click', function () {
-    slow = !slow; slowBtn.setAttribute('aria-pressed', String(slow)); show(current, true);
-  });
-  redBtn.addEventListener('click', function () {
-    reduced = !reduced; redBtn.setAttribute('aria-pressed', String(reduced)); show(current, true);
-  });
-
-  var TOKENS = ':root {\n' +
-    '  /* durations */\n' +
-    Object.keys(DUR).map(function (k) { return '  --mw-dur-' + k + ': ' + DUR[k] + 'ms;'; }).join('\n') + '\n' +
-    '  --mw-stagger: 60ms;\n\n  /* easing */\n' +
-    Object.keys(EASE).map(function (k) { return '  --mw-ease-' + k + ': ' + EASE[k] + ';'; }).join('\n') + '\n\n' +
-    '  /* travel distances */\n  --mw-move-s: 8px;\n  --mw-move-m: 12px;\n  --mw-move-l: 28px;\n}\n\n' +
-    '@media (prefers-reduced-motion: reduce) {\n  :root {\n' +
-    '    --mw-dur-fade: 150ms; --mw-dur-move: 150ms; --mw-dur-settle: 150ms; --mw-dur-warm: 150ms;\n' +
-    '    --mw-dur-pulse: 0ms; --mw-stagger: 0ms;\n' +
-    '    --mw-move-s: 0px; --mw-move-m: 0px; --mw-move-l: 0px;\n  }\n}\n\n' +
-    '/* buttons: the only press feedback */\n' +
-    'button { transition: transform var(--mw-dur-press) var(--mw-ease-standard); }\n' +
-    'button:active { transform: scale(0.98); }';
-  var pre = document.getElementById('tokens'); pre.textContent = TOKENS;
-  var copy = document.getElementById('copy');
-  copy.addEventListener('click', function () {
-    function done(t) { copy.textContent = t; setTimeout(function () { copy.textContent = 'Copy tokens'; }, 1800); }
-    function select() {
-      var r = document.createRange(); r.selectNodeContents(pre);
-      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); done('Selected. Press Ctrl+C');
-    }
-    try { navigator.clipboard.writeText(TOKENS).then(function () { done('Copied'); }, select); } catch (e) { select(); }
-  });
-
-  show(MOMENTS[0]);
-})();
-</script>
-</body>
+        show(MOMENTS[0]);
+      })();
+    </script>
+  </body>
 </html>
