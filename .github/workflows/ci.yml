@@ -67,8 +67,13 @@ jobs:
       CI: 'true'
       NEXT_TELEMETRY_DISABLED: '1'
       TEST_DATABASE_URL: postgresql://meetwell_test_admin:synthetic-ci-only@127.0.0.1:5432/meetwell_test
+      PG_BIN_DIR: /usr/lib/postgresql/16/bin
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Scan full history for secrets, including scanner regression
+        run: bash scripts/scan-secrets.sh
       - uses: pnpm/action-setup@v4
         with:
           version: 12.11.2
@@ -77,6 +82,10 @@ jobs:
           node-version: '24'
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Audit production dependencies (fail on any reported vulnerability)
+        run: corepack pnpm audit --prod
+      - name: Install PostgreSQL 16 backup and restore client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client-16
       - name: Start private object storage and development mailbox
         run: docker compose up --build -d --wait --wait-timeout 120 minio mailpit
       - run: pnpm setup:accounts

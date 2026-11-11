@@ -1,15 +1,37 @@
 # Project status
 
-Updated 2026-11-03 (America/Chicago). Working name: **Meetwell**.
+Updated 2026-11-11 (America/Chicago). Working name: **Meetwell**.
 Pilot proposal: Manhattan, New York City; ages 18–30.
 
 Permanent checkout: `E:\Buisness\Dating_App`.
 Remote: `https://github.com/abinabrahamColorado/Dating_App`.
-Current review branch: `codex/m4-connections-plans`. M3 PR #6 merged after the
+Current work: separate setup and security-hardening reviews. M4 PR #8 merged with
+explicit founder approval, merge commit `cc6ecf1b3c3461c807ea12b8ea96cfa631079cf1`.
+Main CI [42974176138](https://github.com/abinabrahamColorado/Dating_App/actions/runs/42974176138)
+passed `verify`, `windows` and `dev-services`. No M5 is authorized.
+
+Setup [PR #10](https://github.com/abinabrahamColorado/Dating_App/pull/10) is separate,
+unmerged and green at `21f3f9caa3fea0cb913336f39d2a1f5d7042f442`. It records the
+authoritative E: project folder, Astra/Extra High project defaults, pinned Node/
+Corepack/pnpm and the prepared main ruleset. Browser authentication is still needed
+to activate the ruleset. Full Access remains unchanged pending the permissions
+tradeoff decision. The current chat's historical starting directory is not the
+repository; every development command explicitly uses the permanent checkout.
+
+`codex/security-hardening` starts from merged main independently of PR #10. It adds
+nonce CSP/HSTS, strict nonlocal startup/SMTP checks, secret/dependency CI, local
+privacy-limited monitoring and encrypted backup/fresh-restore tools. See DEC-050/051,
+[checklist](security/checklist.md) and [verification](testing/security-hardening.md).
+Full `corepack pnpm check` passes: 46 unit/property/architecture, 74 real PostgreSQL
+integration and 18 Chromium/axe tests (138 total), plus typecheck/lint/format/build.
+The production dependency audit is clean; publication/CI verification is next. External alerting,
+hosting controls and M5 deletion replay remain open. Do not merge this work yet.
+
+M3 PR #6 merged after the
 DEC-045 closure-history correction and all six checks passed at `d0c1aa7`.
 Merge commit: `010a80bc40a96cc0576a0370e6238f9b988e487c`. Main CI
 [41772404412](https://github.com/abinabrahamColorado/Dating_App/actions/runs/41772404412)
-passed all three jobs before the M4 branch was created. Do not merge M4 or start M5.
+passed all three jobs before the M4 branch was created.
 PR #3 merged with explicit founder
 approval at `a4dee472951f4d11968de6613e6d416f0e227df8`. Main CI
 [39547453037](https://github.com/abinabrahamColorado/Dating_App/actions/runs/39547453037)
@@ -53,7 +75,7 @@ Venue edits, review expiry and shutdowns invalidate plans. Calendar/share/manual
 messages, chat/plan safety links and the opt-in Focus offer are implemented.
 See DEC-046–048 and [M4 operations](operations/connections-plans.md).
 
-This review branch isolates authentication email failures: each message commits
+The merged M1 repair isolates authentication email failures: each message commits
 independently, failed attempts persist with a retry delay and budget, and a corrupt
 message cannot undo earlier successful delivery markers. Migration `0004` is
 additive and has been applied only to local development/test databases. SMTP
@@ -84,7 +106,7 @@ and retains attempts, exposures and an append-only closure ledger.
 M3 full `corepack pnpm check` passed: typecheck, lint, formatting, 32 unit/property
 tests, 46 real PostgreSQL integration tests, production build and 13 Chromium tests
 with axe (91 total). See [M3 review](testing/m3-review.md) and the PR's exact-head
-checks for the historical CI results. M3 is now merged; M4 remains for review.
+checks for the historical CI results. M3 and M4 are now merged.
 
 Full `corepack pnpm check` passed on the M2 review branch: typecheck, lint, formatting,
 22 unit/property tests, 34 real PostgreSQL integration tests, production build and
@@ -113,8 +135,8 @@ branch. Its initial run 39541603202 exposed a Compose initialization race:
 `postgis_version()` was unavailable after the socket health check passed. DEC-032
 changes readiness to TCP and retains the SQL assertions. Inspect the final PR head
 and live checks before merging; publication and final CI results are recorded in
-that PR and the task handoff. The older open M0 PR #1 is a conflicting historical proposal and must
-not be mistaken for additional work to merge.
+that PR and the task handoff. Historical M0 PR #1 was subsequently closed without
+merging, as recorded above; it is not additional work to merge.
 
 PR #4 subsequently merged into M1 with explicit approval. The current M1 merge
 review records DEC-033/034, the complete Markdown-rewrite audit, a four-fail/four-pass
@@ -127,14 +149,16 @@ founder's explicit M1 merge and M2 authorization in DEC-035.
 
 Account APIs require local/test mode and a loopback origin. Use synthetic accounts.
 Birth-date entry is not identity verification. Deletion currently disables access;
-it does not erase data. Chat, joint plans,
-feedback, erasure/restore and event Go remain unbuilt. No serving model, member
+it does not erase data. Chat and joint plans are implemented in M4. Feedback,
+erasure/tombstone replay and event Go remain unbuilt. No serving model, member
 GPS collection, real provider integration or live pilot is enabled.
 
-Next: review the M3 PR; do not merge it or start M4 without further authorization.
+Next: finish the separately authorized setup/security reviews and wait for founder
+approval. Do not start M5, research build cards or deployment.
 M1 client retry recovery and ambiguous media-write compensation (G08/G09) remain
 release gates. M2 fixes G02/G03 for current request/case boundaries; M3 now tests
-reservation/delivery/acceptance races. Chat and plan races remain M4 work.
+reservation/delivery/acceptance races. M4 covers chat delivery and plan confirmation
+block races in both transaction orderings.
 Deletion/restore must pass before real enrollment; Go also requires staffed
 operations and explicit activation approval. The founder rejected the crosswalk;
 CODEX_PROMPTS numbering and order govern. M5 deletion already precedes M6 Go.
@@ -159,4 +183,4 @@ retrieve the link in `http://127.0.0.1:8025` and open it in the same browser.
 Run `corepack pnpm worker` in a second terminal for retries.
 See DEVELOPMENT_WINDOWS.md for a synthetic moderator and shutdown instructions.
 Ignored `.env` holds generated keys; `.local/` holds services/data.
-Local services were stopped after verification, with data preserved.
+Local services are running for the current synthetic verification; data is preserved.

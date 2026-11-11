@@ -56,9 +56,10 @@ it('I-04 architecture: every HTTP entry and worker is inventoried; new surfaces 
     'apps/web/server/passkeys.ts':
       'b4f7600984751171bf430f0d4afe7760d26ba284fce4f5f90ccb3c1d151caa64',
     'apps/web/server/mail.ts': '3b8370eec4869db1751869ff9b3a5231e46653092ccba37561fc8c2da14b9a82',
-    // M4 registers only the inventoried delivery and revocation maintenance jobs.
-    'apps/worker/src/main.ts': '320f8a70d51b628087a30bb319369ae69a0b6e90572b5e3e204b8d9f6c775d4e',
-    'apps/worker/src/worker.ts': '4ca1ef0251aed6b867a0d1c13fda3a4d62bb9e90ea22bf95c99742079daa2cf7',
+    // DEC-050 review: same inventoried jobs and guards; startup validation,
+    // fixed heartbeat/events and generic queue failures add no member-data access.
+    'apps/worker/src/main.ts': 'efda471f7382936d514e2e59ef3340d2a75eef2c0902862e8002030104323c99',
+    'apps/worker/src/worker.ts': '86b623ad6a136d776d088b4caf53267b76fe7ef7f5ab7d88a66ec3736ba8d262',
   };
   for (const [path, hash] of Object.entries(reviewedSelfAndInfrastructure))
     expect(

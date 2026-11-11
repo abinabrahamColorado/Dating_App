@@ -587,3 +587,70 @@ production process-secret isolation, manual accessibility review and generic
 opted-in plan reminder delivery. Real venue approval, staffed safety coverage and
 launch privacy review are founder release questions. REA remains uninstalled;
 algorithm research cards remain unimplemented and need separate explicit approval.
+
+## DEC-050 — Separate security hardening and privacy-limited monitoring
+
+Date: 2026-11-11. Spec P22, I-12/I-17/I-19. Founder authorization: the seven-part
+hardening request after approving M4 PR #8. DEC-049 is reserved for the separate
+development-setup PR #10; this branch starts from merged M4, not that setup branch.
+
+Use per-request CSP nonces in Next Proxy, forwarded to the renderer and returned
+in response headers. Static `next.config.ts` headers cannot create request-bound
+nonces, so it retains static protections/HSTS while Proxy sets CSP. Render the
+root dynamically and disable HTML caching; this trades static-page caching for a
+correct nonce boundary. No unsafe-inline scripts; style attributes remain allowed
+for existing React UI and unsafe-eval is development-only. This follows
+[Next's nonce guidance](https://nextjs.org/docs/app/guides/content-security-policy).
+
+Reject nonlocal configuration with missing/example/short passwords or malformed,
+low-diversity/reused 256-bit keys. Apply at wrapper, direct Next and worker startup.
+Require implicit SMTP TLS or mandatory STARTTLS with certificate verification,
+using the shared mail adapter and preserving timeout/retry semantics. Plaintext is
+loopback local-only, including the test server: browser tests now use APP_MODE=local
+with the existing isolated TEST database URLs/bucket, not a nonlocal TLS exception.
+This does not remove the existing local enrollment gate or authorize production.
+
+Nonlocal database URLs support only the `sslmode` query option: other query
+parameters can override credentials/authority in PostgreSQL's parser after a URL
+userinfo check. Reject them rather than validate a different connection from the
+one used. Malformed monitor origins also receive a generic parse error because
+native URL errors retain their input. Both review findings have regression tests.
+
+Add pinned/checksummed full-history gitleaks with a removed-secret regression,
+production dependency audit and weekly reviewed Dependabot PRs. Four historical
+architecture-test hash literals are narrowly excepted by path AND line; no real
+secret was found, no broad allowlist or history rewrite was performed.
+
+Operational telemetry accepts no free-form error/request payload. Fixed events,
+random request IDs and timestamps support local web/worker/uptime observation;
+queue error persistence is sanitized before pg-boss sees it. External alert routing,
+provider, retention and ownership require a founder decision. No SDK/account is
+added. Framework stderr and hosting logs remain explicitly open, not implicitly
+certified by the safe telemetry API. See the monitoring runbook and checklist.
+
+The 49 checklist items use the founder's exact list; absent features are marked
+not applicable. Open operational controls identify owners and remain launch gates.
+No milestone, matching card, privacy policy or repository visibility is changed.
+
+## DEC-051 — Authenticated backups and quarantine-only fresh restore
+
+Date: 2026-11-11. Spec P22, I-12/I-18. The founder requests a backup/restore tool
+and a real fresh-database proof without starting M5.
+
+Encrypt the entire PostgreSQL custom dump with a separate random AES-256-GCM key.
+Authenticate before any restore SQL or database creation. Keep plaintext only in
+memory with a 256 MiB compressed pilot bound, refuse archive overwrite, validate
+the six privilege groups, and restore only to a new generated database. Preserve
+grants and migration ledger; never drop/clean an existing database, promote it or
+start a worker. A failed restore may leave a new quarantined database for review.
+
+Real PostgreSQL tests recover synthetic encrypted content, check ledger/no-op
+migration behavior and safety-role isolation, and reject wrong-key/tamper before
+creation. Archives exclude media, application keys and cluster login credentials.
+The runbook names their separate recovery obligations and the migration-owner
+default-privilege check. Windows directory ACLs need operator verification.
+
+M5 still owns deletion tombstones/replay before serving, retention/legal holds and
+backup expiry; the tool does not complete I-18. Scheduling, off-host storage,
+RPO/RTO, key custody, media recovery and release approval remain human operations
+decisions. No restored database may serve real users at this milestone.

@@ -7,9 +7,10 @@ export default defineConfig({
   use: { baseURL: 'http://localhost:3100', trace: 'retain-on-failure' },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
-    command: 'pnpm exec tsx scripts/web.ts start --port 3100 --hostname 127.0.0.1',
+    command: 'corepack pnpm exec tsx scripts/web.ts start --port 3100 --hostname 127.0.0.1',
     env: {
-      APP_MODE: 'test',
+      // Local HTTP/Mailpit only; database isolation is explicit below.
+      APP_MODE: 'local',
       APP_ORIGIN: 'http://localhost:3100',
       IDENTITY_DATABASE_URL: process.env.TEST_IDENTITY_DATABASE_URL ?? '',
       APP_DATABASE_URL: process.env.TEST_APP_DATABASE_URL ?? '',
