@@ -56,6 +56,8 @@ outside backups. Defaults are `.local/privacy/journal`, `.local/privacy/exports`
 and `.local/privacy/backups`. Hosting must explicitly provision independent,
 durable access-controlled storage and custody; same-host local files are not
 off-host disaster recovery. Never nest the journal inside the export directory.
+Git ignores backup, snapshot and journal artifacts even if their configured
+directory is changed; this is an extra guard, not a substitute for custody controls.
 
 ```powershell
 Set-Location E:\Buisness\Dating_App

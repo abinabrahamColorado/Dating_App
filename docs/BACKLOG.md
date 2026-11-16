@@ -10,8 +10,9 @@ Setup PR #10 merged at `176207a`. Its Windows download failure was repaired by
 PR #12, merged at `7f15c33`; main CI 43824003084 is green (DEC-052).
 PR #11 merged at `37bb33f` after all six checks passed at `cdab890`; main CI
 43879455326 passed. Docs/design PR #9 merged at `cc61242` after update/green CI;
-main CI 43881320513 passed. M5 is now implemented on its separate branch and
-under verification. Its PR must remain unmerged (DEC-053). Research build cards
+main CI 43881320513 passed. M5 is implemented in
+[PR #22](https://github.com/abinabrahamColorado/Dating_App/pull/22); verification
+evidence is recorded in PROJECT_STATUS.md. Its PR must remain unmerged (DEC-053). Research build cards
 remain unauthorized.
 Monitoring vendor selection waits for hosting. Plan self-hosted Uptime Kuma;
 no Sentry or vendor SDK. See [monitoring](operations/monitoring.md).

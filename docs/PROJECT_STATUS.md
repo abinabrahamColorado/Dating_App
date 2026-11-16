@@ -5,7 +5,8 @@ Pilot proposal: Manhattan, New York City; ages 18–30.
 
 Permanent checkout: `E:\Buisness\Dating_App`.
 Remote: `https://github.com/abinabrahamColorado/Dating_App`.
-Current work: M5 on `codex/m5-feedback-outcomes-deletion`, based on `cc61242`.
+Current milestone: M5, implemented in [PR #22](https://github.com/abinabrahamColorado/Dating_App/pull/22)
+on `codex/m5-feedback-outcomes-deletion`, based on `cc61242`. Leave it unmerged.
 Security PR #11 merged with founder approval at `37bb33f` after all six checks
 passed at `cdab890` (46 unit + 74 PostgreSQL + 18 browser/axe = 138 tests).
 Main CI 43879455326 passed all three quality jobs. DEC-054 records the focused,
@@ -19,8 +20,8 @@ passed `verify`, `windows`, and `dev-services` before the M5 branch was created.
 M5 is authorized exactly as CODEX_PROMPTS.md: feedback, attendance provenance,
 separate learning datasets/exports, optional success exits/follow-ups, fixed-cohort
 metrics, retention, deletion receipts and restore tombstone replay. Implementation
-is present; verification is in progress and no M5 completion is claimed yet. Publish one M5
-PR, wait for CI, and stop without merging. M6, design-motion integration, research
+and its 162-test suite are complete; PR #22 awaits founder review. A separate
+approval is required to merge. M6, design-motion integration, research
 build cards, deployment and real enrollment are not authorized by this task.
 Monitoring remains the self-hosted Uptime Kuma plan, with vendor selection deferred
 until hosting and no Sentry/vendor SDK (DEC-053).
@@ -32,9 +33,21 @@ data, encrypted media versions and exports; the independent journal is replayed
 before a restored database can serve member requests. D9 retention includes
 audited case-specific hold/release and annual-review controls. DEC-055–058 and
 [the lifecycle runbook](operations/privacy-lifecycle.md) document the boundaries.
-Current local evidence: typecheck/lint and 53 unit tests passed. The full local
-check stops at PostgreSQL connection refusal; fresh CI verification is pending.
-Do not infer PostgreSQL, restore or browser success from compilation.
+Local evidence: pinned-toolchain frozen install, typecheck, lint, formatting,
+55 unit tests and production build passed. The full local check stops at
+PostgreSQL connection refusal. Hosted Linux verification at `521f1ce` passed
+55 unit + 85 real PostgreSQL/storage + 22 Chromium/axe tests = **162 tests**,
+including old-backup restoration, quarantine and deletion replay. Run
+[43896712076](https://github.com/abinabrahamColorado/Dating_App/actions/runs/43896712076)
+also passed full-history secret scanning and the production dependency audit.
+All six quality jobs at `521f1ce` passed in runs
+[43896712076](https://github.com/abinabrahamColorado/Dating_App/actions/runs/43896712076)
+and [43896938660](https://github.com/abinabrahamColorado/Dating_App/actions/runs/43896938660),
+including complete `corepack pnpm check` on both Windows runners.
+The [PR checks](https://github.com/abinabrahamColorado/Dating_App/pull/22/checks)
+are authoritative for the latest commit's six required Linux, Windows and
+development-service jobs; Windows runs the complete `corepack pnpm check`.
+Never infer current-head CI from a previous commit's result.
 
 Local verification on 2026-11-16 could not start PostgreSQL: Windows Device Guard
 blocked the existing `.local/tools/pgsql/bin/postgres.exe`. No policy exception,
@@ -178,9 +191,10 @@ in PR #8. M5 feedback, metrics and erasure/restore are under verification on the
 own branch. Event Go remains unbuilt. No serving model, member
 GPS collection, real provider integration or live pilot is enabled.
 
-The approved #11/#9 merges and green-main gates are complete. Next: finish M5's
-verification, publish its single PR, wait for green CI and stop without merging
-(DEC-053). M6 is not authorized.
+The approved #11/#9 merges and green-main gates are complete. M5's single PR #22
+is open and has passed all six jobs at its completed implementation commit.
+Next: confirm checks on any final documentation commit, then await the founder's
+review and separate merge approval (DEC-053). M6 is not authorized.
 M1 client retry recovery and ambiguous media-write compensation (G08/G09) remain
 release gates. M2 fixes G02/G03 for current request/case boundaries; M3 now tests
 reservation/delivery/acceptance races. M4 PR #8 proves the chat-delivery and

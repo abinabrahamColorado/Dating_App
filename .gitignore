@@ -9,5 +9,8 @@ coverage/
 playwright-report/
 test-results/
 *.mwbackup
+*.snapshot
+*.tombstone
+journal.v1
 *.tsbuildinfo
 .DS_Store

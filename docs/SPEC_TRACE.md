@@ -1,9 +1,12 @@
-# Specification trace — M1 evidence
+# Specification trace and milestone evidence
 
 ## M5 implementation and verification map
 
 2026-11-16, DEC-055–058. New forward migrations 0014–0016; earlier migrations
 are unchanged. Test outcomes and the unmerged PR are recorded in PROJECT_STATUS.
+`lifecycle-artifacts.test.ts` also proves authenticated journal failure behavior
+and backup expiry after a filesystem copy; the PostgreSQL suite exercises real
+versioned storage, unrelated-message retry preservation and global abuse budgets.
 
 | Scope               | Implementation                                                                                                                          | Executable evidence                                                                                                                                                                                                      |
 | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
