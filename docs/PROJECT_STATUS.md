@@ -33,6 +33,12 @@ updated main into its branch, resolve conflicts, run checks, publish and wait fo
 CI. Do not merge #11 or start M5.
 Monitoring direction: defer vendor selection until hosting; plan self-hosted
 Uptime Kuma; no Sentry or vendor SDK. Apply this to PR #11's runbook at that step.
+Local verification on 2026-11-16 could not start PostgreSQL: Windows Device Guard
+blocked the existing `.local/tools/pgsql/bin/postgres.exe`. No policy exception,
+replacement executable or security-control change was attempted. The machine's
+security administrator must resolve that local execution block before local
+database checks can resume; fresh GitHub CI is independent evidence, not a claim
+that the local environment works. Existing local data is preserved.
 Main rules remain inactive pending GitHub sign-in in the in-app tab. Workspace
 access with Approve for me remains a recommendation, not a verified permission
 profile: the current chat still has Full Access/never. The app controls could not

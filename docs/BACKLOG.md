@@ -16,6 +16,9 @@ update PR #11 with main and resolve conflicts; do not merge #11 or start M5.
 The founder deferred monitoring vendor selection until hosting is chosen and
 directed planning toward self-hosted Uptime Kuma, with no Sentry or vendor SDK.
 Record that direction in PR #11's monitoring guidance when its update can proceed.
+Local setup blocker (2026-11-16): Device Guard blocks the existing PostgreSQL
+executable. The PC's security administrator must review the policy; do not bypass
+it or claim local database checks passed. GitHub runners validate independently.
 
 The separate setup audit (DEC-049) standardizes Corepack/Node and durable guidance.
 The sidebar primary folder is corrected and verified. Remaining setup work:
