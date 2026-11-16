@@ -9,6 +9,14 @@ M4 PR #8 merged with explicit founder approval on 2026-11-11 at `cc6ecf1`.
 Main CI 42974176138 passed all three jobs. Do not start M5.
 The earlier hosted preview remains an independent design reference.
 
+Setup PR #10 merged on 2026-11-16 at `176207a`. Main CI 43819695236 is blocked
+only by the moved PostGIS Windows download (DEC-052). The repair retains the
+existing version/checksum and needs separate merge approval. After main is green,
+update PR #11 with main and resolve conflicts; do not merge #11 or start M5.
+The founder deferred monitoring vendor selection until hosting is chosen and
+directed planning toward self-hosted Uptime Kuma, with no Sentry or vendor SDK.
+Record that direction in PR #11's monitoring guidance when its update can proceed.
+
 The separate setup audit (DEC-049) standardizes Corepack/Node and durable guidance.
 The sidebar primary folder is corrected and verified. Remaining setup work:
 activate and verify main's PR/check/force-push/deletion protections after owner sign-in, and validate
