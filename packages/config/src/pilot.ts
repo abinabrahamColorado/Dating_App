@@ -37,6 +37,13 @@ export const pilot = {
   AVAILABILITY_HORIZON_DAYS: 10, // M0/M3; Spec P6 flexible windows replace mandatory two hours.
   VENUE_IMBALANCE_LAMBDA: 0.5, // M0/M4; Spec P18 weight hypothesis.
   VENUE_SUGGESTIONS: 3, // M0/M4; Spec P18 stable short list.
+  PLAN_DEFAULT_MINUTES: 30, // M4/P6/P18 optional short meeting, not an availability gate.
+  PLAN_MIN_MINUTES: 5,
+  PLAN_MAX_MINUTES: 120, // M4/P18 pilot scheduling bounds; members choose duration.
+  CHAT_MAX_CHARACTERS: 4000, // M4/P21 bounded text-only messages.
+  CHAT_PAGE_SIZE: 50, // M4/P22 bounded history reads, with earlier-page navigation.
+  CONNECTION_REQUESTS_PER_MINUTE: 60, // M4/P21 includes polling.
+  CHAT_POLL_MILLISECONDS: 5000, // M4/P6 polling, no presence or read receipts.
   RETRIEVAL_MAX_ELIGIBLE_NEIGHBORS: 200, // Spec P10 upper pilot bound; exhaustive at small scale.
   STRONG_PREFERENCE_WEIGHT: 2, // M3 definition; Spec P11, P15.
   SOFT_PREFERENCE_WEIGHT: 1, // M3 definition; Spec P11, P15.

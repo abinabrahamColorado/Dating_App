@@ -20,4 +20,4 @@ SELECT 'CREATE DATABASE meetwell_test OWNER meetwell_dev'
 WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'meetwell_test') \gexec
 SQL
 bash "$(dirname "$0")/install-local-services.sh"
-printf '%s\n' 'Native services installed. Copy .env.example to .env, run pnpm db:migrate, then pnpm db:grant-local-worker.'
+printf '%s\n' 'Native services installed. Copy .env.example to .env, run corepack pnpm db:migrate, then corepack pnpm db:grant-local-worker.'

@@ -3,8 +3,31 @@
 M0 was reviewed and merged in PR #2. M1 was merged with explicit founder approval
 in PR #3 at `a4dee472951f4d11968de6613e6d416f0e227df8`; main CI is green.
 M2 merged in PR #5 at `5711fe60dfdec9e9ffa6a2f50b2ea38dea2ecb0f`; main CI
-39723068853 passed. M3 is on `codex/m3-explore-engine` for review. Do not merge
-its PR or start M4. The earlier hosted preview remains an independent design reference.
+39723068853 passed. M3 PR #6 merged with founder approval at
+`010a80bc40a96cc0576a0370e6238f9b988e487c`; main CI 41772404412 passed.
+M4 PR #8 merged with founder approval at `cc6ecf1`; main CI 42974176138 passed.
+Setup PR #10 merged at `176207a`. Its Windows download failure was repaired by
+PR #12, merged at `7f15c33`; main CI 43824003084 is green (DEC-052).
+The founder approved integrating PR #11 with every CI step retained, merging it
+only after all six checks pass, then updating/merging docs/design PR #9 on green
+CI. M5 is authorized only after those merges and green main; its own PR must remain
+unmerged (DEC-053). Research build cards remain unauthorized.
+Monitoring vendor selection waits for hosting. Plan self-hosted Uptime Kuma;
+no Sentry or vendor SDK. See [monitoring](operations/monitoring.md).
+The earlier hosted preview remains an independent design reference.
+
+Local setup blocker (2026-11-16): Device Guard blocks the existing PostgreSQL
+executable. The PC's security administrator must review the policy; do not bypass
+it or claim local database checks passed. GitHub runners validate independently.
+
+PR #11 integration verification: DEC-054 repairs the block/profile race fixture's
+transaction ordering after one Windows failure at `b37a08d`. Keep every denial
+assertion and require fresh green checks before the approved merge.
+
+The separate setup audit (DEC-049) standardizes Corepack/Node and durable guidance.
+The sidebar primary folder is corrected and verified. Remaining setup work:
+activate and verify main's PR/check/force-push/deletion protections after owner sign-in, and validate
+workspace access with automatic review. See [setup evidence](DEVELOPMENT_SETUP.md).
 
 Latest review: [execution roadmap](product/roadmap.md),
 [architecture gaps](architecture/review-2026-10-20.md),
@@ -35,13 +58,21 @@ research is complete for now (DEC-033). DEC-035 authorizes this M2 build only.
 
 ## Dependency refinements
 
+- DEC-050/051 security follow-up: [the 49-item register](security/checklist.md)
+  names remaining release owners. Before hosting, review bucket IAM, network/TLS,
+  build/access/framework log privacy, universal route rate budgets, key custody,
+  external monitoring/alert ownership and isolated staging. No vendor is approved.
+- M5 retains deletion-tombstone replay before restored data may serve traffic,
+  D14 backup expiry, media/key recovery and retention/legal holds. The standalone
+  encrypted backup/fresh-restore drill does not complete I-18 or start M5.
+
 - M3 review correction completed in DEC-045: temporary system cancellations and
   undelivered reservation expiry permit later re-entry; permanent refusals and
   delivered expiry remain excluded. Pre-fix CANCELLED records lack operator-removal
   provenance and remain explicitly marked LEGACY_CANCELLED; no real-user migration
   is authorized by the local synthetic repair.
 
-- Completed in the open M3 PR #6: founder-requested human-readable profile preview
+- Completed in merged M3 PR #6: founder-requested human-readable profile preview
   labels and "My reports" member navigation (DEC-044). M2 PR #5 had already merged
   when this follow-up arrived. No remaining work or milestone change for this copy.
 
@@ -85,8 +116,16 @@ Pricing/payments; demographic research; pooled models/embeddings; broad neighbor
   block-vs-reservation/delivery/acceptance are tested on Postgres. Queued product
   mail is checked again under the pair lock. SMTP already accepted by a transport
   cannot be recalled; see DEC-042.
-- M4: enforce denial in chat and plans; add block-vs-message/delivery/confirmation
-  races and concern links on these surfaces. Enforce stored venue shutdowns.
+- M4 implemented: locked denial for chat send/delivery, plan proposal/change/
+  confirmation; both orderings of block versus delivery/confirmation; concern
+  links on chat/plan screens; venue shutdown exclusion and plan invalidation.
+- M5: enforce D11 encrypted-chat and D12 plan retention after closure, plus active
+  account deletion. Immutable plan versions/confirmations need a narrowly scoped
+  erasure path; safety-held evidence stays isolated. Do not preserve content in
+  command receipts or backups beyond its authorized retention window.
+- M7: pagination/load budgets beyond the pilot, manual screen-reader review,
+  interrupted browser command recovery after reload, and generic opted-in plan
+  reminder delivery. M4 adds no automatic alerts or new outbound message emails.
 - M5/M6: add post-meeting concern links and enforce stored event/Go shutdowns;
   retain report/help access during every shutdown. M5 retains erasure/restore work.
 - M3 implemented: bilateral preference/block/capacity/travel/availability gates,

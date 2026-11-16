@@ -137,7 +137,7 @@ it('I-04 M3 architecture: removing the locked policy at any disclosure stage fai
         readFileSync(`packages/db/src/${p}`, 'utf8').includes('approvedProfileFields('),
     )
     .sort();
-  expect(readers).toEqual(['explore.ts', 'member-access.ts']);
+  expect(readers).toEqual(['connections.ts', 'explore.ts', 'member-access.ts']);
   const f = parse('packages/db/src/explore.ts');
   for (const name of ['own', 'capacity', 'close', 'maintain']) {
     const m = nodes(f).find((n) => ts.isMethodDeclaration(n) && n.name.getText(f) === name)!;

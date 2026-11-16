@@ -8,13 +8,26 @@ export type PairMember = {
   deleted: boolean;
   restricted: boolean;
   blocksOther: boolean;
+  /** Persisted M1 field: true means the member chose to KEEP chats while paused. */
+  pauseChat?: boolean;
 };
 /** Spec P20/P22, I-04. The only bilateral deny policy. Facts must be loaded under
  * ordered locks at disclosure/commit, never supplied by the client or a cache. */
-export function isDenied(u: PairMember, v: PairMember): boolean {
+export function isDenied(
+  u: PairMember,
+  v: PairMember,
+  purpose: 'DISCOVERY' | 'CONNECTION' = 'DISCOVERY',
+): boolean {
   return (
     u.id === v.id ||
-    [u, v].some((m) => m.blocksOther || m.deleted || m.restricted || m.state !== 'ACTIVE')
+    [u, v].some(
+      (m) =>
+        m.blocksOther ||
+        m.deleted ||
+        m.restricted ||
+        (m.state !== 'ACTIVE' &&
+          !(purpose === 'CONNECTION' && m.state === 'PAUSED' && m.pauseChat === true)),
+    )
   );
 }
 export function orderedPair(u: string, v: string): [string, string] {

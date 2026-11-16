@@ -524,32 +524,61 @@ it('I-04 race: a committed block wins against a queued profile read on another s
     b = await member();
   await access(a, b);
   const hold = await admin.connect();
-  await hold.query('BEGIN');
-  await hold.query('SELECT app.lock_pair($1,$2)', [a.memberId, b.memberId]);
-  const block = blockMember(accounts, b, a.memberId, randomUUID());
-  let read: Promise<unknown> | undefined;
+  const suffix = b.memberId.replaceAll('-', ''),
+    trigger = `test_block_gate_${suffix}`,
+    gate = `block-race:${b.memberId}`;
+  // Gate the real block command after it owns both member locks, before INSERT
+  // commits. A queued lock request alone cannot establish transaction order.
+  await admin.query(`CREATE FUNCTION app.${trigger}() RETURNS trigger LANGUAGE plpgsql AS $$
+    BEGIN PERFORM pg_advisory_xact_lock(hashtextextended(TG_ARGV[0],91)); RETURN NEW; END $$`);
+  await admin.query(`CREATE TRIGGER ${trigger} BEFORE INSERT ON app.blocks
+    FOR EACH ROW WHEN (NEW.blocker_id='${b.memberId}'::uuid)
+    EXECUTE FUNCTION app.${trigger}('${gate}')`);
+  let block: Promise<unknown> | undefined, read: Promise<unknown> | undefined;
   try {
+    await hold.query('BEGIN');
+    await hold.query('SELECT pg_advisory_xact_lock(hashtextextended($1,91))', [gate]);
+    const holder = (await hold.query('SELECT pg_backend_pid() AS pid')).rows[0].pid;
+    block = blockMember(accounts, b, a.memberId, randomUUID());
+    let blocker: number | undefined;
     await expect
-      .poll(async () =>
-        Number(
-          (
-            await admin.query(
-              "SELECT count(*) FROM pg_stat_activity WHERE wait_event_type='Lock' AND query LIKE 'SELECT app.lock_pair%' AND pid<>pg_backend_pid()",
-            )
-          ).rows[0].count,
-        ),
-      )
-      .toBeGreaterThan(0);
+      .poll(async () => {
+        blocker = (
+          await admin.query(
+            `SELECT pid FROM pg_stat_activity WHERE datname=current_database()
+         AND query LIKE 'INSERT INTO app.blocks%' AND $1=ANY(pg_blocking_pids(pid))`,
+            [holder],
+          )
+        ).rows[0]?.pid;
+        return blocker;
+      })
+      .toBeDefined();
     read = memberProfile(accounts, a, b.memberId).then(
       () => 'leaked',
       (e: Error) => e.message,
     );
+    await expect
+      .poll(
+        async () =>
+          (
+            await admin.query(
+              `SELECT pid FROM pg_stat_activity WHERE datname=current_database()
+       AND query LIKE 'SELECT app.lock_pair%' AND $1=ANY(pg_blocking_pids(pid))`,
+              [blocker],
+            )
+          ).rowCount,
+      )
+      .toBeGreaterThan(0);
   } finally {
     await hold.query('COMMIT');
     hold.release();
+    await Promise.allSettled([block, read]);
+    await admin.query(`DROP TRIGGER ${trigger} ON app.blocks`);
+    await admin.query(`DROP FUNCTION app.${trigger}()`);
   }
   await block;
   expect(await read).toBe('NOT_FOUND');
+  await expect(memberProfile(accounts, a, b.memberId)).rejects.toThrow('NOT_FOUND');
 });
 it('I-04 I-11 race: block and report filed at the same moment both commit independently', async () => {
   const a = await member(),

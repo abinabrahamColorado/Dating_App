@@ -19,6 +19,7 @@ import { deliverAuthMail } from './mail';
 import { passkeyOptions, verifyPasskey } from './passkeys';
 import { handleSafety } from './safety-api';
 import { handleExplore } from './explore-api';
+import { handleConnections } from './connections-api';
 import { requireSupportedClient } from '@meetwell/db/client-policy';
 import type { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/server';
 
@@ -99,6 +100,11 @@ function key(request: Request) {
   return uuid.parse(request.headers.get('idempotency-key'));
 }
 const errors: Record<string, [number, string]> = {
+  CONNECTION_ENDED: [409, 'This connection has ended.'],
+  PLAN_UNAVAILABLE: [
+    409,
+    'This plan is no longer available. Choose a current venue and time together.',
+  ],
   UNAUTHORIZED: [401, 'Sign in to continue.'],
   FORBIDDEN: [403, 'This action is not available to this account.'],
   INDEPENDENT_REVIEW_REQUIRED: [403, 'A different safety reviewer must decide this appeal.'],
@@ -232,6 +238,19 @@ export async function handle(request: Request, path: string[]) {
     }
     const auth = (await authority())!;
     return await db.withSession(auth, async () => {
+      if (path[0] === 'connections' || (path[0] === 'ops' && path[1] === 'venues')) {
+        registered(auth);
+        return json(
+          await handleConnections({
+            auth,
+            request,
+            path,
+            requestId,
+            body: () => body(request),
+            key: () => key(request),
+          }),
+        );
+      }
       if (path[0] === 'explore' || (path[0] === 'ops' && path[1] === 'explore')) {
         registered(auth);
         return json(

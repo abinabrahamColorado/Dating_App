@@ -516,3 +516,215 @@ initial candidate query included every paused account and then evaluated all of
 their pairs. Scheduled retrieval now selects active Explore accounts only, before
 the unchanged authoritative locked pair gates. This bounds candidate work to the
 current cohort; it does not cache eligibility or weaken any reservation gate.
+
+## M4 connection authority and consent (DEC-046)
+
+2026-11-03, Spec P5/P6/P18, I-04/I-06/I-08/I-09/I-11. The founder authorized M4
+after the corrected M3 merge and green main CI. PR #6 merged at `010a80b`; main
+run 41772404412 passed before this branch. M4 remains unmerged for review.
+
+Chat uses encrypted text and polling, with a durable delivery sweep and no read
+receipts, typing indicators or message-content learning. Send, delivery and every
+plan read/transition recheck `isDenied` under `app.lock_pair`. Existing connection
+access has an explicit purpose in the same deny function: paused members must
+have selected the existing "Keep existing chats while paused" setting; discovery
+still denies every paused member. Focus keeps existing connections. Temporary
+unavailability reveals no counterpart details and still allows private closure.
+Closure cancels pending messages/plans and releases the inherited slot once.
+
+Plan content has an immutable revision independent of the row's CAS version.
+Each person confirms the same content revision; one confirmation never invalidates
+the other person's opportunity to confirm. Changing venue/time creates a revision
+and requires both confirmations again. Confirmed plan IDs, not reconfirmations of
+one plan, count toward the optional Focus offer. Archiving is a private closure,
+distinct from PASS; inactivity is never inferred rejection or attendance.
+
+## Reviewed venues, private choices and stable suggestions (DEC-047)
+
+2026-11-03, Spec P6/P18/P20, I-09/I-12/I-17/I-20. M4 extends the M3 venue read model
+with the complete human-review fields. Partner contact/training and operational
+complaints are encrypted in `ops`, separate from public venue details and safety
+cases. Staff reads/writes require current roles and audit rows. No map vendor or
+real venue is automatically approved; the old minimal synthetic fixture cannot
+be suggested as a complete M4 venue.
+
+Meeting preferences are private per connection. Protective defaults are free,
+no-purchase venues with alcohol-free options, no required accessibility features
+unless selected, and no alcohol-primary venue without both explicit choices and
+both ages at least 21. The member can edit these choices; edits invalidate future
+plans for renewed bilateral consent. A venue review must cover the whole meeting.
+
+Candidates pass both people's availability, access, budget, activity, hours and
+travel gates, then rank by the specified maximum-travel plus imbalance formula.
+Store the ordered choices for a time/preference snapshot; area edits do not
+silently rerank or refill it. Every use revalidates current eligibility. Explicit
+"Refresh reviewed places" requests a new snapshot. Empty supply remains empty.
+Neither member sees the other's origin, travel score or private preferences.
+
+Catalog reads hold shared advisory lock (40,1); operator edits and venue switches
+hold it exclusively before writing. Catalog revocation locks plans in ID order
+and never takes member locks, preserving member -> catalog -> plan ordering.
+Venue edits/shutdowns invalidate future proposed and confirmed plans. Review
+expiry is also checked at reads/confirmation and in the durable maintenance job.
+Re-enabling a place never silently restores a plan or its old approvals.
+
+## Meeting time, sharing and release boundaries (DEC-048)
+
+2026-11-03, Spec P6/P18/P22. The pilot uses New York time for member scheduling;
+venue hours retain their own IANA timezone. Ambiguous or nonexistent local times
+are rejected. All occupied civil minutes, including midnight and DST boundaries,
+must fit permitted hours. The optional default duration is 30 minutes, with a
+5–120 minute pilot range in config; this is not a shared two-hour availability gate.
+
+Only a currently confirmed plan can produce a calendar file or be shared. The
+calendar contains the venue/time, with escaped and folded text. Share uses the
+browser's share sheet or copy fallback and only the venue, time and the sharing
+member's first name. The three arrival/late/leaving messages are explicit member
+actions. There is no contact import, automatic safety alert, live ETA or tracking.
+
+M5 retains D9/D11/D12 retention, scoped legal holds and deletion/restore. M7 retains
+production process-secret isolation, manual accessibility review and generic
+opted-in plan reminder delivery. Real venue approval, staffed safety coverage and
+launch privacy review are founder release questions. REA remains uninstalled;
+algorithm research cards remain unimplemented and need separate explicit approval.
+
+## Development environment and continuity (DEC-049)
+
+2026-11-03, founder setup-audit request; engineering workflow and Spec P22/P23
+release boundaries. Resumed 2026-11-11 after the explicitly approved M4 merge.
+Use `E:\Buisness\Dating_App` as this PC's authoritative checkout and preserve
+existing chats/files. Change the sidebar primary folder only through supported
+app controls; do not edit internal app databases or rewrite historical chat state.
+The settings dialog recovered after a slow load; the primary folder was saved
+through the app and verified by its project-list tool as the actual Git repository.
+
+Keep the verified GPT-6 Astra/Extra High setting and record repository defaults.
+Use Node 24.19.0, Corepack 0.35.0 and pnpm 12.11.2, frozen installs, an early
+toolchain check and sequential verification. Do not alter the machine-wide PATH
+or the app's bundled pnpm fallback. Separate worktrees isolate concurrent edits.
+
+The founder authorized main protections: PR required, the existing `verify`,
+`windows`, `dev-services` GitHub Actions checks required, force-push/deletion
+blocked, merge commits retained, no bypass list. Require zero additional reviews
+so the sole maintainer is not locked out; explicit founder merge approval remains
+a separate workflow obligation. Public visibility is unchanged. The prepared
+ruleset is not yet active: the browser needs owner sign-in and the connector has
+no administration capability. See `docs/DEVELOPMENT_SETUP.md` for exact UI steps.
+
+Recommend workspace access with automatic review after fixing the project root.
+Explain network/process/cache tradeoffs and verify under that mode before claiming
+it sufficient. Current Full access/never-approve settings remain unchanged during
+this audit. No approval is inferred for M5, deployment, live users or
+research build cards. Healthy development checks are not launch readiness.
+
+## DEC-050 — Separate security hardening and privacy-limited monitoring
+
+Date: 2026-11-11. Spec P22, I-12/I-17/I-19. Founder authorization: the seven-part
+hardening request after approving M4 PR #8. DEC-049 is reserved for the separate
+development-setup PR #10; this branch starts from merged M4, not that setup branch.
+
+Use per-request CSP nonces in Next Proxy, forwarded to the renderer and returned
+in response headers. Static `next.config.ts` headers cannot create request-bound
+nonces, so it retains static protections/HSTS while Proxy sets CSP. Render the
+root dynamically and disable HTML caching; this trades static-page caching for a
+correct nonce boundary. No unsafe-inline scripts; style attributes remain allowed
+for existing React UI and unsafe-eval is development-only. This follows
+[Next's nonce guidance](https://nextjs.org/docs/app/guides/content-security-policy).
+
+Reject nonlocal configuration with missing/example/short passwords or malformed,
+low-diversity/reused 256-bit keys. Apply at wrapper, direct Next and worker startup.
+Require implicit SMTP TLS or mandatory STARTTLS with certificate verification,
+using the shared mail adapter and preserving timeout/retry semantics. Plaintext is
+loopback local-only, including the test server: browser tests now use APP_MODE=local
+with the existing isolated TEST database URLs/bucket, not a nonlocal TLS exception.
+This does not remove the existing local enrollment gate or authorize production.
+
+Nonlocal database URLs support only the `sslmode` query option: other query
+parameters can override credentials/authority in PostgreSQL's parser after a URL
+userinfo check. Reject them rather than validate a different connection from the
+one used. Malformed monitor origins also receive a generic parse error because
+native URL errors retain their input. Both review findings have regression tests.
+
+Add pinned/checksummed full-history gitleaks with a removed-secret regression,
+production dependency audit and weekly reviewed Dependabot PRs. Four historical
+architecture-test hash literals are narrowly excepted by path AND line; no real
+secret was found, no broad allowlist or history rewrite was performed.
+
+Operational telemetry accepts no free-form error/request payload. Fixed events,
+random request IDs and timestamps support local web/worker/uptime observation;
+queue error persistence is sanitized before pg-boss sees it. External alert routing,
+provider, retention and ownership require a founder decision. No SDK/account is
+added. Framework stderr and hosting logs remain explicitly open, not implicitly
+certified by the safe telemetry API. See the monitoring runbook and checklist.
+
+The 49 checklist items use the founder's exact list; absent features are marked
+not applicable. Open operational controls identify owners and remain launch gates.
+No milestone, matching card, privacy policy or repository visibility is changed.
+
+## DEC-051 — Authenticated backups and quarantine-only fresh restore
+
+Date: 2026-11-11. Spec P22, I-12/I-18. The founder requests a backup/restore tool
+and a real fresh-database proof without starting M5.
+
+Encrypt the entire PostgreSQL custom dump with a separate random AES-256-GCM key.
+Authenticate before any restore SQL or database creation. Keep plaintext only in
+memory with a 256 MiB compressed pilot bound, refuse archive overwrite, validate
+the six privilege groups, and restore only to a new generated database. Preserve
+grants and migration ledger; never drop/clean an existing database, promote it or
+start a worker. A failed restore may leave a new quarantined database for review.
+
+Real PostgreSQL tests recover synthetic encrypted content, check ledger/no-op
+migration behavior and safety-role isolation, and reject wrong-key/tamper before
+creation. Archives exclude media, application keys and cluster login credentials.
+The runbook names their separate recovery obligations and the migration-owner
+default-privilege check. Windows directory ACLs need operator verification.
+
+M5 still owns deletion tombstones/replay before serving, retention/legal holds and
+backup expiry; the tool does not complete I-18. Scheduling, off-host storage,
+RPO/RTO, key custody, media recovery and release approval remain human operations
+decisions. No restored database may serve real users at this milestone.
+
+## Restore the pinned Windows PostGIS download (DEC-052)
+
+2026-11-16, development reproducibility; Spec P22/P23 release boundaries. The
+founder approved merging setup PR #10, then updating PR #11 only after main CI
+passes. PR #10 merged at `176207ad0c49f88d384f9570dcd47a5ecfba28a0`. Main run
+43819695236 passed `verify` and `dev-services`, but Windows setup failed before
+tests because the pinned PostGIS URL returned HTTP 404.
+
+The official OSGeo directory moved that same 3.6.2 archive into its `archive/`
+subdirectory. Correct only the manifest URL; retain the version, SHA-256,
+extraction path and checksum enforcement. No new dependency version, fallback
+mirror, bypass or product change is introduced. The repair PR records fresh
+download/checksum evidence and CI; main remains red until a separately approved
+repair merge passes its main run. Do not update or merge PR #11 before that gate.
+
+## DEC-053 — Approved integration and monitoring direction
+
+Date: 2026-11-16. Spec P22/P23; founder's explicit merge instructions.
+PR #12 merged at `7f15c33`; main CI 43824003084 passed all three jobs.
+The founder approved resolving PR #11's workflow conflict by retaining the pinned
+Node/Corepack/pnpm setup, full-history secret scan, production dependency audit,
+PostgreSQL 16 backup client and every existing quality gate. Merge #11 only after
+all six checks pass; then update and merge the docs/design-only PR #9 after green
+CI. Start M5 from green updated main, publish a separate PR, and do not merge M5.
+
+Monitoring vendor selection is deferred until hosting is chosen. Plan self-hosted
+Uptime Kuma on founder-controlled infrastructure; no Sentry or vendor SDK.
+Independent probing, notification destination, on-call owner and retention remain
+release decisions. This direction authorizes documentation, not a deployment.
+
+## DEC-054 — Establish the block race's transaction order
+
+Date: 2026-11-16. Spec P20/P22, I-04. The founder explicitly approved this focused
+test repair after one Windows check at `b37a08d` failed while the other five checks
+passed. The existing fixture waited for any queued pair-lock request; that did not
+prove that the block owned the locks before the competing read began.
+
+Use a temporary, synthetic-member-scoped test trigger to pause the real block
+command after it acquires both member locks. PostgreSQL blocking-process evidence
+must then prove the profile read waits behind that exact block transaction before
+the gate is released. Keep the denial assertion and check another read after block
+completion. Remove the temporary trigger/function in cleanup. No runtime policy,
+CI step or security assertion is weakened. Fresh CI must prove the revised fixture;
+a passing rerun of the old fixture alone would not resolve the ordering gap.

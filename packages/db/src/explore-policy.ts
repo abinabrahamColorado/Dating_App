@@ -94,9 +94,10 @@ export async function loadExploreMember(
   };
 }
 export async function loadVenues(db: PoolClient): Promise<Venue[]> {
+  await db.query('SELECT pg_advisory_xact_lock_shared(40,1)');
   const rows =
     await db.query(`SELECT id,ST_Y(public_centroid::geometry) AS lat,ST_X(public_centroid::geometry) AS lon,
-  approved,review_expires_at,alcohol_primary FROM app.lock_explore_venues() ORDER BY id`);
+  approved,review_expires_at,alcohol_primary FROM app.lock_explore_venues() WHERE NOT app.venue_disabled(id) ORDER BY id`);
   return rows.rows.map((r) => ({
     id: r.id,
     centroid: [r.lat, r.lon],

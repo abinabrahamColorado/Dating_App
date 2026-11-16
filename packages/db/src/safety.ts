@@ -463,6 +463,7 @@ export class SafetyStore {
       target = d.target ?? 'GLOBAL';
     return this.staff(auth, (db) =>
       this.command(db, auth, key, { action: 'switch', d }, async () => {
+        if (d.scope === 'VENUE') await db.query('SELECT pg_advisory_xact_lock(40,1)');
         await db.query('SELECT pg_advisory_xact_lock(hashtextextended($1,22))', [
           `${d.scope}:${target}`,
         ]);

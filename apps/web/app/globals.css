@@ -680,3 +680,28 @@ details > .form-stack {
   border-bottom: 1px solid #d5d8cd;
   overflow-wrap: anywhere;
 }
+.chat-messages {
+  list-style: none;
+  padding: 0;
+}
+.chat-messages li,
+.plan-card {
+  padding-block: 1.25rem;
+  border-bottom: 1px solid #d5d8cd;
+  overflow-wrap: anywhere;
+}
+.chat-messages p {
+  white-space: pre-wrap;
+}
+.chat-messages time {
+  font-size: 0.85rem;
+}
+.hours-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-block: 1rem;
+}
+.venue-details {
+  overflow-wrap: anywhere;
+}

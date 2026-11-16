@@ -21,7 +21,7 @@ export async function withMemberPair<T>(
     transaction(store.app, async (db) => {
       await db.query('SELECT app.lock_pair($1,$2)', [auth.memberId, subject]);
       const members = await db.query<PairMember>(
-        `SELECT id,state,deletion_requested_at IS NOT NULL AS deleted,
+        `SELECT id,state,pause_chat AS "pauseChat",deletion_requested_at IS NOT NULL AS deleted,
        app.enforcement_status(id) AS restricted,
        (EXISTS(SELECT 1 FROM app.blocks WHERE low_id=least($1::uuid,$2::uuid) AND high_id=greatest($1::uuid,$2::uuid) AND blocker_id=m.id)
         OR EXISTS(SELECT 1 FROM app.legacy_pair_denials WHERE low_id=least($1::uuid,$2::uuid) AND high_id=greatest($1::uuid,$2::uuid))) AS "blocksOther"
@@ -30,7 +30,12 @@ export async function withMemberPair<T>(
       );
       const u = members.rows.find((r) => r.id === auth.memberId),
         v = members.rows.find((r) => r.id === subject);
-      if (!u || !v || isDenied(u, v)) throw new StoreError('NOT_FOUND');
+      const mutual = await db.query(
+        "SELECT 1 FROM app.opportunities WHERE low_id=least($1::uuid,$2::uuid) AND high_id=greatest($1::uuid,$2::uuid) AND state='MUTUAL' AND slot_held",
+        [auth.memberId, subject],
+      );
+      if (!u || !v || isDenied(u, v, mutual.rowCount ? 'CONNECTION' : 'DISCOVERY'))
+        throw new StoreError('NOT_FOUND');
       const grant = await db.query(
         'SELECT 1 FROM app.profile_access WHERE viewer_id=$1 AND subject_id=$2 AND expires_at>clock_timestamp()',
         [auth.memberId, subject],
@@ -41,7 +46,7 @@ export async function withMemberPair<T>(
   );
 }
 /** Internal allowlist reader: caller must hold the pair guard through this read.
- * Only memberProfile and the M3 guarded card may call it (architecture test). */
+ * Only inventoried guarded profile, introduction and connection reads may call it. */
 export async function approvedProfileFields(store: AccountStore, db: PoolClient, subject: string) {
   const row = await db.query<{ body_cipher: string }>(
     'SELECT body_cipher FROM app.profiles WHERE member_id=$1',

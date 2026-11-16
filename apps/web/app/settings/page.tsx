@@ -75,7 +75,7 @@ export default function Page() {
               </p>
               <p>
                 Focus stops new romantic introductions. Pause stops discovery. Existing connections
-                can remain by your choice when messaging becomes available.
+                remain available while paused only when you choose to keep chats open.
               </p>
               <label className="check-row">
                 <input

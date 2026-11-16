@@ -1,8 +1,23 @@
 # Specification trace — M1 evidence
 
+2026-11-16 I-04 verification update (DEC-054):
+`tests/integration/safety.test.ts` gates the real block after it owns the member
+locks and proves the profile read waits behind that exact transaction. Denial is
+asserted for both the queued read and a read after block completion. Runtime
+authorization is unchanged; fresh CI results are recorded on PR #11.
+
 Source: `docs/architecture-v0.2.txt` (all 32 parts read) and `AGENTS.md`. `P<n>` below means **Spec P<n>**. This is an implementation plan, not a claim that these features are complete. Every product row is **PLANNED** until its milestone supplies the named executable test. M0 implements only the infrastructure checks listed at the end. Module names are planned paths beneath `packages/` or `apps/`; learning is a restricted DB/export module, not a model service.
 
 ## M1 implementation and executable evidence
+
+Development controls are tracked separately in `docs/DEVELOPMENT_SETUP.md`
+(DEC-049): toolchain preflight, frozen install, sequential quality gates and
+GitHub/project-setting evidence. They do not mark any product requirement complete
+or replace the launch gates. M4 evidence is in merged PR #8.
+DEC-052 corrects the archived official Windows PostGIS URL while retaining its
+version and checksum. The clean Windows CI setup checks the downloaded artifact
+and runs the existing real PostgreSQL and browser suites; no product invariant
+or milestone completion changes.
 
 The founder-designated PDF is authoritative; its extracted text is the reading
 aid. The complete 193-row plan below is retained. Except for the bounded evidence
@@ -384,3 +399,54 @@ closure and retains all opportunities plus an append-only closure ledger.
 undelivered expiry, permanent closure parity, and generated pass/block histories
 that cannot be proposed again. Existing delivered-expiry, restriction, operator
 removal and mutual-close tests continue to apply.
+
+## M4 implementation evidence (2026-11-03)
+
+- I-04/I-19: `db/connection-policy` calls the authoritative `isDenied` under
+  `app.lock_pair`. `db/connections` applies it to reads, sends, delivery, proposals,
+  venue/time changes and confirmations. Real PostgreSQL tests cover both orderings
+  of block versus message delivery and plan confirmation, stale sessions and
+  unrelated-member access. M2/M3 inventories extend to every M4 route/job, with
+  negative tests that remove a guard and require the architecture audit to fail.
+- I-06/I-08/I-13; REQ-035: chat/plan lifecycle retains the M3 connection slot;
+  closure releases once. Tests cover explicit paused-chat consent, Focus keeping
+  existing connections, unavailable reads and closure distinct from a pass.
+- I-09; Spec P18: `core/connections`, `db/connections`, `db/venues` and migration
+  0013 implement complete reviewed venue fields, private meeting preferences,
+  both-person filters, stable ranked options, immutable plan revisions and
+  bilateral same-revision confirmations. Tests cover revision/cancel/venue races,
+  expired reviews, venue shutdown, operator revocation, private DTOs and retries.
+- I-11/I-12/I-17/I-20: chat and plan safety links, encrypted messages and private
+  operator records, learning/app role denial, audited venue reviews, no member
+  origin in options/share and no chat content in learning/logs. Existing safety
+  tests remain authoritative for reports, help and case-role isolation.
+- P6/P18: browser workflows cover human venue review, mutual -> proposal -> two
+  confirmations -> plan page without sending a message, calendar download, copy
+  sharing, manual arrival messages, chat, private close, venue shutdown and help.
+  Axe runs on venue review, chat and plan pages; mobile overflow is checked.
+- Domain/property tests cover the prescribed travel ranking, accessibility/cost/
+  activity/alcohol/hour filters, short shared windows, DST gaps/folds, midnight
+  opening boundaries, calendar escaping and opt-in paused connection access.
+
+DEC-046–048 explain protective defaults, serialization and remaining release work.
+M5 feedback/post-meeting surfaces, D9/D11/D12 retention and deletion remain planned;
+M6 event/Go switches remain off. No research build card is implemented.
+
+## Separate security hardening (2026-11-11)
+
+- P22/I-19: `config/security`, `web/security-headers`, `web/proxy`, Next config,
+  instrumentation and web/worker startup enforce nonce CSP, nonlocal HSTS/TLS and
+  secret validation. `unit/security-hardening` and `e2e/security-hardening` cover
+  alternate encodings, direct startup, spoofed headers, blocked injection and
+  working hydration. Existing role/object/CSRF suites remain required.
+- P22/I-12/I-17: `runtime/monitoring`, worker wrappers and `scripts/monitor` emit
+  fixed metadata only. Unit and integration tests cover error sentinel omission,
+  pg-boss persistence, successful jobs, down/up probes and redirect refusal.
+  External alerts and framework/hosting log privacy remain open (DEC-050).
+- P22/I-18 partial infrastructure only: `scripts/database-backup`, backup/restore
+  CLIs and `integration/backup-restore` prove authenticated encrypted archive,
+  fresh database recovery, ledger/grants and tamper rejection. Tombstone replay,
+  deletion/retention and production promotion remain unimplemented M5 work (DEC-051).
+- CI full-history gitleaks, production dependency audit and weekly updates are
+  recorded in `security/checklist.md`; these do not replace runtime authorization
+  tests or launch readiness review.
