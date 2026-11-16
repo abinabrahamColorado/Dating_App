@@ -5,10 +5,25 @@ in PR #3 at `a4dee472951f4d11968de6613e6d416f0e227df8`; main CI is green.
 M2 merged in PR #5 at `5711fe60dfdec9e9ffa6a2f50b2ea38dea2ecb0f`; main CI
 39723068853 passed. M3 PR #6 merged with founder approval at
 `010a80bc40a96cc0576a0370e6238f9b988e487c`; main CI 41772404412 passed.
-M4 PR #8 merged with founder approval at `cc6ecf1b3c3461c807ea12b8ea96cfa631079cf1`;
-main CI 42974176138 passed. Setup PR #10 and the separate security-hardening PR
-remain for review. Do not merge them or start M5 without further approval.
+M4 PR #8 merged with founder approval at `cc6ecf1`; main CI 42974176138 passed.
+Setup PR #10 merged at `176207a`. Its Windows download failure was repaired by
+PR #12, merged at `7f15c33`; main CI 43824003084 is green (DEC-052).
+The founder approved integrating PR #11 with every CI step retained, merging it
+only after all six checks pass, then updating/merging docs/design PR #9 on green
+CI. M5 is authorized only after those merges and green main; its own PR must remain
+unmerged (DEC-053). Research build cards remain unauthorized.
+Monitoring vendor selection waits for hosting. Plan self-hosted Uptime Kuma;
+no Sentry or vendor SDK. See [monitoring](operations/monitoring.md).
 The earlier hosted preview remains an independent design reference.
+
+Local setup blocker (2026-11-16): Device Guard blocks the existing PostgreSQL
+executable. The PC's security administrator must review the policy; do not bypass
+it or claim local database checks passed. GitHub runners validate independently.
+
+The separate setup audit (DEC-049) standardizes Corepack/Node and durable guidance.
+The sidebar primary folder is corrected and verified. Remaining setup work:
+activate and verify main's PR/check/force-push/deletion protections after owner sign-in, and validate
+workspace access with automatic review. See [setup evidence](DEVELOPMENT_SETUP.md).
 
 Latest review: [execution roadmap](product/roadmap.md),
 [architecture gaps](architecture/review-2026-10-20.md),

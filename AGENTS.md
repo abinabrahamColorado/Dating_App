@@ -16,6 +16,30 @@ Never run blanket regex rewrites over documents. Make explicit, reviewed edits
 and verify numbers, times, versions, identifiers, URLs and quotations unchanged
 unless that specific content change is intended and authorized (DEC-034).
 
+## Development environment and continuity
+
+On the founder's Windows PC, run development commands from
+`E:\Buisness\Dating_App`, the authoritative Git checkout. A chat's historical
+starting directory or an empty sidebar folder is not a second repository.
+Read `docs/PROJECT_STATUS.md` and `docs/DEVELOPMENT_SETUP.md` when resuming.
+Preserve the authoritative specification, `CODEX_PROMPTS.md` milestone order,
+and existing founder approvals; green CI never grants permission to merge.
+
+Use Node from `.node-version`, `corepack pnpm`, and the committed lockfile.
+Install with `corepack pnpm install --frozen-lockfile`; run
+`corepack pnpm check` sequentially in one checkout. Never run concurrent Next
+build/type-generation commands in the same checkout. Isolate concurrent code
+changes in separate worktrees, with separate service/test ports when needed.
+
+The founder selected GPT-6 Astra with Extra High reasoning for demanding
+development and architecture. `.codex/config.toml` records these defaults;
+verify the chat picker because an existing chat can override them. Additional
+reasoning or parallel work needs a clear task benefit. Prefer existing tools
+and scoped permissions; do not install REA or start research build cards.
+
+Setup changes do not authorize milestone merges, deployment, destructive
+operations, live enrollment, or consequential product/privacy changes (DEC-049).
+
 ## 1. What we are building
 
 This is a web-first local introduction and meeting service. It gives members a

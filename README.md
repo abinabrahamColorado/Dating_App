@@ -1,6 +1,6 @@
 # Meetwell — Human Connection Platform
 
-M4 connections and plans for a Manhattan, NYC pilot, ages 18–30. Meetwell is a working name. **This is a loopback-only development build using synthetic data.** Accounts, safety review, finite introductions, private decisions, encrypted chat, operator venue review and bilateral meeting plans work. M3 merged with founder approval and green main CI. The M4 PR must remain unmerged for review; complete erasure remains M5.
+M4 connections and plans for a Manhattan, NYC pilot, ages 18–30. Meetwell is a working name. **This is a loopback-only development build using synthetic data.** Accounts, safety review, finite introductions, private decisions, encrypted chat, operator venue review and bilateral meeting plans work. M4 merged with founder approval in PR #8. Complete erasure remains M5, which is not yet authorized.
 
 Start with [AGENTS.md](AGENTS.md), then read the authoritative [architecture PDF](docs/architecture-v0.2.pdf) and its [extracted text](docs/architecture-v0.2.txt). [CODEX_PROMPTS.md](CODEX_PROMPTS.md) defines M0–M7. Run one milestone at a time and review/merge its PR before the next.
 
@@ -23,7 +23,10 @@ implementation, published claims and proposals. The PDF remains authoritative.
 
 ## Prerequisites
 
-Node 24 LTS, Git, and pnpm 12.11.2 through Corepack. Use the native Windows setup, Docker Compose v2, or Ubuntu 24.04 with normal sudo/service-user support. `corepack pnpm` selects the repository's pinned package manager. Exact direct versions and the transitive lockfile are committed. Do not substitute SQLite or a memory database.
+Node **24.19.0** from `.node-version`, Git, Corepack **0.35.0**, and pnpm **12.11.2**. CI uses the same pins. Use the native Windows setup, Docker Compose v2, or Ubuntu 24.04 with normal sudo/service-user support. `corepack pnpm` selects the repository's pinned package manager; the plain `pnpm` command on this PC currently selects a different version. Exact direct versions and the transitive lockfile are committed. Do not substitute SQLite or a memory database.
+
+See [development setup and continuity](docs/DEVELOPMENT_SETUP.md) for Codex project
+settings, AI defaults, permissions, GitHub protections and the current merge boundary.
 
 ## Start here on this Windows PC
 
@@ -85,24 +88,21 @@ scripts/           Reproducible setup and development commands
 ## Local setup with Docker
 
 ```sh
-pnpm install --frozen-lockfile
+corepack pnpm install --frozen-lockfile
 cp .env.example .env
-pnpm services:up
-pnpm db:migrate
-pnpm db:grant-local-worker
-pnpm setup:accounts
-pnpm build
-pnpm test:unit
-pnpm test:integration
-pnpm exec playwright install --with-deps chromium
-pnpm test:e2e
+corepack pnpm services:up
+corepack pnpm db:migrate
+corepack pnpm db:grant-local-worker
+corepack pnpm setup:accounts
+corepack pnpm exec playwright install --with-deps chromium
+corepack pnpm check
 ```
 
 `services:up` starts PostgreSQL16/PostGIS, MinIO and Mailpit, binding ports to loopback. MinIO builds from the pinned official source release because the old binary endpoint is gone; the first build may take several minutes. Compose creates separate `meetwell_dev` and `meetwell_test` databases. The integration runner refuses a database URL whose name does not end in `_test`; it creates only synthetic test objects and never wipes an arbitrary database.
 
 The migration administrator is local development only. `db:grant-local-worker` grants the pre-created non-superuser development login access to the queue group. Production must provision separate service credentials and purpose-scoped grants. No development password should be used outside this loopback setup.
 
-Run `pnpm dev` and open http://localhost:3000 (use localhost for passkeys). Run `pnpm worker` in another terminal for pg-boss and durable email retries. Mailpit is http://127.0.0.1:8025; MinIO console is http://127.0.0.1:9001. Sign in with a synthetic address and open the Mailpit link in the same browser. Photos are encrypted in private buckets; the member account controls and moderation queue are usable locally.
+Run `corepack pnpm dev` and open http://localhost:3000 (use localhost for passkeys). Run `corepack pnpm worker` in another terminal for pg-boss and durable email retries. Mailpit is http://127.0.0.1:8025; MinIO console is http://127.0.0.1:9001. Sign in with a synthetic address and open the Mailpit link in the same browser. Photos are encrypted in private buckets; the member account controls and moderation queue are usable locally.
 
 ## Native Linux fallback when Docker is unavailable
 
@@ -110,10 +110,10 @@ Run `pnpm dev` and open http://localhost:3000 (use localhost for passkeys). Run 
 bash scripts/setup-native.sh
 cp .env.example .env
 bash scripts/start-local-services.sh
-pnpm install --frozen-lockfile
-pnpm db:migrate
-pnpm db:grant-local-worker
-pnpm setup:accounts
+corepack pnpm install --frozen-lockfile
+corepack pnpm db:migrate
+corepack pnpm db:grant-local-worker
+corepack pnpm setup:accounts
 ```
 
 The Linux fallback uses apt to install PostgreSQL 16 and PostGIS, starts a real database service as `postgres`, creates development/test databases idempotently, compiles pinned MinIO source using Go, and verifies the pinned Mailpit archive checksum. It requires network access and sudo capable of switching to the database service account. Stop the auxiliary services with `bash scripts/stop-local-services.sh`; stop PostgreSQL with the normal service tooling when desired. Windows has the separate native workflow above.
@@ -123,14 +123,8 @@ The earlier cloud environment could not run PostgreSQL. Current local and CI ver
 ## Verification and CI
 
 ```sh
-pnpm typecheck
-pnpm lint
-pnpm format:check
-pnpm test:unit
-pnpm test:integration
-pnpm build
-pnpm exec playwright install --with-deps chromium
-pnpm test:e2e
+corepack pnpm exec playwright install --with-deps chromium
+corepack pnpm check
 ```
 
 Unit tests cover every workspace, including a pure property test. Integration tests prove PostgreSQL16/PostGIS presence, migration replay, runtime schema denial and actual durable pg-boss execution. End-to-end tests cover public/member/operator pages, accessibility, real email onboarding, object/field authorization, moderated activation, passkeys and re-authentication. SPEC_TRACE.md identifies the implemented M1 portions; later invariants remain planned.
@@ -143,6 +137,6 @@ GitHub CI runs the same gates against an isolated real PostGIS service. Developm
 
 ## Migration and service controls
 
-`pnpm db:migrate` uses an advisory lock, per-file transactions and immutable SHA256 checksums. Never edit an applied migration; add a forward migration. The first migration creates five application schemas/roles plus an isolated pg-boss queue schema and an ops migration ledger. Runtime roles do not own application schemas or receive broad table grants. Rollback of the initial boundary migration requires a disposable database or an explicit destructive teardown; automatic down migration would risk deleting private data.
+`corepack pnpm db:migrate` uses an advisory lock, per-file transactions and immutable SHA256 checksums. Never edit an applied migration; add a forward migration. The first migration creates five application schemas/roles plus an isolated pg-boss queue schema and an ops migration ledger. Runtime roles do not own application schemas or receive broad table grants. Rollback of the initial boundary migration requires a disposable database or an explicit destructive teardown; automatic down migration would risk deleting private data.
 
 `packages/config/src/pilot.ts` centralizes pilot caps, timers, retention maxima, Manhattan area references and feature flags. EVENTS_ENABLED, GO_ENABLED and NEW_PERSON_GO_ENABLED default to false. CI verifies source; it does not deploy production. Keep the prior preview separate from this architecture.

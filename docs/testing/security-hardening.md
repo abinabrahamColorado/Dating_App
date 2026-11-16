@@ -57,8 +57,10 @@ formatting, **46 unit/property/architecture + 74 real PostgreSQL integration +
 18 Chromium/axe tests = 138**, plus the production build. All existing M0–M4
 workflows pass under the CSP. The production dependency audit found no advisories.
 Final published-head CI is recorded on
-[PR #11](https://github.com/abinabrahamColorado/Dating_App/pull/11) before handoff. Setup PR #10 is
-separate and is not included in this branch.
+[PR #11](https://github.com/abinabrahamColorado/Dating_App/pull/11) before handoff. Setup PR #10 and the PostGIS URL repair PR #12 are now integrated from main.
+DEC-053 preserves their pinned toolchain and all security/quality CI steps.
+Updated-head CI will be recorded on PR #11. Local PostgreSQL checks are currently
+blocked by Windows Device Guard; no bypass or local full-check success is claimed.
 
 DEC-050/051 record the scope and protective choices. Existing enrollment remains
 loopback/synthetic only. This review does not establish readiness for real users.

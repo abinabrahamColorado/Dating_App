@@ -23,21 +23,18 @@ automatic request/console breadcrumbs: they can carry private URLs or content.
 Suppressing raw job errors sacrifices detailed diagnostics; reproduce a failure
 with synthetic fixtures rather than adding member data to telemetry.
 
-## Remaining decision: alert delivery and ownership
+## Hosting and alert delivery plan
 
-The founder has not approved an outside provider. Local events alone cannot alert
-someone when the whole host is down. Choose an operator, an independent probe
-location, routing/escalation, retention and access policy before launch.
+The founder directed planning toward [self-hosted Uptime Kuma](https://github.com/louislam/uptime-kuma)
+and deferred vendor selection until hosting is chosen (DEC-053). No Sentry,
+vendor SDK, monitoring account or deployment is added. Keep the local
+instrumentation while those decisions remain open.
 
-- Keep this local instrumentation until hosting decisions are made (no third-party
-  transfer; external downtime alerting remains open).
-- Evaluate [self-hosted Uptime Kuma](https://github.com/louislam/uptime-kuma) on
-  founder-controlled infrastructure. This requires hosting and maintenance; configure
-  only the fixed health path and an explicitly approved notification destination.
-- Evaluate hosted Sentry only after a separate privacy/vendor decision. Its
-  [sensitive-data guidance](https://docs.sentry.io/platforms/javascript/data-management/sensitive-data/)
-  requires deliberate event filtering. Default SDK collection is not acceptable for
-  this app; no SDK is installed in this PR.
+Plan an independently hosted probe on founder-controlled infrastructure, checking
+only the fixed health path, with an explicitly approved notification destination.
+Local events alone cannot alert someone when the whole app host is down. Before
+launch, name the on-call owner and choose probe hosting, routing/escalation,
+maintenance, access and retention policies.
 
 Next's `onRequestError` hook records a generic event but cannot suppress every raw
 framework stderr exception. Framework/hosting/access-log scrubbing, log access and

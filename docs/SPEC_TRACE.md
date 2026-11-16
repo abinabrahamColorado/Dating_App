@@ -4,6 +4,15 @@ Source: `docs/architecture-v0.2.txt` (all 32 parts read) and `AGENTS.md`. `P<n>`
 
 ## M1 implementation and executable evidence
 
+Development controls are tracked separately in `docs/DEVELOPMENT_SETUP.md`
+(DEC-049): toolchain preflight, frozen install, sequential quality gates and
+GitHub/project-setting evidence. They do not mark any product requirement complete
+or replace the launch gates. M4 evidence is in merged PR #8.
+DEC-052 corrects the archived official Windows PostGIS URL while retaining its
+version and checksum. The clean Windows CI setup checks the downloaded artifact
+and runs the existing real PostgreSQL and browser suites; no product invariant
+or milestone completion changes.
+
 The founder-designated PDF is authoritative; its extracted text is the reading
 aid. The complete 193-row plan below is retained. Except for the bounded evidence
 in this table, requirements remain planned. Test files are
