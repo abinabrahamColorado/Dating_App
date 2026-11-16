@@ -96,6 +96,9 @@ test('I-10 optional success exit and separately consented follow-up remain acces
   await expect(page.getByText('Your answer is saved privately.')).toBeVisible();
   await page.getByRole('button', { name: 'Withdraw this follow-up consent' }).click();
   await expect(page.getByText('You withdrew this follow-up consent.')).toBeVisible();
+  expect(await f.feedback.followups(a)).toMatchObject([
+    { day: 30, revoked: true, answer: 'UNKNOWN' },
+  ]);
 });
 test('I-18 deletion is independent of feedback and shows an accessible receipt after revoking the session', async ({
   page,

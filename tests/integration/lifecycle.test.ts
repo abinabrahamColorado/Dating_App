@@ -4,6 +4,13 @@ import { mkdtemp, readFile, readdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Pool } from 'pg';
+import {
+  S3Client,
+  CreateBucketCommand,
+  PutBucketVersioningCommand,
+  DeleteObjectCommand,
+  DeleteBucketCommand,
+} from '@aws-sdk/client-s3';
 import { connectionFixture } from '../fixtures/connections-db';
 import { FeedbackStore } from '../../packages/db/src/feedback';
 import { PrivacyStore, LifecycleStore } from '../../packages/db/src/lifecycle';
@@ -37,6 +44,45 @@ beforeEach(async () => {
   await f.admin.query('UPDATE app.explore_venues SET approved=false WHERE approved');
 });
 const yes = { met: 'YES', again: 'YES', chips: ['Easy conversation'] };
+it('I-18 media purge removes historical encrypted versions and delete markers from real versioned storage', async () => {
+  const endpoint = process.env.MINIO_ENDPOINT ?? 'http://127.0.0.1:9000';
+  if (!['localhost', '127.0.0.1'].includes(new URL(endpoint).hostname))
+    throw Error('Local synthetic storage required');
+  const client = new S3Client({
+    endpoint,
+    region: 'us-east-1',
+    forcePathStyle: true,
+    credentials: {
+      accessKeyId: process.env.MEDIA_ACCESS_KEY!,
+      secretAccessKey: process.env.MEDIA_SECRET_KEY!,
+    },
+  });
+  const bucket = `meetwell-lifecycle-${randomUUID()}`,
+    id = randomUUID(),
+    previous = process.env.MEDIA_BUCKET;
+  await client.send(new CreateBucketCommand({ Bucket: bucket }));
+  process.env.MEDIA_BUCKET = bucket;
+  try {
+    await client.send(
+      new PutBucketVersioningCommand({
+        Bucket: bucket,
+        VersioningConfiguration: { Status: 'Enabled' },
+      }),
+    );
+    await putPhoto(id, Buffer.from('first synthetic version'));
+    await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: id }));
+    await putPhoto(id, Buffer.from('second synthetic version'));
+    expect((await mediaVersions(id)).length).toBe(3);
+    await deletePhoto(id);
+    expect(await mediaVersions(id)).toEqual([]);
+  } finally {
+    await deletePhoto(id);
+    if (previous === undefined) delete process.env.MEDIA_BUCKET;
+    else process.env.MEDIA_BUCKET = previous;
+    await client.send(new DeleteBucketCommand({ Bucket: bucket }));
+    client.destroy();
+  }
+});
 it('I-12 P26 expired or partial-consent attention windows remain unknown, never zero-cost meetings', async () => {
   for (const [age, consentAge, expected] of [
     [31, 35, null],
@@ -213,12 +259,21 @@ it('I-10 P13 success exits save separate consents atomically; follow-up silence 
 });
 it('I-18 I-12 erasure removes primary records, media versions, snapshots and batch payloads; its independent receipt survives revoked sign-in', async () => {
   const p = await encounter();
+  const unrelated = await f.pair(),
+    retryKey = randomUUID(),
+    originalMessage = await f.connections.send(unrelated.a, unrelated.id, retryKey, {
+      text: 'Synthetic retry survives unrelated deletion',
+    });
   await feedback.answer(p.a, p.encounter, randomUUID(), yes);
   await feedback.attention(p.a, randomUUID(), { action: 'CONSENT', enabled: true });
   await feedback.attention(p.a, randomUUID(), { action: 'RECORD', seconds: 20 });
   const photos = (
     await f.app.query<{ id: string }>('SELECT id FROM app.media WHERE member_id=$1', [p.a.memberId])
   ).rows;
+  await f.accounts.rateLimit('auth:global', 100, 3600);
+  const globalBudget = (
+    await f.identity.query("SELECT requests FROM identity.rate_limits WHERE bucket='auth:global'")
+  ).rows[0].requests;
   await putPhoto(photos[0]!.id, Buffer.from('synthetic encrypted media'));
   const report = await f.safetyStore.report(
     p.b,
@@ -258,6 +313,19 @@ it('I-18 I-12 erasure removes primary records, media versions, snapshots and bat
   await expect(feedback.list(p.a)).rejects.toThrow('UNAUTHORIZED');
   await expect(lifecycle.exportLearning()).rejects.toThrow('pending erasures');
   expect(await lifecycle.eraseOne()).toBe(true);
+  expect(
+    (await f.identity.query("SELECT requests FROM identity.rate_limits WHERE bucket='auth:global'"))
+      .rows[0].requests,
+  ).toBe(globalBudget);
+  expect(
+    await f.connections.send(unrelated.a, unrelated.id, retryKey, {
+      text: 'Synthetic retry survives unrelated deletion',
+    }),
+  ).toEqual(originalMessage);
+  expect(
+    (await f.app.query('SELECT 1 FROM app.messages WHERE connection_id=$1', [unrelated.id]))
+      .rowCount,
+  ).toBe(1);
   expect(await privacy.receipt(result.token)).toMatchObject({
     status: 'COMPLETED',
   });

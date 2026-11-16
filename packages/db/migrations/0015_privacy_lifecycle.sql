@@ -160,7 +160,10 @@ BEGIN
  IF EXISTS(SELECT 1 FROM app.explore_batches WHERE creator_id=who) THEN
   UPDATE app.explore_batches SET creator_id=NULL WHERE creator_id=who;
  END IF;
- DELETE FROM app.command_receipts; -- can contain another member's introduction; conservative pilot invalidation
+ -- Other members' receipts contain only their own policy/version or opaque
+ -- result IDs, never partner profile/feedback/chat payloads. Preserve those
+ -- retry keys so an unrelated deletion cannot duplicate a chat or transition.
+ DELETE FROM app.command_receipts WHERE member_id=who;
  DELETE FROM ops.moderation_receipts;
  DELETE FROM ops.venue_receipts WHERE actor_id=who;
  DELETE FROM app.media WHERE member_id=who;
@@ -174,7 +177,9 @@ BEGIN
  DELETE FROM identity.passkeys WHERE member_id=who;
  DELETE FROM identity.consents WHERE member_id=who;
  DELETE FROM identity.users WHERE id=who;
- DELETE FROM identity.rate_limits; -- bounded counters may embed opaque member IDs
+ DELETE FROM identity.rate_limits WHERE bucket IN('write:'||who,'connections:'||who,
+  'lifecycle:'||who,'explore:'||who,'safety-submit:'||who,'email:'||email_key);
+ -- Keep unrelated and global abuse budgets; one erasure must not reset them.
  DELETE FROM ops.staff WHERE member_id=who;
  DELETE FROM ops.readiness_reviews WHERE actor_id=who;
  DELETE FROM ops.audit WHERE actor_id=who OR subject_id=who OR subject_id=ANY(erased_opportunities);

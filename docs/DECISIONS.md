@@ -797,9 +797,10 @@ an encrypted independent tombstone, then purges private media versions and all
 registered/on-disk learning exports before committing primary-store deletion.
 Failed external cleanup keeps the job pending; account access stays disabled.
 Encrypted batch summaries are scrubbed and affected feasible-set payloads removed.
-Pilot-wide command-receipt and export invalidation avoids retaining another
-member's payload in an opaque cached result. This can require a refreshed command
-after erasure; it never recreates a deleted account.
+Exports are invalidated across the pilot. Erasure removes the deleted member's
+command receipts and moderation caches; other members' minimal opaque result-ID
+receipts remain within their TTL so retries cannot duplicate unrelated messages.
+Receipt payloads contain no partner profile, feedback or chat content.
 
 Necessary opaque pair-denial keys follow DEC-007: retain while either identity
 exists, then until supported backup risk has expired. Account identifiers cannot

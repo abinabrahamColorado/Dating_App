@@ -153,10 +153,11 @@ export async function handle(request: Request, path: string[]) {
       )
         throw new StoreError('FORBIDDEN');
     }
-    const earlyPolicy =
-      route === 'account/policy' && request.method === 'POST'
-        ? policyCommandSchema.parse(await body(request))
-        : null;
+    const policyRequest = route === 'account/policy' && request.method === 'POST';
+    // Authenticate before validating a private policy payload. Only a genuine
+    // deletion command bypasses the client-version switch; session checks still apply.
+    const policyAuthority = policyRequest ? await authority() : null;
+    const earlyPolicy = policyRequest ? policyCommandSchema.parse(await body(request)) : null;
     if (earlyPolicy?.action !== 'DELETE')
       await requireSupportedClient(
         db,
@@ -250,7 +251,7 @@ export async function handle(request: Request, path: string[]) {
       };
       return auth ? await db.withSession(auth, run) : await run();
     }
-    const auth = (await authority())!;
+    const auth = policyAuthority ?? (await authority())!;
     return await db.withSession(auth, async () => {
       if (path[0] === 'connections' || (path[0] === 'ops' && path[1] === 'venues')) {
         registered(auth);

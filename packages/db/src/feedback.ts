@@ -281,8 +281,8 @@ export class FeedbackStore {
             `UPDATE app.outcome_followups SET
         revoked_at=CASE WHEN $3='REVOKE' THEN coalesce(revoked_at,clock_timestamp()) ELSE revoked_at END,
         presented_at=CASE WHEN $3<>'REVOKE' THEN coalesce(presented_at,clock_timestamp()) ELSE presented_at END,
-        answer=CASE WHEN $3='ANSWER' THEN $4 ELSE answer END,
-        answered_at=CASE WHEN $3='ANSWER' THEN clock_timestamp() ELSE answered_at END
+        answer=CASE WHEN $3='REVOKE' THEN NULL WHEN $3='ANSWER' THEN $4 ELSE answer END,
+        answered_at=CASE WHEN $3='REVOKE' THEN NULL WHEN $3='ANSWER' THEN clock_timestamp() ELSE answered_at END
         WHERE member_id=$1 AND day=$2 AND ($3='REVOKE' OR (revoked_at IS NULL AND due_at<=clock_timestamp() AND answer IS NULL)) RETURNING day`,
             [auth.memberId, day, d.action, d.action === 'ANSWER' ? d.answer : null],
           );

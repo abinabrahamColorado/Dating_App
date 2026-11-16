@@ -53,7 +53,7 @@ it('I-04 architecture: every HTTP entry and worker is inventoried; new surfaces 
     // M5 review: readiness checked before member data; deletion needs current
     // session, recent auth and CSRF, its bearer receipt is self-scoped. Feedback
     // dispatch stays inside withSession and the separately inventoried adapter.
-    'apps/web/server/api.ts': '6e9f7b88467886c9d2f80b2e3ba0e5a9f0e28cdbbf839da7cc863adca1cca36b',
+    'apps/web/server/api.ts': '45f86aa2e2f658ab9e055ef8e8e2af13be8cc49ee8994c58e837145ef667129a',
     'apps/web/server/passkeys.ts':
       'b4f7600984751171bf430f0d4afe7760d26ba284fce4f5f90ccb3c1d151caa64',
     'apps/web/server/mail.ts': '3b8370eec4869db1751869ff9b3a5231e46653092ccba37561fc8c2da14b9a82',
