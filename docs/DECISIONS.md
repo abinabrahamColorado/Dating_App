@@ -713,3 +713,18 @@ Monitoring vendor selection is deferred until hosting is chosen. Plan self-hoste
 Uptime Kuma on founder-controlled infrastructure; no Sentry or vendor SDK.
 Independent probing, notification destination, on-call owner and retention remain
 release decisions. This direction authorizes documentation, not a deployment.
+
+## DEC-054 — Establish the block race's transaction order
+
+Date: 2026-11-16. Spec P20/P22, I-04. The founder explicitly approved this focused
+test repair after one Windows check at `b37a08d` failed while the other five checks
+passed. The existing fixture waited for any queued pair-lock request; that did not
+prove that the block owned the locks before the competing read began.
+
+Use a temporary, synthetic-member-scoped test trigger to pause the real block
+command after it acquires both member locks. PostgreSQL blocking-process evidence
+must then prove the profile read waits behind that exact block transaction before
+the gate is released. Keep the denial assertion and check another read after block
+completion. Remove the temporary trigger/function in cleanup. No runtime policy,
+CI step or security assertion is weakened. Fresh CI must prove the revised fixture;
+a passing rerun of the old fixture alone would not resolve the ordering gap.

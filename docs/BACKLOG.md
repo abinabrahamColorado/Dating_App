@@ -20,6 +20,10 @@ Local setup blocker (2026-11-16): Device Guard blocks the existing PostgreSQL
 executable. The PC's security administrator must review the policy; do not bypass
 it or claim local database checks passed. GitHub runners validate independently.
 
+PR #11 integration verification: DEC-054 repairs the block/profile race fixture's
+transaction ordering after one Windows failure at `b37a08d`. Keep every denial
+assertion and require fresh green checks before the approved merge.
+
 The separate setup audit (DEC-049) standardizes Corepack/Node and durable guidance.
 The sidebar primary folder is corrected and verified. Remaining setup work:
 activate and verify main's PR/check/force-push/deletion protections after owner sign-in, and validate

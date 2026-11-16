@@ -1,5 +1,11 @@
 # Specification trace — M1 evidence
 
+2026-11-16 I-04 verification update (DEC-054):
+`tests/integration/safety.test.ts` gates the real block after it owns the member
+locks and proves the profile read waits behind that exact transaction. Denial is
+asserted for both the queued read and a read after block completion. Runtime
+authorization is unchanged; fresh CI results are recorded on PR #11.
+
 Source: `docs/architecture-v0.2.txt` (all 32 parts read) and `AGENTS.md`. `P<n>` below means **Spec P<n>**. This is an implementation plan, not a claim that these features are complete. Every product row is **PLANNED** until its milestone supplies the named executable test. M0 implements only the infrastructure checks listed at the end. Module names are planned paths beneath `packages/` or `apps/`; learning is a restricted DB/export module, not a model service.
 
 ## M1 implementation and executable evidence

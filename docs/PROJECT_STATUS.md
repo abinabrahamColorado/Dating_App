@@ -17,8 +17,11 @@ passed `verify`, `windows`, and `dev-services` (127 tests in verification).
 strict nonlocal startup/SMTP checks, secret/dependency CI, privacy-limited local
 monitoring and encrypted backup/fresh-restore tools. See DEC-050/051,
 [checklist](security/checklist.md) and [verification](testing/security-hardening.md).
-Its earlier local full check passed 138 tests on 2026-11-11. Updated-head CI is
-pending; historical results do not prove the integrated tree. The founder explicitly
+Its earlier local full check passed 138 tests on 2026-11-11. Integration head
+`b37a08d` passed five checks; one Windows run failed the existing block/profile
+race assertion. DEC-054 records the founder-approved test synchronization repair;
+fresh CI is pending and historical results do not prove this repaired tree.
+The founder explicitly
 approved the workflow conflict resolution retaining all setup/security steps, then
 merging #11 only with all six checks green. Next update/merge docs/design PR #9 on
 green CI, verify main, and start M5 on its own branch. M5's PR must remain unmerged.
