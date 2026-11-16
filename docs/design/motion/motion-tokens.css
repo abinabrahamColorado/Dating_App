@@ -1,0 +1,48 @@
+/*
+ * Meetwell motion tokens. Design reference; not yet imported by the app.
+ * Integration: copy these declarations into apps/web/app/globals.css.
+ * See docs/design/motion/README.md for the rules that go with them.
+ */
+:root {
+  /* durations */
+  --mw-dur-press: 80ms;
+  --mw-dur-exit: 160ms;
+  --mw-dur-fade: 240ms;
+  --mw-dur-move: 320ms;
+  --mw-dur-settle: 420ms;
+  --mw-dur-warm: 600ms;
+  --mw-dur-pulse: 1400ms;
+  --mw-stagger: 60ms;
+
+  /* easing */
+  --mw-ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
+  --mw-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --mw-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  /* travel distances */
+  --mw-move-s: 8px;
+  --mw-move-m: 12px;
+  --mw-move-l: 28px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --mw-dur-fade: 150ms;
+    --mw-dur-move: 150ms;
+    --mw-dur-settle: 150ms;
+    --mw-dur-warm: 150ms;
+    --mw-dur-pulse: 0ms;
+    --mw-stagger: 0ms;
+    --mw-move-s: 0px;
+    --mw-move-m: 0px;
+    --mw-move-l: 0px;
+  }
+}
+
+/* buttons: the only press feedback */
+button {
+  transition: transform var(--mw-dur-press) var(--mw-ease-standard);
+}
+button:active {
+  transform: scale(0.98);
+}
