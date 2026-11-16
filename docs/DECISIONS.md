@@ -587,3 +587,32 @@ production process-secret isolation, manual accessibility review and generic
 opted-in plan reminder delivery. Real venue approval, staffed safety coverage and
 launch privacy review are founder release questions. REA remains uninstalled;
 algorithm research cards remain unimplemented and need separate explicit approval.
+
+## Development environment and continuity (DEC-049)
+
+2026-11-03, founder setup-audit request; engineering workflow and Spec P22/P23
+release boundaries. Resumed 2026-11-11 after the explicitly approved M4 merge.
+Use `E:\Buisness\Dating_App` as this PC's authoritative checkout and preserve
+existing chats/files. Change the sidebar primary folder only through supported
+app controls; do not edit internal app databases or rewrite historical chat state.
+The settings dialog recovered after a slow load; the primary folder was saved
+through the app and verified by its project-list tool as the actual Git repository.
+
+Keep the verified GPT-6 Astra/Extra High setting and record repository defaults.
+Use Node 24.19.0, Corepack 0.35.0 and pnpm 12.11.2, frozen installs, an early
+toolchain check and sequential verification. Do not alter the machine-wide PATH
+or the app's bundled pnpm fallback. Separate worktrees isolate concurrent edits.
+
+The founder authorized main protections: PR required, the existing `verify`,
+`windows`, `dev-services` GitHub Actions checks required, force-push/deletion
+blocked, merge commits retained, no bypass list. Require zero additional reviews
+so the sole maintainer is not locked out; explicit founder merge approval remains
+a separate workflow obligation. Public visibility is unchanged. The prepared
+ruleset is not yet active: the browser needs owner sign-in and the connector has
+no administration capability. See `docs/DEVELOPMENT_SETUP.md` for exact UI steps.
+
+Recommend workspace access with automatic review after fixing the project root.
+Explain network/process/cache tradeoffs and verify under that mode before claiming
+it sufficient. Current Full access/never-approve settings remain unchanged during
+this audit. No approval is inferred for M5, deployment, live users or
+research build cards. Healthy development checks are not launch readiness.

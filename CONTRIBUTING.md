@@ -2,6 +2,8 @@
 
 Read `AGENTS.md` and `docs/architecture-v0.2.txt` before implementation.
 Use `docs/PROJECT_STATUS.md` to resume work and `docs/BACKLOG.md` for milestone scope.
+See `docs/DEVELOPMENT_SETUP.md` for the authoritative folder, AI defaults,
+permission recommendations and GitHub protection verification.
 
 ## Branches and reviews
 
@@ -16,6 +18,10 @@ and dependency in the PR. Never overwrite another branch to fold in the correcti
 
 Run `corepack pnpm check` sequentially: Next.js build and route generation share
 generated files and must not run concurrently in the same checkout.
+Use Node from `.node-version` and `corepack pnpm install --frozen-lockfile`.
+The full check begins with `check:toolchain`; a mismatched runtime fails early.
+Use separate worktrees for concurrent code changes. Do not share writable test
+databases, generated build output or service ports between concurrent runs.
 Database tests require a dedicated real PostgreSQL 16/PostGIS database with a name
 ending in `_test`. Use synthetic records only.
 
