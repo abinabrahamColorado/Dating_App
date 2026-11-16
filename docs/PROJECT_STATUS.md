@@ -5,34 +5,29 @@ Pilot proposal: Manhattan, New York City; ages 18–30.
 
 Permanent checkout: `E:\Buisness\Dating_App`.
 Remote: `https://github.com/abinabrahamColorado/Dating_App`.
-Current checkpoint: `codex/fix-postgis-archive`, based on merged setup main.
-PR #6 merged with merge commit `010a80bc40a96cc0576a0370e6238f9b988e487c`;
-[main CI 41772404412](https://github.com/abinabrahamColorado/Dating_App/actions/runs/41772404412)
-passed before M4 started. M4 was implemented in
-[PR #8](https://github.com/abinabrahamColorado/Dating_App/pull/8), on
-`codex/m4-connections-plans` at `85761dd`, with all six CI checks green and
-127 local tests passing (42 unit/property/architecture, 70 PostgreSQL, 15 browser/axe).
-The founder approved merging PR #8 on 2026-11-11. It merged at
-`cc6ecf1b3c3461c807ea12b8ea96cfa631079cf1`;
-[main CI 42974176138](https://github.com/abinabrahamColorado/Dating_App/actions/runs/42974176138)
-passed `verify`, `windows`, and `dev-services` after the merge.
-Setup PR #10 merged with explicit founder approval on 2026-11-16 at
-`176207ad0c49f88d384f9570dcd47a5ecfba28a0`. Main CI
-[43819695236](https://github.com/abinabrahamColorado/Dating_App/actions/runs/43819695236)
-passed `verify` and `dev-services`; `windows` failed before tests because the
-official pinned PostGIS download moved into `archive/`. DEC-052 prepares a URL-only
-repair with the same version/checksum; a separate repair merge requires approval.
+Current checkpoint: integrating `codex/security-hardening` with main for PR #11.
+M3 PR #6 merged at `010a80b`; main CI 41772404412 passed. M4 PR #8 merged at
+`cc6ecf1`; main CI 42974176138 passed all three jobs after 127 tests passed.
+Setup PR #10 merged at `176207a`. Its Windows PostGIS download failure was fixed
+by PR #12, merged with founder approval at `7f15c33`; main CI
+[43824003084](https://github.com/abinabrahamColorado/Dating_App/actions/runs/43824003084)
+passed `verify`, `windows`, and `dev-services` (127 tests in verification).
 
-Setup [PR #10](https://github.com/abinabrahamColorado/Dating_App/pull/10) passed all
-six pre-merge checks at `149063c` and is now merged. Main is not yet green.
-The separate scoped security hardening is published as
-[PR #11](https://github.com/abinabrahamColorado/Dating_App/pull/11), with 138 local
-tests passing at its prior head `e99c8ec`; its historical CI is linked there.
-PR #11 remains unchanged until main is green, as the founder requested. Then merge
-updated main into its branch, resolve conflicts, run checks, publish and wait for
-CI. Do not merge #11 or start M5.
-Monitoring direction: defer vendor selection until hosting; plan self-hosted
-Uptime Kuma; no Sentry or vendor SDK. Apply this to PR #11's runbook at that step.
+[PR #11](https://github.com/abinabrahamColorado/Dating_App/pull/11) adds nonce CSP/HSTS,
+strict nonlocal startup/SMTP checks, secret/dependency CI, privacy-limited local
+monitoring and encrypted backup/fresh-restore tools. See DEC-050/051,
+[checklist](security/checklist.md) and [verification](testing/security-hardening.md).
+Its earlier local full check passed 138 tests on 2026-11-11. Integration head
+`b37a08d` passed five checks; one Windows run failed the existing block/profile
+race assertion. DEC-054 records the founder-approved test synchronization repair;
+fresh CI is pending and historical results do not prove this repaired tree.
+The founder explicitly
+approved the workflow conflict resolution retaining all setup/security steps, then
+merging #11 only with all six checks green. Next update/merge docs/design PR #9 on
+green CI, verify main, and start M5 on its own branch. M5's PR must remain unmerged.
+Monitoring direction is recorded in DEC-053 and the runbook: plan self-hosted
+Uptime Kuma, defer vendor selection until hosting, and add no Sentry/vendor SDK.
+
 Local verification on 2026-11-16 could not start PostgreSQL: Windows Device Guard
 blocked the existing `.local/tools/pgsql/bin/postgres.exe`. No policy exception,
 replacement executable or security-control change was attempted. The machine's
@@ -175,8 +170,9 @@ it does not erase data. Chat and joint plans were merged in PR #8;
 feedback, erasure/restore and event Go remain unbuilt. No serving model, member
 GPS collection, real provider integration or live pilot is enabled.
 
-Next: finish the authorized setup audit and separate scoped security hardening PR.
-Leave both new PRs unmerged and do not start M5 without further founder authorization.
+Next: complete the approved #11/#9 integration and green-main gates, then implement
+M5 exactly as CODEX_PROMPTS.md on a separate branch; publish and verify its PR,
+then stop without merging it (DEC-053).
 M1 client retry recovery and ambiguous media-write compensation (G08/G09) remain
 release gates. M2 fixes G02/G03 for current request/case boundaries; M3 now tests
 reservation/delivery/acceptance races. M4 PR #8 proves the chat-delivery and

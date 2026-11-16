@@ -2,6 +2,8 @@ import 'dotenv/config';
 import { createRequire } from 'node:module';
 import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
+import { assertRuntimeSecurity } from '../packages/config/src/security';
+assertRuntimeSecurity(process.env, 'web');
 const require = createRequire(resolve('apps/web/package.json'));
 const command = process.argv[2] ?? 'dev';
 if (!['dev', 'start'].includes(command)) throw new Error('Expected dev or start');

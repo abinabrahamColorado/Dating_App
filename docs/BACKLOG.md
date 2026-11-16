@@ -5,20 +5,24 @@ in PR #3 at `a4dee472951f4d11968de6613e6d416f0e227df8`; main CI is green.
 M2 merged in PR #5 at `5711fe60dfdec9e9ffa6a2f50b2ea38dea2ecb0f`; main CI
 39723068853 passed. M3 PR #6 merged with founder approval at
 `010a80bc40a96cc0576a0370e6238f9b988e487c`; main CI 41772404412 passed.
-M4 PR #8 merged with explicit founder approval on 2026-11-11 at `cc6ecf1`.
-Main CI 42974176138 passed all three jobs. Do not start M5.
+M4 PR #8 merged with founder approval at `cc6ecf1`; main CI 42974176138 passed.
+Setup PR #10 merged at `176207a`. Its Windows download failure was repaired by
+PR #12, merged at `7f15c33`; main CI 43824003084 is green (DEC-052).
+The founder approved integrating PR #11 with every CI step retained, merging it
+only after all six checks pass, then updating/merging docs/design PR #9 on green
+CI. M5 is authorized only after those merges and green main; its own PR must remain
+unmerged (DEC-053). Research build cards remain unauthorized.
+Monitoring vendor selection waits for hosting. Plan self-hosted Uptime Kuma;
+no Sentry or vendor SDK. See [monitoring](operations/monitoring.md).
 The earlier hosted preview remains an independent design reference.
 
-Setup PR #10 merged on 2026-11-16 at `176207a`. Main CI 43819695236 is blocked
-only by the moved PostGIS Windows download (DEC-052). The repair retains the
-existing version/checksum and needs separate merge approval. After main is green,
-update PR #11 with main and resolve conflicts; do not merge #11 or start M5.
-The founder deferred monitoring vendor selection until hosting is chosen and
-directed planning toward self-hosted Uptime Kuma, with no Sentry or vendor SDK.
-Record that direction in PR #11's monitoring guidance when its update can proceed.
 Local setup blocker (2026-11-16): Device Guard blocks the existing PostgreSQL
 executable. The PC's security administrator must review the policy; do not bypass
 it or claim local database checks passed. GitHub runners validate independently.
+
+PR #11 integration verification: DEC-054 repairs the block/profile race fixture's
+transaction ordering after one Windows failure at `b37a08d`. Keep every denial
+assertion and require fresh green checks before the approved merge.
 
 The separate setup audit (DEC-049) standardizes Corepack/Node and durable guidance.
 The sidebar primary folder is corrected and verified. Remaining setup work:
@@ -53,6 +57,14 @@ research is complete for now (DEC-033). DEC-035 authorizes this M2 build only.
 | M7        | Route/role/object matrix, security/rate budgets, accessibility/mobile audit, runbooks, privacy/release review                           | All20 invariant suites green; P23 gates and documented human operations/legal/venue review                          |
 
 ## Dependency refinements
+
+- DEC-050/051 security follow-up: [the 49-item register](security/checklist.md)
+  names remaining release owners. Before hosting, review bucket IAM, network/TLS,
+  build/access/framework log privacy, universal route rate budgets, key custody,
+  external monitoring/alert ownership and isolated staging. No vendor is approved.
+- M5 retains deletion-tombstone replay before restored data may serve traffic,
+  D14 backup expiry, media/key recovery and retention/legal holds. The standalone
+  encrypted backup/fresh-restore drill does not complete I-18 or start M5.
 
 - M3 review correction completed in DEC-045: temporary system cancellations and
   undelivered reservation expiry permit later re-entry; permanent refusals and

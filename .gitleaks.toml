@@ -1,0 +1,9 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Reviewed SHA-256 code fingerprints in the I-04 architecture test, not API credentials"
+condition = "AND"
+paths = ['''^tests/unit/safety-architecture\.test\.ts$''']
+regexTarget = "line"
+regexes = ['''^\s*'apps/web/server/api\.ts': '[a-f0-9]{64}',$''']

@@ -1,5 +1,5 @@
 import { PgBoss } from 'pg-boss';
-import { randomUUID } from 'node:crypto';
+import { operationalEvent } from '@meetwell/runtime/monitoring';
 export const HEALTH_QUEUE = 'system.healthcheck';
 export function workerOptions(connectionString: string) {
   if (!/^postgres(ql)?:/.test(connectionString)) throw new Error('PostgreSQL is required');
@@ -14,7 +14,7 @@ export function workerOptions(connectionString: string) {
 }
 export function writeOperationalEvent(event: 'worker.started' | 'worker.stopped' | 'worker.error') {
   // Spec P22 / I-12 / I-17: fixed event names, opaque request IDs, no arbitrary payloads.
-  process.stdout.write(`${JSON.stringify({ event, requestId: randomUUID() })}\n`);
+  operationalEvent(event);
 }
 export async function startWorker(connectionString: string) {
   const boss = new PgBoss(workerOptions(connectionString));

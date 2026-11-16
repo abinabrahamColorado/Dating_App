@@ -1,5 +1,11 @@
 # Specification trace — M1 evidence
 
+2026-11-16 I-04 verification update (DEC-054):
+`tests/integration/safety.test.ts` gates the real block after it owns the member
+locks and proves the profile read waits behind that exact transaction. Denial is
+asserted for both the queued read and a read after block completion. Runtime
+authorization is unchanged; fresh CI results are recorded on PR #11.
+
 Source: `docs/architecture-v0.2.txt` (all 32 parts read) and `AGENTS.md`. `P<n>` below means **Spec P<n>**. This is an implementation plan, not a claim that these features are complete. Every product row is **PLANNED** until its milestone supplies the named executable test. M0 implements only the infrastructure checks listed at the end. Module names are planned paths beneath `packages/` or `apps/`; learning is a restricted DB/export module, not a model service.
 
 ## M1 implementation and executable evidence
@@ -425,3 +431,22 @@ removal and mutual-close tests continue to apply.
 DEC-046–048 explain protective defaults, serialization and remaining release work.
 M5 feedback/post-meeting surfaces, D9/D11/D12 retention and deletion remain planned;
 M6 event/Go switches remain off. No research build card is implemented.
+
+## Separate security hardening (2026-11-11)
+
+- P22/I-19: `config/security`, `web/security-headers`, `web/proxy`, Next config,
+  instrumentation and web/worker startup enforce nonce CSP, nonlocal HSTS/TLS and
+  secret validation. `unit/security-hardening` and `e2e/security-hardening` cover
+  alternate encodings, direct startup, spoofed headers, blocked injection and
+  working hydration. Existing role/object/CSRF suites remain required.
+- P22/I-12/I-17: `runtime/monitoring`, worker wrappers and `scripts/monitor` emit
+  fixed metadata only. Unit and integration tests cover error sentinel omission,
+  pg-boss persistence, successful jobs, down/up probes and redirect refusal.
+  External alerts and framework/hosting log privacy remain open (DEC-050).
+- P22/I-18 partial infrastructure only: `scripts/database-backup`, backup/restore
+  CLIs and `integration/backup-restore` prove authenticated encrypted archive,
+  fresh database recovery, ledger/grants and tamper rejection. Tombstone replay,
+  deletion/retention and production promotion remain unimplemented M5 work (DEC-051).
+- CI full-history gitleaks, production dependency audit and weekly updates are
+  recorded in `security/checklist.md`; these do not replace runtime authorization
+  tests or launch readiness review.

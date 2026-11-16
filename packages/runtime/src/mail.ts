@@ -1,21 +1,23 @@
 import nodemailer from 'nodemailer';
 import { appOrigin, store } from './accounts';
 import { accountConfig as c } from '@meetwell/config/accounts';
+import { smtpOptions } from '@meetwell/config/security';
+function transport() {
+  return nodemailer.createTransport({
+    ...smtpOptions(process.env),
+    connectionTimeout: c.SMTP_CONNECTION_TIMEOUT_MS,
+    greetingTimeout: c.SMTP_GREETING_TIMEOUT_MS,
+    socketTimeout: c.SMTP_SOCKET_TIMEOUT_MS,
+  });
+}
 /** Generic event-driven introduction mail. Only errors known to precede SMTP DATA
  * are retried. A timeout during DATA is uncertain and requires manual review. */
 export async function sendIntroductionMail(
   email: string,
 ): Promise<'SENT' | 'RETRY' | 'UNCERTAIN' | 'FAILED'> {
-  const transport = nodemailer.createTransport({
-    host: process.env.SMTP_HOST ?? '127.0.0.1',
-    port: Number(process.env.SMTP_PORT ?? 1025),
-    secure: false,
-    connectionTimeout: c.SMTP_CONNECTION_TIMEOUT_MS,
-    greetingTimeout: c.SMTP_GREETING_TIMEOUT_MS,
-    socketTimeout: c.SMTP_SOCKET_TIMEOUT_MS,
-  });
+  const mailer = transport();
   try {
-    await transport.sendMail({
+    await mailer.sendMail({
       from: 'Meetwell <updates@meetwell.invalid>',
       to: email,
       subject: 'An update in Meetwell',
@@ -34,23 +36,15 @@ export async function sendIntroductionMail(
     if (error.responseCode && error.responseCode >= 500) return 'FAILED';
     return 'UNCERTAIN';
   } finally {
-    transport.close();
+    mailer.close();
   }
 }
 export async function deliverAuthMail(accounts = store()) {
-  // Local mailbox adapter. Real vendor selection and production transport remain release gates.
-  const transport = nodemailer.createTransport({
-    host: process.env.SMTP_HOST ?? '127.0.0.1',
-    port: Number(process.env.SMTP_PORT ?? 1025),
-    secure: false,
-    connectionTimeout: c.SMTP_CONNECTION_TIMEOUT_MS,
-    greetingTimeout: c.SMTP_GREETING_TIMEOUT_MS,
-    socketTimeout: c.SMTP_SOCKET_TIMEOUT_MS,
-  });
+  const mailer = transport();
   try {
     const result = await accounts.deliverMagicLinks(async (email, token) => {
       const link = `${appOrigin()}/verify#${token}`;
-      await transport.sendMail({
+      await mailer.sendMail({
         from: 'Meetwell <access@meetwell.invalid>',
         to: email,
         subject: 'Your sign-in link',
@@ -60,6 +54,6 @@ export async function deliverAuthMail(accounts = store()) {
     if (result.failed > 0)
       process.stderr.write(`${JSON.stringify({ event: 'auth.delivery.retry', ...result })}\n`);
   } finally {
-    transport.close();
+    mailer.close();
   }
 }
