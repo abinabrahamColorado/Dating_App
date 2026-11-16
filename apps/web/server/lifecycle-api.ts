@@ -58,8 +58,12 @@ export async function handleLifecycle(c: {
     );
   if (route === 'POST feedback/:id/answer')
     return feedback.answer(c.auth, uuid.parse(c.path[1]), c.key(), await c.body());
-  if (route === 'POST feedback/:id/invite')
+  if (route === 'POST feedback/:id/invite') {
+    z.object({})
+      .strict()
+      .parse(await c.body());
     return feedback.invite(c.auth, uuid.parse(c.path[1]), c.key());
+  }
   if (route === 'POST feedback/:id/second-meeting')
     return feedback.secondMeeting(c.auth, uuid.parse(c.path[1]), c.key(), await c.body());
   if (route === 'POST outcomes/exit') return feedback.exit(c.auth, c.key(), await c.body());

@@ -125,35 +125,35 @@ END $$;
 REVOKE ALL ON FUNCTION ops.purge_connection(uuid) FROM PUBLIC;
 
 CREATE FUNCTION ops.erase_primary(who uuid) RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog AS $$
-DECLARE o record; encounters uuid[]; opportunities uuid[]; email_key text;
+DECLARE o record; erased_encounters uuid[]; erased_opportunities uuid[]; email_key text;
 BEGIN
  PERFORM pg_advisory_xact_lock(55,2);
  IF NOT EXISTS(SELECT 1 FROM ops.deletion_jobs WHERE member_id=who AND journaled_at IS NOT NULL) THEN RAISE EXCEPTION 'Durable tombstone required'; END IF;
- SELECT array_agg(id) INTO opportunities FROM app.opportunities WHERE who IN(low_id,high_id);
- SELECT array_agg(id) INTO encounters FROM app.encounters WHERE who IN(low_id,high_id);
- FOR o IN SELECT * FROM app.opportunities WHERE id=ANY(opportunities) ORDER BY low_id,high_id LOOP
+ SELECT array_agg(id) INTO erased_opportunities FROM app.opportunities WHERE who IN(low_id,high_id);
+ SELECT array_agg(id) INTO erased_encounters FROM app.encounters WHERE who IN(low_id,high_id);
+ FOR o IN SELECT * FROM app.opportunities WHERE id=ANY(erased_opportunities) ORDER BY low_id,high_id LOOP
   PERFORM app.lock_pair(o.low_id,o.high_id);
   PERFORM app.close_opportunity(o.id,CASE WHEN o.state='MUTUAL' THEN 'CLOSED' ELSE 'CANCELLED' END);
   PERFORM ops.purge_connection(o.id);
  END LOOP;
- DELETE FROM learning.experience WHERE member_id=who OR encounter_id=ANY(encounters);
+ DELETE FROM learning.experience WHERE member_id=who OR encounter_id=ANY(erased_encounters);
  DELETE FROM learning.logistics WHERE who IN(low_id,high_id);
- DELETE FROM learning.introduction_decision WHERE member_id=who OR opportunity_id=ANY(opportunities);
+ DELETE FROM learning.introduction_decision WHERE member_id=who OR opportunity_id=ANY(erased_opportunities);
  DELETE FROM learning.introduction_exposure WHERE who IN(low_id,high_id);
- DELETE FROM app.matching_feedback WHERE member_id=who OR encounter_id=ANY(encounters);
- DELETE FROM app.feedback_prompts WHERE member_id=who OR encounter_id=ANY(encounters);
- DELETE FROM app.encounters WHERE id=ANY(encounters);
- DELETE FROM app.second_meeting_reports WHERE member_id=who OR connection_id=ANY(opportunities);
+ DELETE FROM app.matching_feedback WHERE member_id=who OR encounter_id=ANY(erased_encounters);
+ DELETE FROM app.feedback_prompts WHERE member_id=who OR encounter_id=ANY(erased_encounters);
+ DELETE FROM app.encounters WHERE id=ANY(erased_encounters);
+ DELETE FROM app.second_meeting_reports WHERE member_id=who OR connection_id=ANY(erased_opportunities);
  DELETE FROM app.outcome_followups WHERE member_id=who;
  DELETE FROM app.success_exits WHERE member_id=who;
  DELETE FROM app.attention_minutes WHERE member_id=who;
  DELETE FROM app.attention_consent WHERE member_id=who;
- DELETE FROM app.introduction_mail WHERE member_id=who OR opportunity_id=ANY(opportunities);
- DELETE FROM app.introduction_outbox WHERE opportunity_id=ANY(opportunities);
- DELETE FROM app.introduction_decisions WHERE member_id=who OR opportunity_id=ANY(opportunities);
- DELETE FROM app.opportunity_closures WHERE opportunity_id=ANY(opportunities);
- DELETE FROM app.connections WHERE id=ANY(opportunities);
- DELETE FROM app.opportunities WHERE id=ANY(opportunities);
+ DELETE FROM app.introduction_mail WHERE member_id=who OR opportunity_id=ANY(erased_opportunities);
+ DELETE FROM app.introduction_outbox WHERE opportunity_id=ANY(erased_opportunities);
+ DELETE FROM app.introduction_decisions WHERE member_id=who OR opportunity_id=ANY(erased_opportunities);
+ DELETE FROM app.opportunity_closures WHERE opportunity_id=ANY(erased_opportunities);
+ DELETE FROM app.connections WHERE id=ANY(erased_opportunities);
+ DELETE FROM app.opportunities WHERE id=ANY(erased_opportunities);
  DELETE FROM app.profile_access WHERE viewer_id=who OR subject_id=who;
  -- Encrypted feasible sets and summaries can include non-selected members.
  -- Lifecycle code scrubs affected batches before invoking this function.
@@ -177,7 +177,7 @@ BEGIN
  DELETE FROM identity.rate_limits; -- bounded counters may embed opaque member IDs
  DELETE FROM ops.staff WHERE member_id=who;
  DELETE FROM ops.readiness_reviews WHERE actor_id=who;
- DELETE FROM ops.audit WHERE actor_id=who OR subject_id=who OR subject_id=ANY(opportunities);
+ DELETE FROM ops.audit WHERE actor_id=who OR subject_id=who OR subject_id=ANY(erased_opportunities);
  DELETE FROM ops.audit WHERE subject_id IN(SELECT unnest(media_ids) FROM ops.deletion_jobs WHERE member_id=who);
  DELETE FROM ops.metric_members WHERE member_id=who;
  DELETE FROM ops.metric_snapshots; -- recompute from remaining rows; fixed cohort denominators are immutable

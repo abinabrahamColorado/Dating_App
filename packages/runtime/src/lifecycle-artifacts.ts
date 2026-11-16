@@ -128,6 +128,22 @@ export async function expireBackups(directory: string, before: Date) {
     const path = join(resolve(directory), name),
       info = await lstat(path);
     if (!info.isFile() || info.isSymbolicLink()) throw Error('Invalid backup artifact');
-    if (info.mtime < before) await unlink(path);
+    const file = await open(path, 'r');
+    let created: number;
+    try {
+      const prefix = Buffer.from(lifecycleConfig.BACKUP_ENVELOPE_PREFIX),
+        header = Buffer.alloc(prefix.length + 8),
+        read = await file.read(header, 0, header.length, 0);
+      if (read.bytesRead !== header.length || !header.subarray(0, prefix.length).equals(prefix))
+        throw Error('Unsupported backup envelope; operator review required');
+      created = Number(header.readBigInt64BE(prefix.length));
+      if (!Number.isSafeInteger(created) || created <= 0 || created > Date.now())
+        throw Error('Invalid backup creation time');
+    } finally {
+      await file.close();
+    }
+    // Copying a backup must not reset its retention clock. Restore independently
+    // authenticates this timestamp with the backup key before accepting data.
+    if (Math.min(created, info.mtime.getTime()) < before.getTime()) await unlink(path);
   }
 }

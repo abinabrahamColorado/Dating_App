@@ -240,7 +240,7 @@ export class FeedbackStore {
           for (const day of pilot.FOLLOWUP_DAYS)
             if (day === 30 ? d.followup30 : d.followup90)
               await db.query(
-                `INSERT INTO app.outcome_followups(member_id,day,due_at) VALUES($1,$2,clock_timestamp()+$2*interval '1 day') ON CONFLICT DO NOTHING`,
+                `INSERT INTO app.outcome_followups(member_id,day,due_at) VALUES($1,$2::integer,clock_timestamp()+$2::integer*interval '1 day') ON CONFLICT DO NOTHING`,
                 [auth.memberId, day],
               );
         },

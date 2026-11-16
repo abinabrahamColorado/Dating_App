@@ -14,6 +14,7 @@ import { Envelope } from '../../packages/db/src/encryption';
 import { blockMember } from '../../packages/db/src/member-access';
 import { backupDatabase, restoreDatabase } from '../../scripts/database-backup';
 import { replayDeletions } from '../../scripts/replay-deletions';
+import { pilot, retention } from '../../packages/config/src/pilot';
 const f = connectionFixture(),
   feedback = new FeedbackStore(f.accounts),
   privacy = new PrivacyStore(f.accounts),
@@ -36,6 +37,35 @@ beforeEach(async () => {
   await f.admin.query('UPDATE app.explore_venues SET approved=false WHERE approved');
 });
 const yes = { met: 'YES', again: 'YES', chips: ['Easy conversation'] };
+it('I-12 P26 expired or partial-consent attention windows remain unknown, never zero-cost meetings', async () => {
+  for (const [age, consentAge, expected] of [
+    [31, 35, null],
+    [1, 0, null],
+    [1, 2, 0],
+  ] as const) {
+    const member = await f.member(),
+      id = randomUUID();
+    await f.admin.query(
+      "INSERT INTO ops.metric_cohorts(id,started_at,denominator,policy_version,thresholds) VALUES($1,clock_timestamp()-$2*interval '1 day',1,'synthetic-fixture',$3)",
+      [id, age, JSON.stringify(pilot)],
+    );
+    await f.admin.query('INSERT INTO ops.metric_members(cohort_id,member_id) VALUES($1,$2)', [
+      id,
+      member.memberId,
+    ]);
+    await f.admin.query(
+      "INSERT INTO app.attention_consent(member_id,enabled,updated_at) VALUES($1,true,clock_timestamp()-$2*interval '1 day')",
+      [member.memberId, consentAge],
+    );
+    const data = (
+      await f.worker.query('SELECT ops.metric_input($1,$2) AS data', [
+        id,
+        JSON.stringify(retention),
+      ])
+    ).rows[0].data;
+    expect(data.members[0].activeSeconds).toBe(expected);
+  }
+});
 async function encounter() {
   const p = await f.pair(),
     plan = await f.proposed(p);
@@ -323,8 +353,10 @@ it('I-18 deletion versus export is serialized; a failed external purge cannot cl
     deletePhoto,
   );
   const erasing = paused.eraseOne();
+  void erasing.catch(() => undefined); // Always observed below, even if the concurrent assertion fails.
   await ready;
   const exporting = lifecycle.exportLearning();
+  void exporting.catch(() => undefined);
   try {
     await expect
       .poll(async () =>

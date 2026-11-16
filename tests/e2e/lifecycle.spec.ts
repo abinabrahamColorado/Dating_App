@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { randomUUID } from 'node:crypto';
 import { lifecycleBrowser } from '../fixtures/lifecycle-browser';
+import { refreshMetrics } from '../../packages/db/src/metrics';
 const f = lifecycleBrowser();
 test.describe.configure({ mode: 'serial' });
 test.afterAll(f.close);
@@ -120,9 +121,21 @@ test('I-12 I-20 operator metrics and safety-retention pages are accessible, audi
   page,
 }) => {
   const staff = await f.member(page, true);
+  await f.admin.query("INSERT INTO ops.staff(member_id,role) VALUES($1,'admin')", [staff.memberId]);
   await page.goto('/ops/metrics');
+  await page.getByText('Record readiness evidence (administrator)', { exact: true }).click();
+  await page
+    .getByLabel('Evidence and review record')
+    .fill('Synthetic accessibility review; launch remains disabled.');
+  await page.getByRole('button', { name: 'Save reviewed evidence' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Review recorded.' })).toBeVisible();
   await page.getByRole('button', { name: 'Freeze new enrollment cohort' }).click();
-  await expect(page.getByRole('status')).toContainText('Enrollment is fixed');
+  await expect(page.getByRole('status').filter({ hasText: 'Enrollment is fixed' })).toBeVisible();
+  await refreshMetrics(f.admin, f.accounts);
+  await page.getByRole('button', { name: 'Refresh metrics' }).click();
+  await expect(
+    page.getByRole('table', { name: 'Configured evidence required before expansion' }).first(),
+  ).toBeVisible();
   await axe(page);
   await page.goto('/ops/safety/retention');
   await expect(page.getByRole('heading', { name: 'Safety retention review' })).toBeVisible();

@@ -770,6 +770,10 @@ reads event contents. It excludes hidden, unfocused and idle browser time. The
 display is median/p90 minutes per member meeting-participation, with measured
 members, eligible members, total minutes and participation denominator. It is
 incomplete voluntary client measurement, not surveillance or a causal estimate.
+Expired raw-time windows and consent beginning after cohort enrollment produce
+unknown attention, never zero cost. The primary outcome includes response
+sensitivity bounds: unresolved members may contribute zero or one positive;
+these are bounds, not an imputed estimate.
 
 Numerical gates use configured thresholds and mature observation windows.
 Consent/privacy, operations and experience also need an administrator's encrypted,

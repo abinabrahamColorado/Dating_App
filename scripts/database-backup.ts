@@ -4,10 +4,11 @@ import { readFile, writeFile, access, stat } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import { Pool } from 'pg';
 import { pilot } from '../packages/config/src/pilot';
+import { lifecycleConfig } from '../packages/config/src/lifecycle';
 
 // Bounded pilot tool: authenticated plaintext stays in memory, never in a temp file.
 const limit = 256 * 1024 * 1024;
-const aad = Buffer.from('meetwell-database-backup-v2');
+const aad = Buffer.from(lifecycleConfig.BACKUP_ENVELOPE_PREFIX);
 const roles = [
   'meetwell_identity',
   'meetwell_app',

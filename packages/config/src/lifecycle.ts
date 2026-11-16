@@ -9,4 +9,5 @@ export const lifecycleConfig = {
   ATTENTION_MAX_SECONDS: 60,
   ATTENTION_IDLE_SECONDS: 300,
   ARTIFACT_MAX_BYTES: 256 * 1024 * 1024,
+  BACKUP_ENVELOPE_PREFIX: 'meetwell-database-backup-v2',
 } as const;
