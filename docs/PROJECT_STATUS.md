@@ -1,11 +1,11 @@
 # Project status
 
-Updated 2026-11-11 (America/Chicago). Working name: **Meetwell**.
+Updated 2026-11-16 (America/Chicago). Working name: **Meetwell**.
 Pilot proposal: Manhattan, New York City; ages 18–30.
 
 Permanent checkout: `E:\Buisness\Dating_App`.
 Remote: `https://github.com/abinabrahamColorado/Dating_App`.
-Current setup branch: `codex/development-setup`, based on reviewed `main`.
+Current checkpoint: `codex/fix-postgis-archive`, based on merged setup main.
 PR #6 merged with merge commit `010a80bc40a96cc0576a0370e6238f9b988e487c`;
 [main CI 41772404412](https://github.com/abinabrahamColorado/Dating_App/actions/runs/41772404412)
 passed before M4 started. M4 was implemented in
@@ -16,14 +16,29 @@ The founder approved merging PR #8 on 2026-11-11. It merged at
 `cc6ecf1b3c3461c807ea12b8ea96cfa631079cf1`;
 [main CI 42974176138](https://github.com/abinabrahamColorado/Dating_App/actions/runs/42974176138)
 passed `verify`, `windows`, and `dev-services` after the merge.
-The setup branch is based on that M4 baseline and changes development controls only.
+Setup PR #10 merged with explicit founder approval on 2026-11-16 at
+`176207ad0c49f88d384f9570dcd47a5ecfba28a0`. Main CI
+[43819695236](https://github.com/abinabrahamColorado/Dating_App/actions/runs/43819695236)
+passed `verify` and `dev-services`; `windows` failed before tests because the
+official pinned PostGIS download moved into `archive/`. DEC-052 prepares a URL-only
+repair with the same version/checksum; a separate repair merge requires approval.
 
 Setup [PR #10](https://github.com/abinabrahamColorado/Dating_App/pull/10) passed all
-six CI checks at `21f3f9c`; final documentation-follow-up CI is linked on the PR.
+six pre-merge checks at `149063c` and is now merged. Main is not yet green.
 The separate scoped security hardening is published as
 [PR #11](https://github.com/abinabrahamColorado/Dating_App/pull/11), with 138 local
-tests passing; its final published-head CI is linked there. Neither PR may merge
-without approval. Do not start M5.
+tests passing at its prior head `e99c8ec`; its historical CI is linked there.
+PR #11 remains unchanged until main is green, as the founder requested. Then merge
+updated main into its branch, resolve conflicts, run checks, publish and wait for
+CI. Do not merge #11 or start M5.
+Monitoring direction: defer vendor selection until hosting; plan self-hosted
+Uptime Kuma; no Sentry or vendor SDK. Apply this to PR #11's runbook at that step.
+Local verification on 2026-11-16 could not start PostgreSQL: Windows Device Guard
+blocked the existing `.local/tools/pgsql/bin/postgres.exe`. No policy exception,
+replacement executable or security-control change was attempted. The machine's
+security administrator must resolve that local execution block before local
+database checks can resume; fresh GitHub CI is independent evidence, not a claim
+that the local environment works. Existing local data is preserved.
 Main rules remain inactive pending GitHub sign-in in the in-app tab. Workspace
 access with Approve for me remains a recommendation, not a verified permission
 profile: the current chat still has Full Access/never. The app controls could not

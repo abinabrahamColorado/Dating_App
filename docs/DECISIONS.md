@@ -616,3 +616,18 @@ Explain network/process/cache tradeoffs and verify under that mode before claimi
 it sufficient. Current Full access/never-approve settings remain unchanged during
 this audit. No approval is inferred for M5, deployment, live users or
 research build cards. Healthy development checks are not launch readiness.
+
+## Restore the pinned Windows PostGIS download (DEC-052)
+
+2026-11-16, development reproducibility; Spec P22/P23 release boundaries. The
+founder approved merging setup PR #10, then updating PR #11 only after main CI
+passes. PR #10 merged at `176207ad0c49f88d384f9570dcd47a5ecfba28a0`. Main run
+43819695236 passed `verify` and `dev-services`, but Windows setup failed before
+tests because the pinned PostGIS URL returned HTTP 404.
+
+The official OSGeo directory moved that same 3.6.2 archive into its `archive/`
+subdirectory. Correct only the manifest URL; retain the version, SHA-256,
+extraction path and checksum enforcement. No new dependency version, fallback
+mirror, bypass or product change is introduced. The repair PR records fresh
+download/checksum evidence and CI; main remains red until a separately approved
+repair merge passes its main run. Do not update or merge PR #11 before that gate.
