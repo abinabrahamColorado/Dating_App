@@ -1,5 +1,6 @@
 'use client';
 import { useCallback, useEffect, useState, useRef } from 'react';
+import Link from 'next/link';
 import { Shell } from '../../../components/shell';
 import { api, Notice, messageOf } from '../../../components/client';
 import { useSafetyCommand } from '../../../components/safety';
@@ -104,6 +105,7 @@ export default function Page() {
       <section className="dashboard form-stack">
         <p className="eyebrow">RESTRICTED STAFF ACCESS</p>
         <h1>Safety console</h1>
+        <Link href="/ops/safety/retention">Review case retention and legal holds</Link>
         <p>
           Every case view is audited. Precautionary restrictions are temporary review measures. A
           report count never creates a permanent ban.

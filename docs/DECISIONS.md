@@ -728,3 +728,112 @@ the gate is released. Keep the denial assertion and check another read after blo
 completion. Remove the temporary trigger/function in cleanup. No runtime policy,
 CI step or security assertion is weakened. Fresh CI must prove the revised fixture;
 a passing rerun of the old fixture alone would not resolve the ordering gap.
+
+## DEC-055 — Private, optional meeting feedback and outcomes
+
+2026-11-16. Spec P13/P17, I-10/I-11/I-12. M5 asks once at 10:00 in the
+confirmed venue's civil timezone on the morning after the planned start. A future
+plan invalidated before that start loses its prompt; closing a connection after
+the start preserves the member's own optional meeting record. No email nag or
+automatic mutual-Yes disclosure is added. Explicitly reviewing prior meetings is
+a member choice, not a repeated prompt. Invitations use the existing chat send
+and delivery guards; answers and chips never enter a message. A voluntary
+off-platform second-meeting report counts only when both members report it.
+
+Matching answers, integrity review and safety reports stay separate. Feedback
+contains no free text. The optional chip step offers at most two P17 choices.
+Success exit and each 30/90-day consent commit atomically with the account change;
+missing or withdrawn follow-ups remain unknown. Follow-ups are available in-app
+once due; no new external transport or re-engagement campaign is introduced.
+
+## DEC-056 — Fixed cohorts, honest completeness and reviewed gates
+
+2026-11-16. Spec P23/P26. Operators freeze disjoint cohorts of active,
+discovery-seeking, unrestricted members before observation. Configuration and the
+denominator are frozen with the cohort. Erasure removes member linkage and
+recomputes snapshots without shrinking that denominator. The primary observed
+rate counts distinct members with both-reported attendance and both private Yes
+answers for a meeting in the 28-day window. Attendance disagreement is
+contradictory; different preferences are not a contradiction. Off-platform second
+meetings are a lower-bound self-report, not verified attendance.
+
+Publish numerator, denominator, observation window and completeness. System
+observations and single-person measurements explicitly identify what "one"
+means. Suppress an entire metric group if its denominator or any nonzero
+component/complement is smaller than the configured cell minimum. Operators
+cannot retrieve raw answers through the metrics API. Privacy-sensitive operations
+counts receive the same suppression; exact case work remains in the audited
+safety console. These controls do not establish differential privacy.
+
+Attention measurement is separately opt-in, counts active seconds only, and never
+reads event contents. It excludes hidden, unfocused and idle browser time. The
+display is median/p90 minutes per member meeting-participation, with measured
+members, eligible members, total minutes and participation denominator. It is
+incomplete voluntary client measurement, not surveillance or a causal estimate.
+
+Numerical gates use configured thresholds and mature observation windows.
+Consent/privacy, operations and experience also need an administrator's encrypted,
+audited evidence review; it expires after the configured 30 days. Missing/expired
+evidence fails closed. No review changes live enrollment or Go flags. Go's
+incremental-value gate remains unevaluated and failing until separately authorized
+work supplies evidence. No learned matching card or M6 feature is included.
+
+## DEC-057 — Erasure barriers, independent journal and restore quarantine
+
+2026-11-16. Spec P22, I-18/I-19. Requesting deletion disables the account,
+revokes sessions and creates the job in the policy transaction. A private
+HttpOnly receipt capability lasts through the configured erasure and backup
+window. The receipt reports dates/status only; its standard safety-retention
+notice never confirms whether the member is involved in a case.
+
+All runtime transactions take a shared privacy barrier; erasure, exports and
+metric refresh take an exclusive barrier. Nested transactions reuse the outer
+lease to avoid reacquiring behind a queued writer. Erasure first durably records
+an encrypted independent tombstone, then purges private media versions and all
+registered/on-disk learning exports before committing primary-store deletion.
+Failed external cleanup keeps the job pending; account access stays disabled.
+Encrypted batch summaries are scrubbed and affected feasible-set payloads removed.
+Pilot-wide command-receipt and export invalidation avoids retaining another
+member's payload in an opaque cached result. This can require a refreshed command
+after erasure; it never recreates a deleted account.
+
+Necessary opaque pair-denial keys follow DEC-007: retain while either identity
+exists, then until supported backup risk has expired. Account identifiers cannot
+be reused. Safety evidence stays isolated under D9, not copied into the learning
+or serving boundary. No CDN/search/model/vendor-data adapter exists; private
+media is no-store and a configured CDN without a purge implementation fails.
+
+Backup format v2 authenticates its creation time and refuses restores older than
+the configured 30-day expiry. It excludes database readiness attestation data.
+A restored database therefore refuses member API work and worker startup. The
+operator must freeze the source, independently verify the current journal digest,
+replay every tombstone into a fresh restore, and verify the digest again before
+attesting that specific database name/OID. A backup cannot attest itself. Static
+public help/liveness is not member-data serving. Traffic promotion still requires
+founder approval. This is a bounded single-database pilot workflow, not a claim of
+distributed failover or independently managed off-host disaster recovery.
+
+## DEC-058 — Retention authority and human review
+
+2026-11-16. Spec P22 D4–D15, I-12/I-18/I-20. The worker gets narrow maintenance
+functions, never direct safety-table reads or arbitrary deletion grants. Runtime
+histories remain append-only. The migration owner can delete inside reviewed
+retention functions; a user-set session flag cannot bypass the history trigger.
+
+D5/D8 learning and feedback rows expire; D11/D12 closed communication/planning
+payloads, expired authentication artifacts and D13 counters have separate cutoffs.
+D9 reports, integrity records and appeals expire after closure plus 24 calendar
+months unless a finite case-specific hold applies. Holds need encrypted rationale,
+an explicit end and a review date within 12 months. Every hold view/change is
+audited and staff revocation is rechecked. Inactive state and audit minimization
+are review queues rather than silently treating inactivity as consent to erase.
+Raw GPS, appearance embeddings, demographic research, contact imports and vendor
+evidence remain uncollected; there is no pretend retention job for absent data.
+
+Local encrypted journals/exports and backup-directory cleanup are implemented.
+Journal tombstones are retained until the operations owner verifies all covered
+copies have expired; no automatic pruning assumes unknown external copies are
+gone. Hosting, off-host journal/backup custody, key recovery, RPO/RTO, media
+recovery, log retention and staffed review owners remain launch decisions.
+Windows Device Guard still blocks local PostgreSQL. Do not evade that policy;
+record local non-database checks separately from real PostgreSQL CI evidence.

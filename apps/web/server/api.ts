@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { cookies } from 'next/headers';
 import { after, NextResponse } from 'next/server';
 import { accountConfig as c } from '@meetwell/config/accounts';
+import { pilot } from '@meetwell/config/pilot';
 import {
   emailSchema,
   profileSchema,
@@ -20,11 +21,14 @@ import { passkeyOptions, verifyPasskey } from './passkeys';
 import { handleSafety } from './safety-api';
 import { handleExplore } from './explore-api';
 import { handleConnections } from './connections-api';
+import { handleLifecycle } from './lifecycle-api';
+import { PrivacyStore } from '@meetwell/db/lifecycle';
 import { requireSupportedClient } from '@meetwell/db/client-policy';
 import type { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/server';
 
 export const SESSION_COOKIE = 'meetwell_session';
 const BROWSER_COOKIE = 'meetwell_browser';
+const RECEIPT_COOKIE = 'meetwell_deletion_receipt';
 const uuid = z.uuid();
 const headers = {
   'Cache-Control': 'no-store, private',
@@ -141,6 +145,7 @@ export async function handle(request: Request, path: string[]) {
     requireDevelopmentEnrollment();
     const route = path.join('/');
     const db = store();
+    await db.assertServingReady();
     if (request.method === 'POST') {
       if (
         request.headers.get('origin') !== appOrigin() ||
@@ -148,12 +153,21 @@ export async function handle(request: Request, path: string[]) {
       )
         throw new StoreError('FORBIDDEN');
     }
-    await requireSupportedClient(
-      db,
-      route,
-      request.method,
-      request.headers.get('x-meetwell-client-version'),
-    );
+    const earlyPolicy =
+      route === 'account/policy' && request.method === 'POST'
+        ? policyCommandSchema.parse(await body(request))
+        : null;
+    if (earlyPolicy?.action !== 'DELETE')
+      await requireSupportedClient(
+        db,
+        route,
+        request.method,
+        request.headers.get('x-meetwell-client-version'),
+      );
+    if (route === 'account/deletion-receipt' && request.method === 'GET')
+      return json(
+        await new PrivacyStore(db).receipt((await cookies()).get(RECEIPT_COOKIE)?.value ?? ''),
+      );
     if (route === 'auth/request' && request.method === 'POST') {
       const data = z
         .object({
@@ -251,6 +265,23 @@ export async function handle(request: Request, path: string[]) {
           }),
         );
       }
+      if (
+        path[0] === 'feedback' ||
+        path[0] === 'outcomes' ||
+        (path[0] === 'ops' && path[1] === 'metrics')
+      ) {
+        registered(auth);
+        return json(
+          await handleLifecycle({
+            auth,
+            request,
+            path,
+            requestId,
+            body: () => body(request),
+            key: () => key(request),
+          }),
+        );
+      }
       if (path[0] === 'explore' || (path[0] === 'ops' && path[1] === 'explore')) {
         registered(auth);
         return json(
@@ -317,8 +348,14 @@ export async function handle(request: Request, path: string[]) {
         return json({ revoked: true });
       }
       if (route === 'account/policy' && request.method === 'POST') {
-        const command = policyCommandSchema.parse(await body(request));
-        if (command.action === 'DELETE') recent(auth);
+        const command = earlyPolicy!;
+        if (command.action === 'DELETE') {
+          recent(auth);
+          const result = await new PrivacyStore(db).request(auth, key(request), command.version);
+          await setCookie(RECEIPT_COOKIE, result.token, pilot.DELETION_RECEIPT_DAYS * 86400);
+          await setCookie(SESSION_COOKIE, '', 0);
+          return json(result.policy);
+        }
         const next = await db.changePolicy(auth, key(request), command);
         if (next.deletionRequested) await setCookie(SESSION_COOKIE, '', 0);
         return json(next);

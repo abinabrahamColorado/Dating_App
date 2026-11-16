@@ -10,7 +10,7 @@ if (!url || !key || !path)
 try {
   const database = await restoreDatabase(url, path, key);
   console.log(
-    `Restored isolated database: ${database}. QUARANTINED: do not serve before M5 tombstone replay and release approval.`,
+    `Restored isolated database: ${database}. QUARANTINED: verify the current independent deletion journal, run db:release-restore, and obtain release approval before serving.`,
   );
 } catch {
   console.error(

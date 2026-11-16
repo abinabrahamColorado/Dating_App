@@ -29,6 +29,7 @@ const profiles = pgSchema('app').table('profiles', {
   version: integer('version').notNull(),
 });
 export class StoreError extends Error {}
+const privacyScope = new AsyncLocalStorage<boolean>();
 export async function transaction<T>(
   pool: Pool,
   run: (client: PoolClient) => Promise<T>,
@@ -36,7 +37,13 @@ export async function transaction<T>(
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    const result = await run(client);
+    // One shared barrier per call chain. Nested transactions must reuse the
+    // outer lease: reacquiring behind a queued exclusive erasure could deadlock.
+    if (!privacyScope.getStore()) {
+      await client.query('SELECT pg_advisory_xact_lock_shared(55,2)');
+      await client.query('SELECT app.assert_serving_ready()');
+    }
+    const result = await privacyScope.run(true, () => run(client));
     await client.query('COMMIT');
     return result;
   } catch (error) {
@@ -108,6 +115,9 @@ export class AccountStore {
   }
   lookup(value: string) {
     return lookupToken(this.lookupKey, value);
+  }
+  async assertServingReady() {
+    await this.app.query('SELECT app.assert_serving_ready()');
   }
   /** Internal repositories reuse the checked identity transaction. Borrowing a
    * second pool slot while all slots hold sessions can deadlock guarded reads.
@@ -504,11 +514,17 @@ export class AccountStore {
       return { removed: true };
     });
   }
-  async changePolicy(authority: Authority, key: string, command: PolicyCommand) {
+  async changePolicy(
+    authority: Authority,
+    key: string,
+    command: PolicyCommand,
+    afterChange?: (db: PoolClient, next: Policy) => Promise<void>,
+    receiptContext?: unknown,
+  ) {
     const result = await this.mutate(
       authority.memberId,
       key,
-      command,
+      receiptContext === undefined ? command : { command, context: receiptContext },
       async (db, policy) => {
         const profile = await db.query('SELECT 1 FROM app.profiles WHERE member_id=$1', [
           authority.memberId,
@@ -544,6 +560,7 @@ export class AccountStore {
             command.exitReason ?? null,
           ],
         );
+        if (afterChange) await afterChange(db, next);
         return next;
       },
       true,

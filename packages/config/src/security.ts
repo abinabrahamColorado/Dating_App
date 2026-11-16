@@ -60,7 +60,9 @@ export function assertRuntimeSecurity(env: Environment, role: 'web' | 'worker') 
     'IDENTITY_ENCRYPTION_KEY',
     'APP_ENCRYPTION_KEY',
     'LOOKUP_KEY',
-    ...(role === 'web' ? ['MEDIA_ENCRYPTION_KEY', 'SAFETY_ENCRYPTION_KEY'] : []),
+    ...(role === 'web'
+      ? ['MEDIA_ENCRYPTION_KEY', 'SAFETY_ENCRYPTION_KEY']
+      : ['LIFECYCLE_ENCRYPTION_KEY']),
   ];
   const unique = new Set<string>();
   for (const name of keys) {
@@ -95,7 +97,7 @@ export function assertRuntimeSecurity(env: Environment, role: 'web' | 'worker') 
       invalid(name);
     }
   }
-  if (role === 'web') {
+  {
     strongSecret('MEDIA_SECRET_KEY', env.MEDIA_SECRET_KEY);
     if (!env.MEDIA_ACCESS_KEY || env.MEDIA_ACCESS_KEY === 'meetwell-local')
       invalid('MEDIA_ACCESS_KEY');

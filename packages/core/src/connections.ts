@@ -186,7 +186,10 @@ export function zonedParts(instant: Date, timezone: string, formatter = zonedFor
 }
 /** Local inputs must have exactly one instant. Reject DST gaps AND folds instead
  * of silently choosing a different time or one of two possible confirmations. */
-export function localMeetingInstant(local: string, timezone = launch.timezone): string | null {
+export function localMeetingInstant(
+  local: string,
+  timezone: string = launch.timezone,
+): string | null {
   if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(local)) return null;
   const guess = Date.parse(`${local}:00Z`);
   if (!Number.isFinite(guess)) return null;

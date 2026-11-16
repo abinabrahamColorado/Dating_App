@@ -32,15 +32,19 @@ export default function Page() {
         <h2>Your controls</h2>
         <p>
           You can edit preferences and review their history, sign out other devices, pause, focus,
-          or exit. A deletion request disables your account immediately. Full deletion processing is
-          being built in a later milestone, so use synthetic data only.
+          or exit. A deletion request disables your account immediately, revokes sign-ins and queues
+          removal from primary stores, private media and learning exports. You receive a private
+          deletion receipt. This development preview remains for synthetic data only.
         </p>
         <h2>Retention and limits</h2>
         <p>
-          The planned active-store deletion maximum is {pilot.DELETION_ACTIVE_STORES_DAYS} days,
-          with bounded backup expiry and separately reviewed safety holds. These are engineering
-          targets for the future service, not a claim that deletion orchestration is complete in
-          this preview. No matching model, marketing analytics or third-party tracking is enabled.
+          The active-store deletion target is {pilot.DELETION_ACTIVE_STORES_DAYS} days. Encrypted
+          backups expire within {pilot.BACKUP_EXPIRY_DAYS} days; deletion records are replayed
+          before a restored database serves member data. Safety cases have separate, restricted
+          retention: 24 calendar months after closure with annual review and documented
+          case-specific legal holds. Private matching feedback is retained for up to 180 days.
+          Optional active-time counts contain no screen contents. No matching model or third-party
+          tracking is enabled.
         </p>
       </section>
     </Shell>

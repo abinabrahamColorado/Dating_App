@@ -20,6 +20,8 @@ export default function Page() {
     [reminders, setReminders] = useState(false);
   const [exitReason, setExitReason] = useState(''),
     [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [followup30, setFollowup30] = useState(false),
+    [followup90, setFollowup90] = useState(false);
   const [sessions, setSessions] = useState<{ id: string; current: boolean; createdAt: string }[]>(
     [],
   );
@@ -38,13 +40,21 @@ export default function Page() {
   }
   async function policy(action: PolicyCommand['action']) {
     if (!me) return;
-    await api('account/policy', {
-      action,
-      version: me.policy.version,
-      ...(action === 'PAUSE' ? { pauseChat, planReminders: reminders } : {}),
-      ...(action === 'EXIT' && exitReason ? { exitReason } : {}),
-    });
-    if (action === 'DELETE') router.replace('/signin');
+    if (action === 'EXIT')
+      await api('outcomes/exit', {
+        version: me.policy.version,
+        meaningfulConnection: exitReason === 'met-someone-here',
+        followup30: exitReason === 'met-someone-here' && followup30,
+        followup90: exitReason === 'met-someone-here' && followup90,
+        ...(['taking-a-break', 'other'].includes(exitReason) ? { exitReason } : {}),
+      });
+    else
+      await api('account/policy', {
+        action,
+        version: me.policy.version,
+        ...(action === 'PAUSE' ? { pauseChat, planReminders: reminders } : {}),
+      });
+    if (action === 'DELETE') router.replace('/deletion-receipt');
     else {
       setStatus('Your account choice is saved.');
       await refresh();
@@ -132,6 +142,32 @@ export default function Page() {
                 Exit closes discovery. Returning needs a fresh eligibility review; it is not a
                 pause.
               </p>
+              {exitReason === 'met-someone-here' && (
+                <fieldset>
+                  <legend>Optional private follow-ups</legend>
+                  <p>
+                    Tell us later whether this meaningful connection continues. Each choice is
+                    separate; you can withdraw either.
+                  </p>
+                  <label className="check-row">
+                    <input
+                      type="checkbox"
+                      checked={followup30}
+                      onChange={(e) => setFollowup30(e.target.checked)}
+                    />
+                    Ask me once after 30 days
+                  </label>
+                  <label className="check-row">
+                    <input
+                      type="checkbox"
+                      checked={followup90}
+                      onChange={(e) => setFollowup90(e.target.checked)}
+                    />
+                    Ask me once after 90 days
+                  </label>
+                </fieldset>
+              )}
+              <Link href="/outcomes">Manage follow-ups and optional time measurement</Link>
               <button
                 className="secondary"
                 disabled={busy || me.policy.state === 'EXITED'}
@@ -259,8 +295,9 @@ export default function Page() {
             <section className="panel form-stack">
               <h2>Request account deletion</h2>
               <p>
-                This immediately disables your account and signs out every device. Data erasure is a
-                later milestone; this preview is for synthetic data only.
+                This immediately disables your account and signs out every device. A background job
+                removes your data and provides a receipt. Limited safety-case records may be
+                retained under the published policy. This preview is for synthetic data only.
               </p>
               <label className="check-row">
                 <input

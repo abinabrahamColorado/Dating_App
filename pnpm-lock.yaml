@@ -318,9 +318,15 @@ importers:
 
   packages/runtime:
     dependencies:
+      '@aws-sdk/client-s3':
+        specifier: 3.1152.0
+        version: 3.1152.0
       '@meetwell/config':
         specifier: workspace:*
         version: link:../config
+      '@meetwell/core':
+        specifier: workspace:*
+        version: link:../core
       '@meetwell/db':
         specifier: workspace:*
         version: link:../db

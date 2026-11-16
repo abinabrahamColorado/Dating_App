@@ -5,28 +5,36 @@ Pilot proposal: Manhattan, New York City; ages 18–30.
 
 Permanent checkout: `E:\Buisness\Dating_App`.
 Remote: `https://github.com/abinabrahamColorado/Dating_App`.
-Current checkpoint: integrating `codex/security-hardening` with main for PR #11.
-M3 PR #6 merged at `010a80b`; main CI 41772404412 passed. M4 PR #8 merged at
-`cc6ecf1`; main CI 42974176138 passed all three jobs after 127 tests passed.
-Setup PR #10 merged at `176207a`. Its Windows PostGIS download failure was fixed
-by PR #12, merged with founder approval at `7f15c33`; main CI
-[43824003084](https://github.com/abinabrahamColorado/Dating_App/actions/runs/43824003084)
-passed `verify`, `windows`, and `dev-services` (127 tests in verification).
+Current work: M5 on `codex/m5-feedback-outcomes-deletion`, based on `cc61242`.
+Security PR #11 merged with founder approval at `37bb33f` after all six checks
+passed at `cdab890` (46 unit + 74 PostgreSQL + 18 browser/axe = 138 tests).
+Main CI 43879455326 passed all three quality jobs. DEC-054 records the focused,
+founder-approved block/profile race test synchronization repair.
+Docs/design PR #9 was updated from that main, passed CI 43879610594, and merged
+at `cc61242`. Its three motion-reference files are unchanged and are not integrated
+into application components. Final main CI
+[43881320513](https://github.com/abinabrahamColorado/Dating_App/actions/runs/43881320513)
+passed `verify`, `windows`, and `dev-services` before the M5 branch was created.
 
-[PR #11](https://github.com/abinabrahamColorado/Dating_App/pull/11) adds nonce CSP/HSTS,
-strict nonlocal startup/SMTP checks, secret/dependency CI, privacy-limited local
-monitoring and encrypted backup/fresh-restore tools. See DEC-050/051,
-[checklist](security/checklist.md) and [verification](testing/security-hardening.md).
-Its earlier local full check passed 138 tests on 2026-11-11. Integration head
-`b37a08d` passed five checks; one Windows run failed the existing block/profile
-race assertion. DEC-054 records the founder-approved test synchronization repair;
-fresh CI is pending and historical results do not prove this repaired tree.
-The founder explicitly
-approved the workflow conflict resolution retaining all setup/security steps, then
-merging #11 only with all six checks green. Next update/merge docs/design PR #9 on
-green CI, verify main, and start M5 on its own branch. M5's PR must remain unmerged.
-Monitoring direction is recorded in DEC-053 and the runbook: plan self-hosted
-Uptime Kuma, defer vendor selection until hosting, and add no Sentry/vendor SDK.
+M5 is authorized exactly as CODEX_PROMPTS.md: feedback, attendance provenance,
+separate learning datasets/exports, optional success exits/follow-ups, fixed-cohort
+metrics, retention, deletion receipts and restore tombstone replay. Implementation
+is present; verification is in progress and no M5 completion is claimed yet. Publish one M5
+PR, wait for CI, and stop without merging. M6, design-motion integration, research
+build cards, deployment and real enrollment are not authorized by this task.
+Monitoring remains the self-hosted Uptime Kuma plan, with vendor selection deferred
+until hosting and no Sentry/vendor SDK (DEC-053).
+
+M5 adds morning-after private feedback, separate invitation and reporting paths,
+attendance provenance, opt-in success follow-ups, separate learning snapshots,
+fixed-cohort metrics and expiring readiness evidence. Deletion covers primary
+data, encrypted media versions and exports; the independent journal is replayed
+before a restored database can serve member requests. D9 retention includes
+audited case-specific hold/release and annual-review controls. DEC-055–058 and
+[the lifecycle runbook](operations/privacy-lifecycle.md) document the boundaries.
+Current local evidence: typecheck/lint and 53 unit tests passed. The full local
+check stops at PostgreSQL connection refusal; fresh CI verification is pending.
+Do not infer PostgreSQL, restore or browser success from compilation.
 
 Local verification on 2026-11-16 could not start PostgreSQL: Windows Device Guard
 blocked the existing `.local/tools/pgsql/bin/postgres.exe`. No policy exception,
@@ -165,14 +173,14 @@ founder's explicit M1 merge and M2 authorization in DEC-035.
 ## Release limits and next work
 
 Account APIs require local/test mode and a loopback origin. Use synthetic accounts.
-Birth-date entry is not identity verification. Deletion currently disables access;
-it does not erase data. Chat and joint plans were merged in PR #8;
-feedback, erasure/restore and event Go remain unbuilt. No serving model, member
+Birth-date entry is not identity verification. Chat and joint plans were merged
+in PR #8. M5 feedback, metrics and erasure/restore are under verification on their
+own branch. Event Go remains unbuilt. No serving model, member
 GPS collection, real provider integration or live pilot is enabled.
 
-Next: complete the approved #11/#9 integration and green-main gates, then implement
-M5 exactly as CODEX_PROMPTS.md on a separate branch; publish and verify its PR,
-then stop without merging it (DEC-053).
+The approved #11/#9 merges and green-main gates are complete. Next: finish M5's
+verification, publish its single PR, wait for green CI and stop without merging
+(DEC-053). M6 is not authorized.
 M1 client retry recovery and ambiguous media-write compensation (G08/G09) remain
 release gates. M2 fixes G02/G03 for current request/case boundaries; M3 now tests
 reservation/delivery/acceptance races. M4 PR #8 proves the chat-delivery and
