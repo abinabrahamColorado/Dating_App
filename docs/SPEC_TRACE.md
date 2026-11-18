@@ -465,10 +465,26 @@ M6 event/Go switches remain off. No research build card is implemented.
   fixed metadata only. Unit and integration tests cover error sentinel omission,
   pg-boss persistence, successful jobs, down/up probes and redirect refusal.
   External alerts and framework/hosting log privacy remain open (DEC-050).
-- P22/I-18 partial infrastructure only: `scripts/database-backup`, backup/restore
+- P22/I-18 backup infrastructure: `scripts/database-backup`, backup/restore
   CLIs and `integration/backup-restore` prove authenticated encrypted archive,
   fresh database recovery, ledger/grants and tamper rejection. Tombstone replay,
-  deletion/retention and production promotion remain unimplemented M5 work (DEC-051).
+  deletion/retention are implemented by M5 (DEC-057/058); production promotion
+  still needs founder approval.
 - CI full-history gitleaks, production dependency audit and weekly updates are
   recorded in `security/checklist.md`; these do not replace runtime authorization
   tests or launch readiness review.
+
+## Enforced deletion correction (DEC-007 / DEC-059)
+
+- P20/P22, I-12/I-18/I-19: migration `0017_enforced_rejoin`, `db/accounts` and
+  `db/lifecycle` retain only a safety-scoped keyed email plus finite D9 expiry.
+  `integration/erasure-enforcement` proves active versus lifted/no enforcement,
+  request/consume denial, case normalization, privacy-lock race, expiry, direct
+  insert/update guards, role isolation and unchanged legitimate rejoining.
+- I-18/I-20: the same suite proves only affected moderation receipts are deleted,
+  staff operator/case audit survives, subject linkage is removed, and history
+  mutation remains forbidden. Existing audit-review scheduling is unchanged.
+- I-18: `scripts/replay-deletions` requires a frozen current safety source in
+  addition to independent tombstones. `integration/lifecycle` restores an archive
+  made before enforcement/deletion, rejects using the target as its safety source,
+  and proves the denied email survives recovery without extending its expiry.

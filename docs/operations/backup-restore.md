@@ -68,11 +68,20 @@ and private network access. The tool is not a substitute for network policy.
 3. Prove app/learning roles still cannot read safety records; audit grants and
    restore operator privileges. Do not put operator credentials into the app.
 4. Freeze the source and independently verify the current deletion-journal digest.
-   Set operator-only `RESTORE_DATABASE_URL` to the fresh target and run
+   Set operator-only `RESTORE_DATABASE_URL` to the fresh target and
+   `SAFETY_RESTORE_SOURCE_DATABASE_URL` to the frozen current safety database,
+   independently recovered if necessary. The old archive cannot supply this
+   current denial set. Do not use a restored target as its own safety source.
+   If the current set is unavailable, leave recovery quarantined. Then run
    `corepack pnpm db:release-restore <verified-digest>`. Follow
    [the privacy lifecycle runbook](privacy-lifecycle.md). Missing/changed journals,
    failed cleanup or pending erasures keep the target quarantined. Backups exclude
    readiness attestation data; the target name/OID must be attested only after replay.
+   DEC-059 also copies only keyed email denials and original expiry timestamps
+   directly between safety schemas and rejects a changing source. Keep source
+   writes frozen through traffic promotion; no hash export goes into logs or the
+   ordinary deletion journal. Run pending migrations on an older restored schema
+   before release. Operator credentials must remain outside web/worker settings.
 5. Reconcile separately backed-up encrypted media and queue/outbox state. Starting
    a worker can repeat previously sent notifications; do not start it during a drill.
 6. Require the founder's release approval after the operational/privacy gates pass.

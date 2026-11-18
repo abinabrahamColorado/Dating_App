@@ -2,6 +2,7 @@ import type { AccountStore } from '../packages/db/src/accounts';
 import { LifecycleStore, lifecycleTransaction } from '../packages/db/src/lifecycle';
 import type { LifecycleArtifacts } from '../packages/runtime/src/lifecycle-artifacts';
 import { Pool } from 'pg';
+import { createHash } from 'node:crypto';
 /** Only a fresh restore can be released. Caller must freeze the source and
  * independently verify its current journal digest. A database backup can never
  * supply its own "latest" deletion journal or permission to serve. */
@@ -11,6 +12,7 @@ export async function replayDeletions(
   artifacts: LifecycleArtifacts,
   expectedDigest: string,
   purgePhoto: (id: string) => Promise<void>,
+  currentSafetySource: Pool,
 ) {
   const name = new URL(url).pathname.slice(1);
   if (!/^meetwell_restore_[a-f0-9]{32}$/.test(name))
@@ -20,6 +22,21 @@ export async function replayDeletions(
     throw Error('Latest independent journal digest required');
   const pool = new Pool({ connectionString: url });
   try {
+    // Operator-only recovery reads. No safety hash enters the ordinary deletion
+    // journal, learning export, application role, logs or an unencrypted file.
+    const sourceName = (await currentSafetySource.query('SELECT current_database() AS name'))
+      .rows[0].name as string;
+    if (sourceName.startsWith('meetwell_restore_'))
+      throw Error('Independent current safety source required');
+    const readDenials = async () =>
+      (
+        await currentSafetySource.query<{ email_lookup: string; expires_at: Date }>(
+          'SELECT email_lookup,expires_at FROM safety.rejoin_denials ORDER BY email_lookup',
+        )
+      ).rows;
+    const safetyRows = await readDenials();
+    const safetyDigest = (rows: typeof safetyRows) =>
+      createHash('sha256').update(JSON.stringify(rows)).digest('hex');
     await lifecycleTransaction(
       pool,
       async (db) => {
@@ -56,6 +73,16 @@ export async function replayDeletions(
         await db.query('DELETE FROM ops.learning_exports');
         if ((await db.query('SELECT 1 FROM ops.deletion_jobs WHERE completed_at IS NULL')).rowCount)
           throw Error('Pending erasure blocks activation');
+        if (safetyDigest(await readDenials()) !== safetyDigest(safetyRows))
+          throw Error('Safety source changed during replay; freeze and retry');
+        // The current source is authoritative, including lifted/expired records;
+        // old backup enforcement must not manufacture a new retention period.
+        await db.query('DELETE FROM safety.rejoin_denials');
+        for (const row of safetyRows)
+          await db.query(
+            'INSERT INTO safety.rejoin_denials(email_lookup,expires_at) SELECT $1,$2::timestamptz WHERE $2::timestamptz>clock_timestamp()',
+            [row.email_lookup, row.expires_at],
+          );
         await db.query("INSERT INTO ops.lifecycle_audit(event) VALUES('RESTORE_REPLAY')");
         await db.query(
           'INSERT INTO ops.serving_attestation(database_name,database_oid) SELECT current_database(),oid FROM pg_database WHERE datname=current_database()',

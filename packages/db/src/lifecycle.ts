@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type { Pool, PoolClient } from 'pg';
 import { z } from 'zod';
 import { deletionDeadline, retentionCutoffs } from '@meetwell/core/retention';
+import { retention } from '@meetwell/config/pilot';
 import { AccountStore, StoreError, type Authority } from './accounts';
 import { hashToken } from './encryption';
 
@@ -21,7 +22,11 @@ export class PrivacyStore {
     const token = this.accounts.lookup(`deletion-receipt:${auth.memberId}:${key}`);
     const next = await this.accounts.withSession(auth, () =>
       this.accounts.changePolicy(auth, key, { action: 'DELETE', version }, async (db) => {
-        await db.query('SELECT app.request_erasure($1,$2)', [auth.memberId, hashToken(token)]);
+        await db.query('SELECT app.request_erasure($1,$2,$3)', [
+          auth.memberId,
+          hashToken(token),
+          retention.D9_SAFETY_AFTER_CLOSURE_MONTHS,
+        ]);
       }),
     );
     return { policy: next, token };
@@ -127,7 +132,10 @@ export class LifecycleStore {
             ]);
           }
         }
-        await db.query('SELECT ops.erase_primary($1)', [job.member_id]);
+        await db.query('SELECT ops.erase_primary($1,$2)', [
+          job.member_id,
+          retention.D9_SAFETY_AFTER_CLOSURE_MONTHS,
+        ]);
         return true;
       },
       quarantined,
@@ -141,6 +149,7 @@ export class LifecycleStore {
       await this.artifacts.purgeSnapshots();
       await db.query('DELETE FROM ops.learning_exports');
       await db.query('SELECT ops.retain_until($1)', [JSON.stringify(retentionCutoffs(now))]);
+      await db.query('SELECT ops.expire_rejoin_denials()');
     });
   }
   async exportLearning() {

@@ -28,19 +28,20 @@ Run `corepack pnpm worker` after local service setup. `feedback.maintain`,
 Monitor queue failures and overdue deletion/review counts; a completion receipt
 is written only after required cleanup succeeds.
 
-| Store                           | Erasure / retention                                                                                                                                                            |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Identity                        | Revoke sessions immediately; purge identity, consents, challenges, passkeys and keyed mail rows during erasure. Expired auth artifacts and counters expire separately.         |
-| Profiles/preferences            | Remove encrypted settings and all versions on account erasure. Flag inactive records for human review after the configured period.                                             |
-| Connections/plans               | Erase affected chats, planning preferences, options, versions and confirmations. Close opportunities and release capacity before removal.                                      |
-| Learning                        | Explicit separate exposure/decision, experience and logistics columns; no narrative, location, chat or audit demographics. Row TTLs and account erasure apply.                 |
-| Cohorts/metrics                 | Remove identity joins; preserve frozen enrollment count; invalidate and recompute aggregates. Suppress small cells and complements.                                            |
-| Media                           | Remove every object version and delete marker. Reconcile unreferenced objects after the operational grace period. Failed object cleanup keeps the job pending.                 |
-| Exports                         | Encrypted timestamped snapshots in the configured directory. Erasure and retention invalidate all copies in that directory, including a file left by a failed registry commit. |
-| Safety                          | Isolated D9 case/appeal/hold records, annual review, 24 calendar months after closure and documented scoped holds. Serving receipts reveal no case-existence fact.             |
-| Audits                          | Opaque operational records; erase ordinary actor/subject joins with deletion. Audit minimization review is explicit; case access records follow the case's D9 scope.           |
-| Pair denials                    | Minimal opaque keys while either identity remains, then through supported backup expiry. No reused identity IDs.                                                               |
-| CDN/cache/search/models/vendors | No public CDN, personal server cache, search index, model, embedding or identity vendor. Responses are no-store. Received external email cannot be recalled.                   |
+| Store                           | Erasure / retention                                                                                                                                                                            |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Identity                        | Revoke sessions immediately; purge identity, consents, challenges, passkeys and keyed mail rows during erasure. Expired auth artifacts and counters expire separately.                         |
+| Profiles/preferences            | Remove encrypted settings and all versions on account erasure. Flag inactive records for human review after the configured period.                                                             |
+| Connections/plans               | Erase affected chats, planning preferences, options, versions and confirmations. Close opportunities and release capacity before removal.                                                      |
+| Learning                        | Explicit separate exposure/decision, experience and logistics columns; no narrative, location, chat or audit demographics. Row TTLs and account erasure apply.                                 |
+| Cohorts/metrics                 | Remove identity joins; preserve frozen enrollment count; invalidate and recompute aggregates. Suppress small cells and complements.                                                            |
+| Media                           | Remove every object version and delete marker. Reconcile unreferenced objects after the operational grace period. Failed object cleanup keeps the job pending.                                 |
+| Exports                         | Encrypted timestamped snapshots in the configured directory. Erasure and retention invalidate all copies in that directory, including a file left by a failed registry commit.                 |
+| Safety                          | Isolated D9 case/appeal/hold records, annual review, 24 calendar months after closure and documented scoped holds. Serving receipts reveal no case-existence fact.                             |
+| Audits                          | Preserve departing staff actor ID, action/time and opaque event/request IDs; clear optional subject links on their operator audit rows. Audit review remains explicit; case access follows D9. |
+| Enforced rejoining              | Only existing keyed email lookup plus expiry in safety, for 24 calendar months from an enforced deletion request. No new denial for an unenforced member; expiry is not extended by retries.   |
+| Pair denials                    | Minimal opaque keys while either identity remains, then through supported backup expiry. No reused identity IDs.                                                                               |
+| CDN/cache/search/models/vendors | No public CDN, personal server cache, search index, model, embedding or identity vendor. Responses are no-store. Received external email cannot be recalled.                                   |
 
 Raw application access/IP logs are not collected. Before hosting, configure
 platform/framework/database log rotation and validate redaction; these external
@@ -84,13 +85,17 @@ latest independent journal and recording its verified digest. Restore only into
 a fresh `meetwell_restore_…` target. Set operator-only `RESTORE_DATABASE_URL` to
 that target, recover the original application and lifecycle keys separately, and
 point media cleanup at the corresponding private storage inventory.
+Set operator-only `SAFETY_RESTORE_SOURCE_DATABASE_URL` to the frozen, independently
+verified current safety database. It supplies the minimal email denial set with
+original expiries; an old archive or the target itself cannot supply current
+enforcement. Without recoverable current safety state, leave the target offline.
 
 ```powershell
 corepack pnpm db:release-restore <independently-verified-current-journal-digest>
 ```
 
 This replays erasure before writing database readiness. A changed digest, missing
-journal, failed purge or pending job leaves the target quarantined. Test readiness,
+journal, missing/changing safety source, failed purge or pending job leaves the target quarantined. Test readiness,
 schema checksums, role isolation, deleted canaries and media recovery. Keep workers
 off during a drill to avoid replaying external mail. Founder approval is still
 required before traffic changes. A failure must never lead to bypassing readiness
