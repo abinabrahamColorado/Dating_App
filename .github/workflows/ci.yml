@@ -105,7 +105,7 @@ jobs:
       - run: corepack pnpm build
       - run: corepack pnpm exec playwright install --with-deps chromium
       - run: corepack pnpm test:e2e
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: synthetic-browser-test-results
