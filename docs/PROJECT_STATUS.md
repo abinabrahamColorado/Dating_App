@@ -11,12 +11,27 @@ Main run [44267728623](https://github.com/abinabrahamColorado/Dating_App/actions
 failed the production dependency audit on two Next.js advisories; main is not
 green. No audit gate was weakened and no dependency PR is approved for merge.
 Current work: separate `codex/prevent-enforced-rejoin` security correction
-(DEC-059), not M6. New PR must remain unmerged. Dependabot #13–#21 are review only.
+(DEC-059), [PR #23](https://github.com/abinabrahamColorado/Dating_App/pull/23),
+not M6. PR #23 must remain unmerged. Dependabot #13–#21 are review only.
 Local correction checks: typecheck, lint, formatting and 55 unit tests passed.
 `corepack pnpm check` reached integration tests and stopped at PostgreSQL
 `ECONNREFUSED 127.0.0.1:55432`; database validation awaits hosted CI. The separate
 production build compiled/typechecked but exited with Next.js `SecurityFatalError`
 for the dependency advisories. No security warning or audit threshold was bypassed.
+At correction commit `dc76092`, hosted Windows run
+[44269397465](https://github.com/abinabrahamColorado/Dating_App/actions/runs/44269397465)
+passed complete `corepack pnpm check`: 55 unit + 91 PostgreSQL/storage + 22
+browser/axe tests (168). Both Linux verification runs stopped at the unchanged
+Next.js production audit; development services passed. The final follow-up adds
+one regression for a new enforcement period after expiry and verifies restored
+expiry equality, plus runbook clarifications. Check the current PR head's CI;
+earlier green Windows evidence does not establish all current-head checks green.
+
+Dependency review: #21 is the priority Next.js security update; #13–#15/#17 look
+compatible but their CI predates M5. #18 (Playwright 1.65.1) and #19 (ESLint
+10.15.0) pass Windows on current main but share the Next audit failure. #16 needs
+its Windows axe document-title failure investigated and #20 needs a retry after
+a Go dependency download failure. No dependency PR was changed or merged.
 Security PR #11 merged with founder approval at `37bb33f` after all six checks
 passed at `cdab890` (46 unit + 74 PostgreSQL + 18 browser/axe = 138 tests).
 Main CI 43879455326 passed all three quality jobs. DEC-054 records the focused,

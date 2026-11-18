@@ -612,6 +612,19 @@ it('I-18 P22 restoring an older backup cannot serve until the latest independent
     await replayDeletions(target.toString(), f.accounts, artifacts, digest, deletePhoto, f.admin);
     expect(
       (
+        await pool.query(
+          'SELECT email_lookup,expires_at FROM safety.rejoin_denials ORDER BY email_lookup',
+        )
+      ).rows,
+    ).toEqual(
+      (
+        await f.safety.query(
+          'SELECT email_lookup,expires_at FROM safety.rejoin_denials ORDER BY email_lookup',
+        )
+      ).rows,
+    );
+    expect(
+      (
         await pool.query('SELECT identity.signup_denied($1) AS denied', [
           f.accounts.lookup(`${p.a.memberId}@synthetic.invalid`),
         ])

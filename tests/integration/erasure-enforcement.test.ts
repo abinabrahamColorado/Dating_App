@@ -210,6 +210,39 @@ it('I-12 safety email hashes are unreadable to identity, app, learning, operator
   ).rejects.toMatchObject({ code: '42501' });
 });
 
+it('I-18 D9 a new enforced deletion after expiry starts a finite period even before hourly cleanup', async () => {
+  const a = await f.member();
+  await restrict(a);
+  await request(a);
+  await erase(a);
+  const key = f.accounts.lookup(email(a));
+  await f.admin.query(
+    "UPDATE safety.rejoin_denials SET expires_at=clock_timestamp()-interval '1 second' WHERE email_lookup=$1",
+    [key],
+  );
+  const next = await f.member();
+  await f.identity.query('UPDATE identity.users SET email_lookup=$1 WHERE id=$2', [
+    key,
+    next.memberId,
+  ]);
+  await restrict(next);
+  await request(next);
+  expect(await denied(a)).toBe(true);
+  const job = (
+    await f.admin.query('SELECT requested_at FROM ops.deletion_jobs WHERE member_id=$1', [
+      next.memberId,
+    ])
+  ).rows[0];
+  expect(
+    (
+      await f.safety.query('SELECT expires_at FROM safety.rejoin_denials WHERE email_lookup=$1', [
+        key,
+      ])
+    ).rows[0].expires_at,
+  ).toEqual(addCalendarMonths(job.requested_at, months));
+  await erase(next);
+});
+
 it('I-18 I-20 erasure removes only affected moderation receipts and preserves staff audit history without subject linkage', async () => {
   const staff = await f.member(true),
     otherStaff = await f.member(true),
