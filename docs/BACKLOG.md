@@ -8,10 +8,12 @@ M2 merged in PR #5 at `5711fe60dfdec9e9ffa6a2f50b2ea38dea2ecb0f`; main CI
 M4 PR #8 merged with founder approval at `cc6ecf1`; main CI 42974176138 passed.
 Setup PR #10 merged at `176207a`. Its Windows download failure was repaired by
 PR #12, merged at `7f15c33`; main CI 43824003084 is green (DEC-052).
-The founder approved integrating PR #11 with every CI step retained, merging it
-only after all six checks pass, then updating/merging docs/design PR #9 on green
-CI. M5 is authorized only after those merges and green main; its own PR must remain
-unmerged (DEC-053). Research build cards remain unauthorized.
+PR #11 merged at `37bb33f` after all six checks passed at `cdab890`; main CI
+43879455326 passed. Docs/design PR #9 merged at `cc61242` after update/green CI;
+main CI 43881320513 passed. M5 is implemented in
+[PR #22](https://github.com/abinabrahamColorado/Dating_App/pull/22); verification
+evidence is recorded in PROJECT_STATUS.md. Its PR must remain unmerged (DEC-053). Research build cards
+remain unauthorized.
 Monitoring vendor selection waits for hosting. Plan self-hosted Uptime Kuma;
 no Sentry or vendor SDK. See [monitoring](operations/monitoring.md).
 The earlier hosted preview remains an independent design reference.
@@ -20,9 +22,9 @@ Local setup blocker (2026-11-16): Device Guard blocks the existing PostgreSQL
 executable. The PC's security administrator must review the policy; do not bypass
 it or claim local database checks passed. GitHub runners validate independently.
 
-PR #11 integration verification: DEC-054 repairs the block/profile race fixture's
-transaction ordering after one Windows failure at `b37a08d`. Keep every denial
-assertion and require fresh green checks before the approved merge.
+PR #11 integration verification is complete: DEC-054 repaired the block/profile
+race fixture's transaction ordering without weakening denial assertions. All six
+checks passed before the explicitly approved merge.
 
 The separate setup audit (DEC-049) standardizes Corepack/Node and durable guidance.
 The sidebar primary folder is corrected and verified. Remaining setup work:
@@ -62,9 +64,20 @@ research is complete for now (DEC-033). DEC-035 authorizes this M2 build only.
   names remaining release owners. Before hosting, review bucket IAM, network/TLS,
   build/access/framework log privacy, universal route rate budgets, key custody,
   external monitoring/alert ownership and isolated staging. No vendor is approved.
-- M5 retains deletion-tombstone replay before restored data may serve traffic,
-  D14 backup expiry, media/key recovery and retention/legal holds. The standalone
-  encrypted backup/fresh-restore drill does not complete I-18 or start M5.
+- M5 implements deletion, independent journal replay, encrypted snapshot
+  invalidation, private-media version/orphan cleanup and D-table retention jobs.
+  Backup expiry is P22 deletion orchestration; D14 is optional demographic
+  research and remains uncollected. Real PostgreSQL/restore/browser evidence is
+  tracked in PROJECT_STATUS.md; do not equate implementation with a launch.
+- Before launch: assign inactive-state, audit-minimization and annual D9 review
+  owners; validate case-specific legal holds, retention and consent wording with
+  the privacy/legal owner. Choose hosting, independent off-host journal/backup/media
+  custody, keys, RPO/RTO and restore-drill cadence. Configure external platform log
+  retention and scoped object-version cleanup permissions. No outside vendor SDK.
+- M5 limitations (DEC-055–058): in-app follow-ups only; optional active-time counts
+  are incomplete client measurements; all exports are invalidated on erasure/TTL;
+  restore requires a source freeze and independently verified current journal.
+  Pilot-wide opaque receipt invalidation can require refreshing a command.
 
 - M3 review correction completed in DEC-045: temporary system cancellations and
   undelivered reservation expiry permit later re-entry; permanent refusals and
@@ -133,12 +146,10 @@ Pricing/payments; demographic research; pooled models/embeddings; broad neighbor
   Before scaling beyond 200 review members: load-test retrieval/lock duration and
   introduce a reviewed bounded retrieval policy with explicit retrieval-miss accounting.
   Do not silently truncate the exhaustive pilot cohort (DEC-040).
-- M5: erase stores/exports, reconcile encrypted media orphans, expire auth/outbox/
-  rate-limit records, apply tombstones on restore and prove retention deadlines.
-- M5: enforce D9 safety retention: 24 calendar months after case closure, annual
-  review and shorter retention where unneeded; case-specific legal holds prevent
-  deletion only for their documented scope/duration. Add expiry, hold/release and
-  restored-backup tests. M2 stores cases but does not run this retention job.
+- M5 implementation under verification: erasure, encrypted media-orphan cleanup,
+  auth/counter expiry, tombstone replay and retention tests. D9 has case-specific
+  hold/release controls and audited annual-review views. Operational review is a
+  human responsibility; no blanket indefinite retention exception is approved.
 - M7: passkey listing/removal/recovery with recent authentication; production
   KMS/key rotation, scoped object-storage credentials, real mail transport, strict
   CSP, per-request body deadlines, broader abuse budgets, additional staff abuse scenarios,

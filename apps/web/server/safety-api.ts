@@ -42,6 +42,8 @@ export const safetyRoutes = {
   'GET ops/safety/switches': 'staff',
   'POST ops/safety/switches': 'staff',
   'GET ops/safety/audit': 'staff',
+  'GET ops/safety/retention': 'staff',
+  'POST ops/safety/retention': 'staff',
 } as const;
 export async function handleSafety(c: Context): Promise<unknown> {
   const p = c.path,
@@ -67,6 +69,9 @@ export async function handleSafety(c: Context): Promise<unknown> {
     return blockMember(store(), auth, d.subjectId, c.key());
   }
   const db = safetyStore();
+  if (route === 'GET ops/safety/retention') return db.retentionQueue(auth, c.requestId);
+  if (route === 'POST ops/safety/retention')
+    return db.hold(auth, c.key(), await c.body(), c.requestId);
   if (
     ['POST safety/reports', 'POST safety/integrity'].includes(route) &&
     !(await store().rateLimit(

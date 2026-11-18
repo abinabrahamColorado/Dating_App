@@ -33,6 +33,7 @@ export function connectionFixture() {
     ops = role('ops'),
     safety = role('safety'),
     learning = role('learning'),
+    worker = role('worker'),
     key = () => randomBytes(32).toString('base64');
   const accounts = new AccountStore({
       app,
@@ -52,7 +53,7 @@ export function connectionFixture() {
     await migrate(url.toString());
   }
   async function stop() {
-    await Promise.all([admin, app, identity, ops, safety, learning].map((p) => p.end()));
+    await Promise.all([admin, app, identity, ops, safety, learning, worker].map((p) => p.end()));
     await cluster.query(`DROP DATABASE "${name}"`);
     await cluster.end();
   }
@@ -134,6 +135,7 @@ export function connectionFixture() {
     });
   }
   return {
+    worker,
     url: url.toString(),
     admin,
     app,

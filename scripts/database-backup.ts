@@ -3,10 +3,12 @@ import { createCipheriv, createDecipheriv, randomBytes, randomUUID } from 'node:
 import { readFile, writeFile, access, stat } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import { Pool } from 'pg';
+import { pilot } from '../packages/config/src/pilot';
+import { lifecycleConfig } from '../packages/config/src/lifecycle';
 
 // Bounded pilot tool: authenticated plaintext stays in memory, never in a temp file.
 const limit = 256 * 1024 * 1024;
-const aad = Buffer.from('meetwell-database-backup-v1');
+const aad = Buffer.from(lifecycleConfig.BACKUP_ENVELOPE_PREFIX);
 const roles = [
   'meetwell_identity',
   'meetwell_app',
@@ -92,35 +94,46 @@ async function pg(program: 'pg_dump' | 'pg_restore', url: string, args: string[]
 }
 export async function backupDatabase(url: string, archive: string, key: string) {
   const bytes = keyBytes(key);
-  const dump = await pg('pg_dump', url, ['--format=custom', '--no-owner', '--no-password']);
+  const dump = await pg('pg_dump', url, [
+    '--format=custom',
+    '--no-owner',
+    '--no-password',
+    '--exclude-table-data=ops.serving_attestation',
+  ]);
+  const created = Buffer.alloc(8);
+  created.writeBigInt64BE(BigInt(Date.now()));
   const iv = randomBytes(12),
     cipher = createCipheriv('aes-256-gcm', bytes, iv);
-  cipher.setAAD(aad);
+  cipher.setAAD(Buffer.concat([aad, created]));
   const ciphertext = Buffer.concat([cipher.update(dump), cipher.final()]);
-  await writeFile(archive, Buffer.concat([aad, iv, cipher.getAuthTag(), ciphertext]), {
+  await writeFile(archive, Buffer.concat([aad, created, iv, cipher.getAuthTag(), ciphertext]), {
     flag: 'wx',
     mode: 0o600,
   });
 }
 export async function restoreDatabase(clusterUrl: string, archive: string, key: string) {
   const bytes = keyBytes(key);
-  if ((await stat(archive)).size > limit + aad.length + 28)
+  if ((await stat(archive)).size > limit + aad.length + 36)
     throw new Error('Backup exceeds the pilot limit');
   const data = await readFile(archive);
   if (!data.subarray(0, aad.length).equals(aad)) throw new Error('Unsupported backup format');
   const decipher = createDecipheriv(
     'aes-256-gcm',
     bytes,
-    data.subarray(aad.length, aad.length + 12),
+    data.subarray(aad.length + 8, aad.length + 20),
   );
-  decipher.setAAD(aad);
-  decipher.setAuthTag(data.subarray(aad.length + 12, aad.length + 28));
+  const created = data.subarray(aad.length, aad.length + 8);
+  decipher.setAAD(Buffer.concat([aad, created]));
+  decipher.setAuthTag(data.subarray(aad.length + 20, aad.length + 36));
   let dump: Buffer;
   try {
-    dump = Buffer.concat([decipher.update(data.subarray(aad.length + 28)), decipher.final()]);
+    dump = Buffer.concat([decipher.update(data.subarray(aad.length + 36)), decipher.final()]);
   } catch {
     throw new Error('Backup authentication failed');
   }
+  const age = Date.now() - Number(created.readBigInt64BE());
+  if (age < 0 || age > pilot.BACKUP_EXPIRY_DAYS * 86400000)
+    throw Error('Backup is expired or has a future timestamp');
   // Authenticate the complete archive BEFORE creating a database or executing restored SQL.
   const cluster = new Pool({ connectionString: clusterUrl, connectionTimeoutMillis: 10000 });
   const database = `meetwell_restore_${randomUUID().replaceAll('-', '')}`;

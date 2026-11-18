@@ -5,6 +5,8 @@ import { Pool } from 'pg';
 import { parse } from 'dotenv';
 import { migrate } from '../packages/db/src/migrate';
 import { setupLocalStorage } from '../apps/web/server/setup-storage';
+import { lifecycleArtifacts } from '../packages/runtime/src/lifecycle';
+import { mkdir } from 'node:fs/promises';
 
 const path = '.env';
 const existing = await readFile(path, 'utf8').catch(() => '');
@@ -57,6 +59,7 @@ for (const key of [
   'MEDIA_ENCRYPTION_KEY',
   'SAFETY_ENCRYPTION_KEY',
   'LOOKUP_KEY',
+  'LIFECYCLE_ENCRYPTION_KEY',
 ]) {
   set(key, values[key] ?? randomBytes(32).toString('base64'));
 }
@@ -69,6 +72,11 @@ set(
 );
 set('MEDIA_BUCKET', 'meetwell-private');
 await setupLocalStorage();
+await lifecycleArtifacts().initialize();
+await mkdir(process.env.BACKUP_DIRECTORY ?? '.local/privacy/backups', {
+  recursive: true,
+  mode: 0o700,
+});
 // Replace only keys owned by this setup; preserve all other configuration and comments.
 const lines = existing
   .split(/\r?\n/)

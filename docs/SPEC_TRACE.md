@@ -1,4 +1,26 @@
-# Specification trace — M1 evidence
+# Specification trace and milestone evidence
+
+## M5 implementation and verification map
+
+2026-11-16, DEC-055–058. New forward migrations 0014–0016; earlier migrations
+are unchanged. Test outcomes and the unmerged PR are recorded in PROJECT_STATUS.
+`lifecycle-artifacts.test.ts` also proves authenticated journal failure behavior
+and backup expiry after a filesystem copy; the PostgreSQL suite exercises real
+versioned storage, unrelated-message retry preservation and global abuse budgets.
+
+| Scope               | Implementation                                                                                                                          | Executable evidence                                                                                                                                                                                                      |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| P17 / I-10          | `core/feedback`, `db/feedback`, `/feedback`, `/outcomes`, settings success exit                                                         | `tests/unit/lifecycle.test.ts`, `tests/integration/lifecycle.test.ts`, `tests/e2e/lifecycle.spec.ts`: private optional answers, one prompt, missing/disputed provenance, separate invitation, consent/revoke/idempotence |
+| P17/P20 / I-11/I-12 | Post-meeting independent integrity/safety links; learning experience/logistics schemas and explicit export projection                   | Database role denials and forbidden-column assertions in lifecycle integration tests; post-meeting links/axe in lifecycle E2E                                                                                            |
+| P26/P23             | `core/metrics`, `db/metrics`, fixed cohorts, suppressed snapshots, `/ops/metrics`, audited expiring readiness evidence                  | Fixture cohort definitions, distinct-member counting, incomplete outcomes and suppression unit/property tests; disjoint/fixed cohort and revoked-staff PostgreSQL tests                                                  |
+| P22 / I-18          | `db/lifecycle`, independent encrypted journal, version-aware media purge, worker maintenance, `replay-deletions`, readiness attestation | Real PostgreSQL erasure, pending export/erasure race, storage-failure receipt, old-backup restore/quarantine/replay, D5/D8/D11/D12/D13 expiry tests                                                                      |
+| P22 / I-12/I-20     | D9 closure clocks, finite encrypted case holds, `/ops/safety/retention`, narrow maintenance functions                                   | Hold/release/expiry, per-row audited view, denied app/learning/worker narrative access and revoked-staff tests                                                                                                           |
+| I-04/I-19           | Guarded explicit invitation; self-scoped history/receipt; shared/exclusive privacy barrier                                              | `lifecycle-architecture.test.ts`, reviewed M2 route/job inventory and existing M3/M4 block races; M5 block before invitation delivery                                                                                    |
+
+No M6 events/Go, model training, research build card, public deployment or real
+enrollment is included. Existing M2/M3/M4 race tests remain required. No new
+member-to-member path bypasses the central deny policy; own historical answers
+do not disclose current profiles or another member's response.
 
 2026-11-16 I-04 verification update (DEC-054):
 `tests/integration/safety.test.ts` gates the real block after it owns the member

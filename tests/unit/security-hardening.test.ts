@@ -25,6 +25,7 @@ function valid() {
     'MEDIA_ENCRYPTION_KEY',
     'SAFETY_ENCRYPTION_KEY',
     'LOOKUP_KEY',
+    'LIFECYCLE_ENCRYPTION_KEY',
   ])
     env[key] = randomBytes(32).toString('base64');
   for (const key of [

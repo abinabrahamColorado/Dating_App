@@ -139,7 +139,7 @@ export function ConcernForm({
         )}
       </section>
       <section className="panel form-stack">
-        <h2>Something important differed from their profile</h2>
+        <h2 id="integrity">Something important differed from their profile</h2>
         <p>
           This optional concern goes to a separate integrity review. A discrepancy alone does not
           prove deliberate misrepresentation.

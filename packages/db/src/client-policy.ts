@@ -11,6 +11,7 @@ export async function requireSupportedClient(
   suppliedVersion: string | null,
 ) {
   if (isSafetyAssistanceRoute(route, method)) return;
+  if (route === 'account/deletion-receipt' && method === 'GET') return;
   const version = clientVersionSchema.parse(suppliedVersion ?? safetyConfig.CLIENT_VERSION);
   const result = await store.app.query<{ disabled: boolean }>(
     'SELECT app.client_version_disabled($1) OR app.client_version_disabled($2) AS disabled',

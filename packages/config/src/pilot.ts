@@ -83,6 +83,8 @@ export const pilot = {
   INITIAL_VENUE_REVIEW_MAX: 20, // Spec P32.
   BACKUP_EXPIRY_DAYS: 30,
   DELETION_ACTIVE_STORES_DAYS: 30, // Spec P22.
+  DELETION_RECEIPT_DAYS: 60, // M5 receipt access covers active erasure and backup expiry, Spec P22.
+  READINESS_REVIEW_DAYS: 30, // M5 explicit expiry for human-reviewed P23 evidence.
 } as const;
 export const retention = {
   D1_RAW_GPS_COLLECTION_ENABLED: false, // Spec P22 D1; event-only scope, never collected.

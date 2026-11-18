@@ -38,6 +38,8 @@ export default function Page() {
           <Link href="/ops/explore">Review introductions</Link>
           {' · '}
           <Link href="/ops/venues">Manage approved public meeting places</Link>
+          {' · '}
+          <Link href="/ops/metrics">Outcomes & readiness</Link>
         </p>
         {!me ? (
           <p role="status">Checking access…</p>

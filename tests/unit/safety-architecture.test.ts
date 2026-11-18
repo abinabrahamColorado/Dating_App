@@ -50,15 +50,16 @@ it('I-04 architecture: every HTTP entry and worker is inventoried; new surfaces 
   // disclosure under an old name. Review any diff before updating these baselines;
   // a new member-data path must use withMemberPair and get a negative race test.
   const reviewedSelfAndInfrastructure: Record<string, string> = {
-    // M4 review: dispatches connections/venues only after current session,
-    // registration, client-version, CSRF and body checks; adapter inventory below.
-    'apps/web/server/api.ts': '606c4b446cf2d91c306448ae29c69ae02f2be63466acb0f1dae691e613d6add5',
+    // M5 review: readiness checked before member data; deletion needs current
+    // session, recent auth and CSRF, its bearer receipt is self-scoped. Feedback
+    // dispatch stays inside withSession and the separately inventoried adapter.
+    'apps/web/server/api.ts': '45f86aa2e2f658ab9e055ef8e8e2af13be8cc49ee8994c58e837145ef667129a',
     'apps/web/server/passkeys.ts':
       'b4f7600984751171bf430f0d4afe7760d26ba284fce4f5f90ccb3c1d151caa64',
     'apps/web/server/mail.ts': '3b8370eec4869db1751869ff9b3a5231e46653092ccba37561fc8c2da14b9a82',
-    // DEC-050 review: same inventoried jobs and guards; startup validation,
-    // fixed heartbeat/events and generic queue failures add no member-data access.
-    'apps/worker/src/main.ts': 'efda471f7382936d514e2e59ef3340d2a75eef2c0902862e8002030104323c99',
+    // M5 review: restore/journal startup guards and four inventoried maintenance
+    // jobs. Explicit invitations still use M4's separately guarded delivery job.
+    'apps/worker/src/main.ts': 'c203834b41d7a41e696b79a067a6b1a2af5262d08579e1b9e4718ac8f43b320e',
     'apps/worker/src/worker.ts': '86b623ad6a136d776d088b4caf53267b76fe7ef7f5ab7d88a66ec3736ba8d262',
   };
   for (const [path, hash] of Object.entries(reviewedSelfAndInfrastructure))
@@ -77,6 +78,7 @@ it('I-04 architecture: every HTTP entry and worker is inventoried; new surfaces 
       'api.ts',
       'connections-api.ts',
       'explore-api.ts',
+      'lifecycle-api.ts',
       'mail.ts',
       'media.ts',
       'passkeys.ts',
@@ -91,6 +93,7 @@ it('I-04 architecture: every HTTP entry and worker is inventoried; new surfaces 
   expect(files('apps/worker/src').sort()).toEqual([
     'apps/worker/src/connections.ts',
     'apps/worker/src/explore.ts',
+    'apps/worker/src/lifecycle.ts',
     'apps/worker/src/main.ts',
     'apps/worker/src/worker.ts',
   ]);
@@ -112,6 +115,10 @@ it('I-04 architecture: every HTTP entry and worker is inventoried; new surfaces 
     "'explore.deliver'",
     "'explore.mail'",
     "'explore.maintain'",
+    "'feedback.maintain'",
+    "'metrics.refresh'",
+    "'privacy.erase'",
+    "'privacy.retain'",
     'HEALTH_QUEUE',
   ]);
   const entry = parse('apps/web/app/api/v1/[...path]/route.ts');
@@ -169,6 +176,7 @@ it('I-04 I-12 architecture: existing account routes remain self-scoped; no new d
   expect(methods).toEqual(
     [
       'addPhoto',
+      'assertServingReady',
       'auditLog',
       'changePolicy',
       'consumeMagicLink',
@@ -215,6 +223,8 @@ it('I-04 I-12 architecture: existing account routes remain self-scoped; no new d
       'account/sessions',
       'account/sessions/revoke-others',
       'account/policy',
+      'account/policy', // body parsed once before the client-version deletion exception
+      'account/deletion-receipt',
       'profile',
       'preferences',
       'photos',

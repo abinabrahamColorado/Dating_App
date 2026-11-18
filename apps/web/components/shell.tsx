@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { AttentionMeasurement } from './attention';
 export function Shell({ children, member = false }: { children: ReactNode; member?: boolean }) {
   return (
     <>
+      {member && <AttentionMeasurement />}
       <a className="skip" href="#main">
         Skip to content
       </a>
@@ -15,6 +17,7 @@ export function Shell({ children, member = false }: { children: ReactNode; membe
             <>
               <Link href="/app">My profile</Link>
               <Link href="/explore">Introductions</Link>
+              <Link href="/feedback">After a meeting</Link>
               <Link href="/settings">Settings</Link>
               <Link href="/safety/cases">My reports</Link>
             </>

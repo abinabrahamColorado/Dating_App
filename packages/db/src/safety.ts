@@ -15,6 +15,8 @@ import {
 } from '@meetwell/core/safety';
 import { AccountStore, StoreError, transaction, type Authority } from './accounts';
 import { Envelope } from './encryption';
+import { holdCommandSchema, validHoldDates } from '@meetwell/core/legal-hold';
+import { retentionCutoffs } from '@meetwell/core/retention';
 
 type CaseRow = {
   id: string;
@@ -37,6 +39,91 @@ type Enforcement = {
 /** Only the safety service receives this pool/key. Serving imports member-access,
  * never this class to make a profile eligibility decision. */
 export class SafetyStore {
+  async retentionQueue(auth: Authority, requestId: string) {
+    return this.staff(auth, async (db) => {
+      const cutoff = retentionCutoffs(new Date()).safetyReview;
+      const rows = (
+        await db.query<{
+          id: string;
+          kind: 'report' | 'integrity' | 'appeal';
+          closed_at: Date | null;
+          reviewed_at: Date | null;
+          hold_version: number;
+          until_at: Date | null;
+          review_at: Date | null;
+          reason_cipher: string | null;
+          released_at: Date | null;
+        }>(
+          `SELECT r.*,coalesce(h.version,0) hold_version,h.until_at,h.review_at,h.reason_cipher,h.released_at FROM (
+          SELECT id,'report' kind,closed_at,reviewed_at,created_at FROM safety.report UNION ALL
+          SELECT id,'integrity',closed_at,reviewed_at,created_at FROM safety.integrity_signal UNION ALL
+          SELECT id,'appeal',closed_at,reviewed_at,created_at FROM safety.appeal
+        ) r LEFT JOIN safety.legal_holds h ON h.kind=r.kind AND h.record_id=r.id
+        WHERE coalesce(r.reviewed_at,r.created_at)<$1 OR (h.released_at IS NULL AND h.until_at>clock_timestamp())
+        ORDER BY coalesce(h.review_at,r.reviewed_at,r.created_at),r.id LIMIT $2`,
+          [cutoff, c.CASE_PAGE_SIZE],
+        )
+      ).rows;
+      for (const row of rows)
+        await this.audit(db, auth.memberId, row.id, 'RETENTION_VIEW', requestId);
+      return rows.map(({ reason_cipher, ...r }) => ({
+        ...r,
+        reason: reason_cipher
+          ? this.cipher.open<string>(reason_cipher, `hold:${r.kind}:${r.id}`)
+          : null,
+      }));
+    });
+  }
+  async hold(auth: Authority, key: string, input: unknown, requestId: string) {
+    const d = holdCommandSchema.parse(input),
+      table =
+        d.kind === 'report' ? 'report' : d.kind === 'integrity' ? 'integrity_signal' : 'appeal';
+    return this.staff(auth, (db) =>
+      this.command(db, auth, key, { action: 'retention', d }, async () => {
+        if (
+          !(await db.query(`SELECT id FROM safety.${table} WHERE id=$1 FOR UPDATE`, [d.recordId]))
+            .rowCount
+        )
+          throw new StoreError('NOT_FOUND');
+        const prior = (
+          await db.query(
+            'SELECT version FROM safety.legal_holds WHERE kind=$1 AND record_id=$2 FOR UPDATE',
+            [d.kind, d.recordId],
+          )
+        ).rows[0];
+        if ((prior?.version ?? 0) !== d.version) throw new StoreError('STALE_VERSION');
+        if (d.action === 'SET') {
+          const now = (await db.query<{ now: Date }>('SELECT clock_timestamp() AS now')).rows[0]!
+            .now;
+          if (!validHoldDates(new Date(d.until), new Date(d.review), now))
+            throw new StoreError('INVALID_INPUT');
+          await db.query(
+            `INSERT INTO safety.legal_holds(kind,record_id,reason_cipher,actor_id,until_at,review_at,version) VALUES($1,$2,$3,$4,$5,$6,1)
+          ON CONFLICT(kind,record_id) DO UPDATE SET reason_cipher=excluded.reason_cipher,actor_id=excluded.actor_id,until_at=excluded.until_at,review_at=excluded.review_at,version=safety.legal_holds.version+1,updated_at=clock_timestamp(),released_at=NULL`,
+            [
+              d.kind,
+              d.recordId,
+              this.cipher.seal(d.reason, `hold:${d.kind}:${d.recordId}`),
+              auth.memberId,
+              d.until,
+              d.review,
+            ],
+          );
+        } else if (d.action === 'RELEASE') {
+          if (!prior) throw new StoreError('NOT_FOUND');
+          await db.query(
+            'UPDATE safety.legal_holds SET released_at=clock_timestamp(),version=version+1 WHERE kind=$1 AND record_id=$2',
+            [d.kind, d.recordId],
+          );
+        }
+        await db.query(`UPDATE safety.${table} SET reviewed_at=clock_timestamp() WHERE id=$1`, [
+          d.recordId,
+        ]);
+        await this.audit(db, auth.memberId, d.recordId, `RETENTION_${d.action}`, requestId);
+        return { saved: true };
+      }),
+    );
+  }
   private readonly cipher: Envelope;
   constructor(
     readonly accounts: AccountStore,
