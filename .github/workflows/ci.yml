@@ -16,7 +16,7 @@ jobs:
       CI: 'true'
       NEXT_TELEMETRY_DISABLED: '1'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v4
         with:
           version: 12.11.2
@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build and health-check the documented development services
         run: docker compose up --build -d --wait --wait-timeout 120
       - name: Verify development and test database isolation
@@ -75,7 +75,7 @@ jobs:
       TEST_DATABASE_URL: postgresql://meetwell_test_admin:synthetic-ci-only@127.0.0.1:5432/meetwell_test
       PG_BIN_DIR: /usr/lib/postgresql/16/bin
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Scan full history for secrets, including scanner regression
