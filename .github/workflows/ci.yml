@@ -17,7 +17,7 @@ jobs:
       NEXT_TELEMETRY_DISABLED: '1'
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: 12.11.2
       - uses: actions/setup-node@v4
@@ -80,7 +80,7 @@ jobs:
           fetch-depth: 0
       - name: Scan full history for secrets, including scanner regression
         run: bash scripts/scan-secrets.sh
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: 12.11.2
       - uses: actions/setup-node@v4
