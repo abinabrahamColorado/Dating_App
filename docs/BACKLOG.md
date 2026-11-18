@@ -12,7 +12,11 @@ PR #11 merged at `37bb33f` after all six checks passed at `cdab890`; main CI
 43879455326 passed. Docs/design PR #9 merged at `cc61242` after update/green CI;
 main CI 43881320513 passed. M5 is implemented in
 [PR #22](https://github.com/abinabrahamColorado/Dating_App/pull/22); verification
-evidence is recorded in PROJECT_STATUS.md. Its PR must remain unmerged (DEC-053). Research build cards
+evidence is recorded in PROJECT_STATUS.md. It merged on 2026-11-18 at `83e3a23`.
+Main's dependency audit is now blocked by Next.js advisories GHSA-mfr8-8qww-v76h
+and GHSA-vc7v-qv4w-wrv8. Dependency PRs #13–#21 need founder merge approval;
+do not suppress the audit. The DEC-059 erasure correction is a separate PR.
+Research build cards
 remain unauthorized.
 Monitoring vendor selection waits for hosting. Plan self-hosted Uptime Kuma;
 no Sentry or vendor SDK. See [monitoring](operations/monitoring.md).
@@ -21,6 +25,11 @@ The earlier hosted preview remains an independent design reference.
 Local setup blocker (2026-11-16): Device Guard blocks the existing PostgreSQL
 executable. The PC's security administrator must review the policy; do not bypass
 it or claim local database checks passed. GitHub runners validate independently.
+
+DEC-059 recovery prerequisite: the operations owner must preserve the current
+safety denial set independently of old archives before any traffic promotion.
+Restore release fails closed without that source. Hosting must supply off-host
+custody/recovery and preserve the lookup key throughout the finite denial period.
 
 PR #11 integration verification is complete: DEC-054 repaired the block/profile
 race fixture's transaction ordering without weakening denial assertions. All six

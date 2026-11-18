@@ -1,12 +1,22 @@
 # Project status
 
-Updated 2026-11-16 (America/Chicago). Working name: **Meetwell**.
+Updated 2026-11-18 (America/Chicago). Working name: **Meetwell**.
 Pilot proposal: Manhattan, New York City; ages 18–30.
 
 Permanent checkout: `E:\Buisness\Dating_App`.
 Remote: `https://github.com/abinabrahamColorado/Dating_App`.
-Current milestone: M5, implemented in [PR #22](https://github.com/abinabrahamColorado/Dating_App/pull/22)
-on `codex/m5-feedback-outcomes-deletion`, based on `cc61242`. Leave it unmerged.
+M5 [PR #22](https://github.com/abinabrahamColorado/Dating_App/pull/22) merged with
+founder approval using a merge commit, `83e3a2377ec6aa1c20308958bd37177bb8db17c1`.
+Main run [44267728623](https://github.com/abinabrahamColorado/Dating_App/actions/runs/44267728623)
+failed the production dependency audit on two Next.js advisories; main is not
+green. No audit gate was weakened and no dependency PR is approved for merge.
+Current work: separate `codex/prevent-enforced-rejoin` security correction
+(DEC-059), not M6. New PR must remain unmerged. Dependabot #13–#21 are review only.
+Local correction checks: typecheck, lint, formatting and 55 unit tests passed.
+`corepack pnpm check` reached integration tests and stopped at PostgreSQL
+`ECONNREFUSED 127.0.0.1:55432`; database validation awaits hosted CI. The separate
+production build compiled/typechecked but exited with Next.js `SecurityFatalError`
+for the dependency advisories. No security warning or audit threshold was bypassed.
 Security PR #11 merged with founder approval at `37bb33f` after all six checks
 passed at `cdab890` (46 unit + 74 PostgreSQL + 18 browser/axe = 138 tests).
 Main CI 43879455326 passed all three quality jobs. DEC-054 records the focused,
@@ -20,8 +30,7 @@ passed `verify`, `windows`, and `dev-services` before the M5 branch was created.
 M5 is authorized exactly as CODEX_PROMPTS.md: feedback, attendance provenance,
 separate learning datasets/exports, optional success exits/follow-ups, fixed-cohort
 metrics, retention, deletion receipts and restore tombstone replay. Implementation
-and its 162-test suite are complete; PR #22 awaits founder review. A separate
-approval is required to merge. M6, design-motion integration, research
+and its 162-test suite are complete; PR #22 is now merged. M6, design-motion integration, research
 build cards, deployment and real enrollment are not authorized by this task.
 Monitoring remains the self-hosted Uptime Kuma plan, with vendor selection deferred
 until hosting and no Sentry/vendor SDK (DEC-053).

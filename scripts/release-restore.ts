@@ -5,12 +5,14 @@ import { lifecycleArtifacts } from '../packages/runtime/src/lifecycle';
 import { deletePhoto } from '../packages/runtime/src/media-storage';
 import { replayDeletions } from './replay-deletions';
 const url = process.env.RESTORE_DATABASE_URL,
+  safetyUrl = process.env.SAFETY_RESTORE_SOURCE_DATABASE_URL,
   digest = process.argv[2];
-if (!url || !digest)
+if (!url || !digest || !safetyUrl)
   throw Error(
-    'Set RESTORE_DATABASE_URL to the quarantined database; supply the independently verified current journal digest',
+    'Set RESTORE_DATABASE_URL and operator-only SAFETY_RESTORE_SOURCE_DATABASE_URL to the frozen current safety source; supply the independently verified current journal digest',
   );
 const pool = new Pool({ connectionString: url });
+const safetySource = new Pool({ connectionString: safetyUrl });
 try {
   const accounts = new AccountStore({
     app: pool,
@@ -20,7 +22,7 @@ try {
     identityKey: process.env.IDENTITY_ENCRYPTION_KEY ?? '',
     lookupKey: process.env.LOOKUP_KEY ?? '',
   });
-  await replayDeletions(url, accounts, lifecycleArtifacts(), digest, deletePhoto);
+  await replayDeletions(url, accounts, lifecycleArtifacts(), digest, deletePhoto, safetySource);
   process.stdout.write(
     'Deletion replay verified. Database readiness attested; deployment and traffic changes still require founder approval.\n',
   );
@@ -31,4 +33,5 @@ try {
   process.exitCode = 1;
 } finally {
   await pool.end();
+  await safetySource.end();
 }

@@ -169,8 +169,13 @@ export class AccountStore {
     });
   }
   /** Atomic DB budget; contains keyed tokens, never raw email/IP/location. */
-  async rateLimit(bucket: string, maximum: number, seconds: number): Promise<boolean> {
-    const result = await this.identity.query<{ requests: number }>(
+  async rateLimit(
+    bucket: string,
+    maximum: number,
+    seconds: number,
+    connection: Pool | PoolClient = this.identity,
+  ): Promise<boolean> {
+    const result = await connection.query<{ requests: number }>(
       `
       INSERT INTO identity.rate_limits(bucket, window_start, requests) VALUES($1, now(), 1)
       ON CONFLICT(bucket) DO UPDATE SET
@@ -184,29 +189,45 @@ export class AccountStore {
     return result.rows[0]!.requests <= maximum;
   }
   async requestMagicLink(email: string, browser: string): Promise<string | null> {
-    const allowed = await this.rateLimit(
-      `email:${this.lookup(email)}`,
-      config.AUTH_REQUESTS_PER_HOUR,
-      3600,
-    );
+    email = email.trim().toLowerCase();
     const global = await this.rateLimit('auth:global', config.AUTH_GLOBAL_REQUESTS_PER_HOUR, 3600);
-    if (!allowed || !global) return null; // Same external response as successful delivery.
-    const id = randomUUID(),
-      token = newToken();
-    await this.identity.query(
-      `INSERT INTO identity.magic_links
-      (id,email_lookup,payload_cipher,token_hash,browser_hash,expires_at)
-      VALUES($1,$2,$3,$4,$5,now() + $6 * interval '1 minute')`,
-      [
-        id,
-        this.lookup(email),
-        this.identityCipher.seal({ email, token }, `magic:${id}`),
-        hashToken(token),
-        hashToken(browser),
-        config.MAGIC_LINK_MINUTES,
-      ],
-    );
-    return id;
+    if (!global) return null;
+    return transaction(this.identity, async (db) => {
+      if (
+        (
+          await db.query<{ denied: boolean }>('SELECT identity.signup_denied($1) AS denied', [
+            this.lookup(email),
+          ])
+        ).rows[0]!.denied
+      )
+        return null;
+      // Denied requests retain no extra email-keyed counters outside safety.
+      if (
+        !(await this.rateLimit(
+          `email:${this.lookup(email)}`,
+          config.AUTH_REQUESTS_PER_HOUR,
+          3600,
+          db,
+        ))
+      )
+        return null;
+      const id = randomUUID(),
+        token = newToken();
+      await db.query(
+        `INSERT INTO identity.magic_links
+         (id,email_lookup,payload_cipher,token_hash,browser_hash,expires_at)
+         VALUES($1,$2,$3,$4,$5,now() + $6 * interval '1 minute')`,
+        [
+          id,
+          this.lookup(email),
+          this.identityCipher.seal({ email, token }, `magic:${id}`),
+          hashToken(token),
+          hashToken(browser),
+          config.MAGIC_LINK_MINUTES,
+        ],
+      );
+      return id;
+    });
   }
   /** Each message commits independently, so a poison row cannot roll back prior sends.
    * The adapter MUST bound SMTP waits. SKIP LOCKED permits concurrent runners without
@@ -265,6 +286,14 @@ export class AccountStore {
       );
       const link = consumed.rows[0];
       if (!link) throw new StoreError('INVALID_LINK');
+      if (
+        (
+          await db.query<{ denied: boolean }>('SELECT identity.signup_denied($1) AS denied', [
+            link.email_lookup,
+          ])
+        ).rows[0]!.denied
+      )
+        throw new StoreError('INVALID_LINK');
       const { email } = this.identityCipher.open<{ email: string }>(
         link.payload_cipher,
         `magic:${link.id}`,

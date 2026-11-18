@@ -370,9 +370,12 @@ it('I-18 I-12 erasure removes primary records, media versions, snapshots and bat
   expect((await artifacts.readJournal()).entries.some((t) => t.memberId === p.a.memberId)).toBe(
     true,
   );
-  await expect(f.worker.query('SELECT ops.erase_primary($1)', [p.b.memberId])).rejects.toThrow(
-    'Durable tombstone required',
-  );
+  await expect(
+    f.worker.query('SELECT ops.erase_primary($1,$2)', [
+      p.b.memberId,
+      retention.D9_SAFETY_AFTER_CLOSURE_MONTHS,
+    ]),
+  ).rejects.toThrow('Durable tombstone required');
   await expect(
     f.app.query('INSERT INTO app.members(id) VALUES($1)', [p.a.memberId]),
   ).rejects.toThrow('Identifier retired');
@@ -571,6 +574,11 @@ it('I-18 P22 restoring an older backup cannot serve until the latest independent
     archive = join(directory, `${randomUUID()}.mwbackup`),
     backupKey = randomBytes(32).toString('base64');
   await backupDatabase(f.url, archive, backupKey);
+  // Enforcement occurred after the backup and cannot be inferred from it.
+  await f.safety.query(
+    'INSERT INTO safety.enforcement(member_id,restricted,version) VALUES($1,true,1)',
+    [p.a.memberId],
+  );
   await privacy.request(p.a, randomUUID(), (await f.accounts.policy(p.a.memberId)).version);
   await lifecycle.eraseOne();
   const digest = (await artifacts.readJournal()).digest,
@@ -586,12 +594,29 @@ it('I-18 P22 restoring an older backup cannot serve until the latest independent
       'RESTORE_QUARANTINED',
     );
     await expect(
-      replayDeletions(target.toString(), f.accounts, artifacts, '0'.repeat(64), deletePhoto),
+      replayDeletions(
+        target.toString(),
+        f.accounts,
+        artifacts,
+        '0'.repeat(64),
+        deletePhoto,
+        f.admin,
+      ),
     ).rejects.toThrow('Latest independent journal');
     await expect(pool.query('SELECT app.assert_serving_ready()')).rejects.toThrow(
       'RESTORE_QUARANTINED',
     );
-    await replayDeletions(target.toString(), f.accounts, artifacts, digest, deletePhoto);
+    await expect(
+      replayDeletions(target.toString(), f.accounts, artifacts, digest, deletePhoto, pool),
+    ).rejects.toThrow('Independent current safety source');
+    await replayDeletions(target.toString(), f.accounts, artifacts, digest, deletePhoto, f.admin);
+    expect(
+      (
+        await pool.query('SELECT identity.signup_denied($1) AS denied', [
+          f.accounts.lookup(`${p.a.memberId}@synthetic.invalid`),
+        ])
+      ).rows[0].denied,
+    ).toBe(true);
     await expect(pool.query('SELECT app.assert_serving_ready()')).resolves.toBeDefined();
     expect(
       (await pool.query('SELECT 1 FROM app.profiles WHERE member_id=$1', [p.a.memberId])).rowCount,
